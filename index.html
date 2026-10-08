@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Model → MP4 + Görünümler</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17242d;--mute:#5d6d78;--panel:#f6f7f8;--line:#d5dade;--accent:#1f4fd8;--stage:#b9c3cb}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:#151515;display:grid;grid-template-columns:1fr 350px}
+#stage{position:relative;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0;min-width:0;background:linear-gradient(180deg,#0f1011 0%,#151617 62%,#1e2022 100%)}
+#cv{width:100%;height:100%;object-fit:contain;display:block;touch-action:none;cursor:grab;border-radius:12px;box-shadow:0 22px 70px rgba(0,0,0,.42)}
+#cv:active{cursor:grabbing}
+#cv.tr{background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
+#drop{position:absolute;inset:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed #7d8b95;color:#3a4953;text-align:center;pointer-events:none;background:rgba(246,247,248,.55)}
+#drop b{font-size:20px;font-weight:600}
+#stage.over #drop{border-color:var(--accent);background:rgba(31,79,216,.12)}
+#stage.has #drop{display:none}
+#toast{position:absolute;left:24px;right:24px;top:24px;background:#b3261e;color:#fff;padding:10px 14px;border-radius:4px;display:none;font-weight:500}
+aside{background:var(--panel);border-left:1px solid var(--line);padding:18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+h1{font-size:18px;font-weight:600;margin:0}
+.sub{color:var(--mute);margin:2px 0 0}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:10px}
+legend{font-weight:600;padding:0;margin-bottom:8px}
+label{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center}
+label>span:last-child{color:var(--mute);font-variant-numeric:tabular-nums}
+label input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.row{display:flex;gap:10px}
+.row label{flex:1;grid-template-columns:1fr}
+select,input[type=color]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 6px}
+input[type=color]{padding:2px}
+.chk{grid-template-columns:auto 1fr;justify-content:start;gap:8px}
+button,.btn{font:inherit;font-weight:600;border-radius:4px;border:1px solid var(--ink);background:#fff;color:var(--ink);height:38px;padding:0 14px;cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button.primary,.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;display:none}
+#bar i{display:block;height:100%;width:0;background:var(--accent)}
+#msg{color:var(--mute);min-height:20px}
+#msg.err{color:#b3261e}
+#res{display:none;gap:8px;flex-direction:column}
+#res video{width:100%;background:#000}
+#gal{display:none;grid-template-columns:repeat(3,1fr);gap:6px}
+#gal button{display:block;font-size:12px;font-weight:500;height:auto;padding:0;border:0;background:none}
+#gal img{width:100%;aspect-ratio:1;object-fit:contain;background:#dfe3e6;border:1px solid var(--line);display:block}
+#photos{display:flex;flex-wrap:wrap;gap:6px}
+#photos img{width:56px;height:40px;object-fit:cover;border:2px solid var(--line);cursor:pointer}
+#photos img.sel{border-color:var(--accent)}
+.xyz{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.xyz label{grid-template-columns:1fr}
+input[type=number]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 6px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.three button,.small{height:32px}
+#lb{position:fixed;inset:0;background:rgba(10,16,20,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9;padding:20px}
+#lb img{max-width:92vw;max-height:80vh;object-fit:contain;background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
+.lbb{display:flex;gap:10px}
+.hd{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}#lang{width:auto;min-width:92px;flex:none}
+[dir=rtl] aside{border-left:0;border-right:1px solid var(--line)}
+input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 8px}
+.qv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.qv button{height:30px;padding:0 4px;font-size:12px}
+#stats{font-size:12px}
+@media(max-width:860px){body{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto}aside{border-left:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<main id="stage">
+  <canvas id="cv" width="1280" height="720"></canvas>
+  <div id="drop"><b>Modeli buraya bırak</b><span>STL, 3MF veya OBJ (birden fazla olabilir). Arka plan için bir resim de bırakabilirsin.</span></div>
+  <div id="toast"></div>
+</main>
+<aside>
+  <div class="hd">
+    <div><h1 data-i="title"></h1><p class="sub" data-i="sub"></p></div>
+    <select id="lang" aria-label="Language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
+  </div>
+  <button id="open" class="primary" data-i="open"></button>
+  <input id="file" type="file" accept=".stl,.3mf,.obj" multiple hidden>
+  <select id="models" style="display:none"></select>
+  <div id="info" class="sub"></div>
+  <div id="stats" class="sub"></div>
+  <div class="two"><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
+
+  <fieldset>
+    <legend data-i="g_bg"></legend>
+    <label><span data-i="scene"></span><select id="bg">
+      <optgroup data-g="grp_3d">
+        <option value="office" data-i="b_office"></option><option value="shelf" data-i="b_shelf"></option><option value="workshop" data-i="b_work"></option><option value="desk" data-i="b_desk"></option>
+        <option value="studio_pro" data-i="b_studiopro"></option><option value="loft" data-i="b_loft"></option><option value="minimal" data-i="b_minimal"></option><option value="darkroom" data-i="b_darkroom"></option>
+      </optgroup>
+      <optgroup data-g="grp_simple">
+        <option value="studio" data-i="b_studio"></option><option value="grad" data-i="b_grad"></option><option value="solid" data-i="b_solid"></option><option value="concrete" data-i="b_conc"></option><option value="outdoor" data-i="b_out"></option><option value="forest" data-i="b_forest"></option><option value="beach" data-i="b_beach"></option><option value="citynight" data-i="b_citynight"></option><option value="gradient_pro" data-i="b_gradpro"></option><option value="photo" data-i="b_photo"></option><option value="transparent" data-i="b_trans"></option>
+      </optgroup>
+      <optgroup data-g="grp_photo">
+        <option value="p1" data-i="s1"></option><option value="p2" data-i="s2"></option><option value="p3" data-i="s3"></option><option value="p4" data-i="s4"></option><option value="p5" data-i="s5"></option>
+        <option value="p6" data-i="s6"></option><option value="p7" data-i="s7"></option><option value="p8" data-i="s8"></option><option value="p9" data-i="s9"></option><option value="p10" data-i="s10"></option>
+        <option value="p11" data-i="s11"></option><option value="p12" data-i="s12"></option><option value="p13" data-i="s13"></option><option value="p14" data-i="s14"></option><option value="p15" data-i="s15"></option>
+      </optgroup>
+    </select></label>
+    <div class="row" id="cols">
+      <label><span data-i="c1"></span><input id="cb" type="color" value="#eef1f4"></label>
+      <label><span data-i="c2"></span><input id="cb2" type="color" value="#aab6c0"></label>
+    </div>
+    <label><span data-i="blur"></span><span id="vBl">0</span><input id="blur" type="range" min="0" max="30" step="1" value="0"></label>
+    <div id="photos"></div>
+    <button id="pickPhoto" class="small" data-i="addphoto"></button>
+    <input id="photo" type="file" accept="image/*" multiple hidden>
+    <label class="chk"><input id="sh" type="checkbox" checked><span data-i="shadow"></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_harm"></legend>
+    <label><span data-i="h_az"></span><span id="vLa">0°</span><input id="la" type="range" min="-90" max="90" step="1" value="35"></label>
+    <label><span data-i="h_warm"></span><span id="vLw">0</span><input id="lw" type="range" min="-100" max="100" step="1" value="0"></label>
+    <label><span data-i="h_str"></span><span id="vLs">1.00</span><input id="ls" type="range" min="0.3" max="1.8" step="0.05" value="1"></label>
+    <label><span data-i="h_sh"></span><span id="vSa">0.28</span><input id="sa" type="range" min="0" max="0.8" step="0.02" value="0.28"></label>
+    <label><span data-i="h_vs"></span><span id="vVs">0%</span><input id="vs" type="range" min="-30" max="30" step="1" value="0"></label>
+    <div class="row">
+      <label><span data-i="h_tint"></span><input id="ct" type="color" value="#ff9a3c"></label>
+      <label><span data-i="h_tints"></span><input id="ts" type="range" min="0" max="60" step="1" value="0"></label>
+    </div>
+    <button id="autoH" class="small" data-i="h_auto"></button>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_model"></legend>
+    <div class="row">
+      <label><span data-i="mat"></span><select id="mat"><option value="plastik" data-i="m1"></option><option value="mat" data-i="m2"></option><option value="parlak" data-i="m3"></option><option value="kil" data-i="m4"></option><option value="metal" data-i="m5"></option><option value="cam" data-i="m6"></option></select></label>
+      <label><span data-i="col"></span><input id="cm" type="color" value="#d8d2c6"></label>
+    </div>
+    <div class="row">
+      <label><span data-i="upax"></span><select id="up"><option value="z">Z (STL, 3MF)</option><option value="y">Y (OBJ)</option></select></label>
+      <label><span data-i="dir"></span><select id="dir"><option value="1" data-i="ccw"></option><option value="-1" data-i="cw"></option></select></label>
+    </div>
+    <label class="chk"><input id="wf" type="checkbox"><span data-i="wire"></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_tr"></legend>
+    <div class="xyz">
+      <label><span data-i="rot" data-s=" X°"></span><input id="rx" type="number" step="15" value="0"></label>
+      <label><span data-i="rot" data-s=" Y°"></span><input id="ry" type="number" step="15" value="0"></label>
+      <label><span data-i="rot" data-s=" Z°"></span><input id="rz" type="number" step="15" value="0"></label>
+    </div>
+    <div class="three"><button id="bx">X +90°</button><button id="by">Y +90°</button><button id="bz">Z +90°</button></div>
+    <div class="xyz">
+      <label><span data-i="pos" data-s=" X (mm)"></span><input id="px" type="number" step="1" value="0"></label>
+      <label><span data-i="pos" data-s=" Y (mm)"></span><input id="py" type="number" step="1" value="0"></label>
+      <label><span data-i="pos" data-s=" Z (mm)"></span><input id="pz" type="number" step="1" value="0"></label>
+    </div>
+    <label><span data-i="scale"></span><span id="vSc">1.00</span><input id="sc" type="range" min="0.2" max="3" step="0.01" value="1"></label>
+    <div class="two"><button id="trReset" class="small" data-i="reset"></button><button id="flat" class="small" data-i="flat"></button></div>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_cam"></legend>
+    <label><span data-i="el"></span><span id="vEl">22°</span><input id="el" type="range" min="-85" max="85" step="1" value="22"></label>
+    <label><span data-i="zoom"></span><span id="vZm">1.00</span><input id="zm" type="range" min="0.3" max="4" step="0.01" value="1"></label>
+    <label><span data-i="cam_motion"></span><select id="camo"><option value="none" data-i="cm_none"></option><option value="orbit" data-i="cm_orbit"></option><option value="sine" data-i="cm_sine"></option><option value="dolly" data-i="cm_dolly"></option><option value="crane" data-i="cm_crane"></option></select></label>
+    <div class="sub" data-i="qv"></div>
+    <div class="qv"><button data-qv="0,0" data-i="v_front"></button><button data-qv="180,0" data-i="v_back"></button><button data-qv="-90,0" data-i="v_right"></button><button data-qv="90,0" data-i="v_left"></button><button data-qv="0,85" data-i="v_top"></button><button data-qv="0,-85" data-i="v_bot"></button><button data-qv="45,35" data-i="v_iso"></button></div>
+    <label class="chk"><input id="bob" type="checkbox"><span data-i="bob"></span></label>
+    <label class="chk"><input id="ortho" type="checkbox" checked><span data-i="ortho"></span></label>
+    <label class="chk"><input id="iso" type="checkbox"><span data-i="iso"></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_out"></legend>
+    <div class="row">
+      <label><span data-i="resol"></span><select id="res">
+        <option value="1280x720">1280×720</option><option value="1920x1080" selected>1920×1080</option>
+        <option value="1080x1080">1080×1080</option><option value="1080x1920">1080×1920</option><option value="3840x2160">3840×2160 (4K)</option>
+      </select></label>
+      <label><span data-i="fmt"></span><select id="fmt"><option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select></label>
+    </div>
+    <div class="row">
+      <label><span>FPS</span><select id="fps"><option>24</option><option selected>30</option><option>60</option></select></label>
+      <label><span data-i="turns"></span><select id="turns"><option>1</option><option>2</option><option>3</option></select></label>
+    </div>
+    <label><span data-i="dur"></span><span id="vDur">6</span><input id="dur" type="range" min="2" max="30" step="1" value="6"></label>
+    <label><span data-i="q"></span><span id="vBr">12 Mbps</span><input id="br" type="range" min="2" max="40" step="1" value="12"></label>
+    <label class="chk"><input id="cap" type="checkbox"><span data-i="cap"></span></label>
+    <label><span data-i="capt"></span><input id="capt" type="text" value=""></label>
+    <label class="chk"><input id="gif" type="checkbox"><span data-i="gif"></span></label>
+    <label><span data-i="gif_q"></span><select id="gifq"><option value="low" data-i="gq_low"></option><option value="mid" selected data-i="gq_mid"></option><option value="high" data-i="gq_high"></option></select></label>
+    <label class="chk"><input id="sheet" type="checkbox"><span data-i="sheet"></span></label>
+    <label><span data-i="save"></span><select id="sv"><option value="dl" data-i="sv1"></option><option value="dir" data-i="sv2"></option></select></label>
+    <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
+  </fieldset>
+
+  <button id="all" class="primary" disabled data-i="go"></button>
+  <div class="two"><button id="onlyV" disabled data-i="onlyv"></button><button id="onlyI" disabled data-i="onlyi"></button></div>
+  <button id="batch" style="display:none" disabled data-i="batch"></button>
+  <div id="bar"><i></i></div>
+  <div id="msg"></div>
+  <div id="res"><video id="vid" controls loop></video><a id="dl" class="btn primary"></a></div>
+  <div id="gal"></div>
+  <button id="redl" style="display:none" data-i="redl"></button>
+</aside>
+<div id="lb"><img id="lbi" alt=""><div class="lbb"><a id="lbd" class="btn primary"></a><button id="lbcp" data-i="copy"></button><button id="lbc" data-i="close"></button></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
+<script>
+/* REF artık kullanılmıyor - preset'ler prosedürel çizilecek */
+const REF = '';
+
+/* ---------- Çeviri sözlüğü ---------- */
+const DICT_RAW = `title=3D model → MP4 ve görünümler|3D model → MP4 & views|3D-Modell → MP4 & Ansichten|Modèle 3D → MP4 et vues|Modelo 3D → MP4 y vistas|3D-модель → MP4 и виды|نموذج ثلاثي الأبعاد ← MP4 ومناظر
+sub=Tarayıcıda çalışır, dosyalar yüklenmez.|Runs in your browser, files are never uploaded.|Läuft im Browser, Dateien werden nicht hochgeladen.|Fonctionne dans le navigateur, aucun fichier envoyé.|Funciona en el navegador, no se suben archivos.|Работает в браузере, файлы не загружаются.|يعمل في المتصفح ولا يتم رفع الملفات.
+open=Model aç (STL / 3MF / OBJ)|Open model (STL / 3MF / OBJ)|Modell öffnen (STL / 3MF / OBJ)|Ouvrir un modèle (STL / 3MF / OBJ)|Abrir modelo (STL / 3MF / OBJ)|Открыть модель (STL / 3MF / OBJ)|فتح نموذج (STL / 3MF / OBJ)
+drop1=Modeli buraya bırak|Drop the model here|Modell hier ablegen|Déposez le modèle ici|Suelta el modelo aquí|Перетащите модель сюда|أسقط النموذج هنا
+drop2=STL, 3MF veya OBJ (birden fazla olabilir). Arka plan için bir resim de bırakabilirsin.|STL, 3MF or OBJ (several allowed). You can also drop an image as background.|STL, 3MF oder OBJ (mehrere möglich). Auch ein Bild als Hintergrund.|STL, 3MF ou OBJ (plusieurs possibles). Vous pouvez aussi déposer une image d'arrière-plan.|STL, 3MF u OBJ (varios). También puedes soltar una imagen de fondo.|STL, 3MF или OBJ (можно несколько). Можно также перетащить изображение для фона.|STL أو 3MF أو OBJ (عدة ملفات). يمكنك أيضًا إسقاط صورة كخلفية.
+fs=Tam ekran|Fullscreen|Vollbild|Plein écran|Pantalla completa|Во весь экран|ملء الشاشة
+pause=Duraklat|Pause|Pause|Pause|Pausa|Пауза|إيقاف مؤقت
+play=Oynat|Play|Abspielen|Lecture|Reproducir|Играть|تشغيل
+g_bg=Arka plan|Background|Hintergrund|Arrière-plan|Fondo|Фон|الخلفية
+g_harm=Uyum (ışık ve konum)|Harmony (light & position)|Harmonie (Licht & Position)|Harmonie (lumière et position)|Armonía (luz y posición)|Гармония (свет и позиция)|التناسق (الضوء والموضع)
+g_model=Model|Model|Modell|Modèle|Modelo|Модель|النموذج
+g_tr=Model konumu, dönüşü ve ölçeği|Model position, rotation & scale|Modellposition, Drehung & Skalierung|Position, rotation et échelle|Posición, rotación y escala|Положение, поворот и масштаб|موضع النموذج ودورانه وحجمه
+g_cam=Kamera|Camera|Kamera|Caméra|Cámara|Камера|الكاميرا
+g_out=Çıktı|Output|Ausgabe|Sortie|Salida|Вывод|المخرجات
+grp_photo=Fotoğraf sahneleri|Photo scenes|Fotoszenen|Scènes photo|Escenas de foto|Фото-сцены|مشاهد صور
+grp_3d=3B ortamlar|3D environments|3D-Umgebungen|Environnements 3D|Entornos 3D|3D-окружения|بيئات ثلاثية الأبعاد
+grp_simple=Basit arka planlar|Simple backgrounds|Einfache Hintergründe|Arrière-plans simples|Fondos simples|Простые фоны|خلفيات بسيطة
+scene=Ortam|Scene|Szene|Scène|Escena|Сцена|المشهد
+s1=Masa|Desk|Schreibtisch|Bureau|Escritorio|Стол|مكتب
+s2=Pencere ışığı|Window light|Fensterlicht|Lumière de fenêtre|Luz de ventana|Свет из окна|ضوء النافذة
+s3=Bitki|Plant|Pflanze|Plante|Planta|Растение|نبتة
+s4=Kitaplık|Bookshelf|Bücherregal|Bibliothèque|Estantería|Книжная полка|رف الكتب
+s5=Ayna görüntü|Mirrored|Gespiegelt|Miroir|Espejo|Зеркально|معكوس
+s6=Gün batımı|Sunset|Sonnenuntergang|Coucher de soleil|Atardecer|Закат|غروب
+s7=Sabah serinliği|Cool morning|Kühler Morgen|Matin frais|Mañana fría|Прохладное утро|صباح بارد
+s8=Gece lambası|Night lamp|Nachtlampe|Lampe de nuit|Lámpara nocturna|Ночник|مصباح ليلي
+s9=Siyah-beyaz|Black & white|Schwarzweiß|Noir et blanc|Blanco y negro|Чёрно-белый|أبيض وأسود
+s10=Aydınlık ofis|Bright office|Helles Büro|Bureau lumineux|Oficina luminosa|Светлый офис|مكتب مضيء
+s11=Stüdyo beyaz|Studio white|Studio weiß|Studio blanc|Estudio blanco|Белая студия|استوديو أبيض
+s12=Sinematik|Cinematic|Cinematisch|Cinématique|Cinemático|Кинематограф|سينمائي
+s13=Soft pembe|Soft pink|Weiches Rosa|Rose doux|Rosa suave|Мягкий розовый|وردي ناعم
+s14=Mavi saat|Blue hour|Blaue Stunde|Heure bleue|Hora azul|Синий час|الساعة الزرقاء
+s15=Yeşil doğa|Green nature|Grüne Natur|Nature verte|Naturaleza verde|Зелёная природа|الطبيعة الخضراء
+b_office=Çalışma ofisi|Office|Büro|Bureau|Oficina|Офис|مكتب عمل
+b_shelf=Kitaplık|Bookshelf|Regal|Bibliothèque|Estantería|Полка|رف
+b_work=Atölye|Workshop|Werkstatt|Atelier|Taller|Мастерская|ورشة
+b_desk=Ahşap masa|Wood desk|Holztisch|Bureau en bois|Mesa de madera|Деревянный стол|مكتب خشبي
+b_studiopro=Pro stüdyo|Pro studio|Profi-Studio|Studio pro|Estudio pro|Про-студия|استوديو احترافي
+b_loft=Endüstriyel loft|Industrial loft|Industrie-Loft|Loft industriel|Loft industrial|Индустриальный лофт|لوفت صناعي
+b_minimal=Minimal galeri|Minimal gallery|Minimal-Galerie|Galerie minimale|Galería minimal|Минимал-галерея|معرض بسيط
+b_darkroom=Karanlık oda|Dark room|Dunkelraum|Chambre noire|Cuarto oscuro|Тёмная комната|غرفة مظلمة
+b_studio=Stüdyo|Studio|Studio|Studio|Estudio|Студия|استوديو
+b_grad=Degrade|Gradient|Verlauf|Dégradé|Degradado|Градиент|تدرج
+b_solid=Düz renk|Solid colour|Einfarbig|Couleur unie|Color liso|Однотонный|لون موحد
+b_conc=Beton|Concrete|Beton|Béton|Hormigón|Бетон|خرسانة
+b_out=Dış mekan|Outdoor|Draußen|Extérieur|Exterior|На улице|خارجي
+b_forest=Orman|Forest|Wald|Forêt|Bosque|Лес|غابة
+b_beach=Plaj|Beach|Strand|Plage|Playa|Пляж|شاطئ
+b_citynight=Şehir gecesi|City night|Stadt bei Nacht|Ville la nuit|Ciudad de noche|Ночной город|مدينة ليلاً
+b_gradpro=Renkli degrade|Colour gradient|Farbverlauf|Dégradé couleur|Degradado color|Цветной градиент|تدرج ملون
+b_photo=Fotoğraflarım|My photos|Meine Fotos|Mes photos|Mis fotos|Мои фото|صوري
+b_trans=Şeffaf (PNG/WebP)|Transparent (PNG/WebP)|Transparent (PNG/WebP)|Transparent (PNG/WebP)|Transparente (PNG/WebP)|Прозрачный (PNG/WebP)|شفاف (PNG/WebP)
+c1=Renk 1|Colour 1|Farbe 1|Couleur 1|Color 1|Цвет 1|اللون 1
+c2=Renk 2|Colour 2|Farbe 2|Couleur 2|Color 2|Цвет 2|اللون 2
+blur=Arka plan bulanıklığı|Background blur|Hintergrundunschärfe|Flou d'arrière-plan|Desenfoque de fondo|Размытие фона|ضبابية الخلفية
+addphoto=Fotoğraf ekle|Add photo|Foto hinzufügen|Ajouter une photo|Añadir foto|Добавить фото|إضافة صورة
+shadow=Zemin gölgesi|Floor shadow|Bodenschatten|Ombre au sol|Sombra en el suelo|Тень на полу|ظل الأرضية
+h_az=Işık yönü|Light direction|Lichtrichtung|Direction de la lumière|Dirección de la luz|Направление света|اتجاه الضوء
+h_warm=Işık sıcaklığı|Light warmth|Lichtwärme|Chaleur de la lumière|Calidez de la luz|Тёплота света|دفء الضوء
+h_str=Işık gücü|Light strength|Lichtstärke|Intensité|Intensidad|Яркость света|شدة الضوء
+h_sh=Gölge yoğunluğu|Shadow strength|Schattenstärke|Force de l'ombre|Fuerza de sombra|Плотность тени|قوة الظل
+h_vs=Model dikey konumu|Model vertical position|Vertikale Modellposition|Position verticale|Posición vertical|Вертикальное положение|الموضع العمودي
+h_tint=Ton rengi|Tint colour|Tönung|Teinte|Tinte|Оттенок|لون الصبغة
+h_tints=Ton gücü|Tint strength|Tönungsstärke|Force de la teinte|Fuerza de tinte|Сила оттенка|قوة الصبغة
+h_auto=Sahneye göre otomatik uyumla|Auto-match to scene|Automatisch an Szene anpassen|Ajuster à la scène|Ajustar a la escena|Подогнать под сцену|مطابقة تلقائية للمشهد
+mat=Malzeme|Material|Material|Matière|Material|Материал|الخامة
+m1=Plastik|Plastic|Kunststoff|Plastique|Plástico|Пластик|بلاستيك
+m2=Mat|Matte|Matt|Mat|Mate|Матовый|مطفي
+m3=Parlak|Glossy|Glänzend|Brillant|Brillante|Глянцевый|لامع
+m4=Kil|Clay|Ton|Argile|Arcilla|Глина|طين
+m5=Metal|Metal|Metall|Métal|Metal|Металл|معدن
+m6=Cam|Glass|Glas|Verre|Vidrio|Стекло|زجاج
+col=Renk|Colour|Farbe|Couleur|Color|Цвет|اللون
+upax=Yukarı eksen|Up axis|Aufwärtsachse|Axe vertical|Eje vertical|Ось вверх|المحور الرأسي
+dir=Dönüş yönü|Spin direction|Drehrichtung|Sens de rotation|Dirección de giro|Направление вращения|اتجاه الدوران
+ccw=Saat yönü tersi|Counter-clockwise|Gegen den Uhrzeigersinn|Sens antihoraire|Antihorario|Против часовой|عكس عقارب الساعة
+cw=Saat yönü|Clockwise|Im Uhrzeigersinn|Sens horaire|Horario|По часовой|مع عقارب الساعة
+wire=Tel kafes|Wireframe|Drahtgitter|Fil de fer|Malla de alambre|Каркас|إطار سلكي
+rot=Dönüş|Rotation|Drehung|Rotation|Rotación|Поворот|دوران
+pos=Konum|Position|Position|Position|Posición|Позиция|الموضع
+scale=Ölçek|Scale|Skalierung|Échelle|Escala|Масштаб|الحجم
+reset=Konumu ve dönüşü sıfırla|Reset position & rotation|Position & Drehung zurücksetzen|Réinitialiser position et rotation|Restablecer posición y rotación|Сбросить положение и поворот|إعادة ضبط الموضع والدوران
+flat=Düz yüzeye yatır (otomatik)|Lay flat (auto)|Flach legen (automatisch)|Poser à plat (auto)|Apoyar plano (auto)|Положить плашмя (авто)|وضع مسطح (تلقائي)
+el=Bakış açısı|Elevation|Blickwinkel|Angle de vue|Ángulo de vista|Угол обзора|زاوية النظر
+zoom=Yakınlaştırma (fare tekeri / iki parmak)|Zoom (mouse wheel / pinch)|Zoom (Mausrad / Pinch)|Zoom (molette / pincement)|Zoom (rueda / pellizco)|Масштаб (колесо / щипок)|تكبير (عجلة الفأرة / قرص)
+cam_motion=Kamera hareketi|Camera motion|Kamerabewegung|Mouvement caméra|Movimiento de cámara|Движение камеры|حركة الكاميرا
+cm_none=Sabit|Static|Statisch|Statique|Estático|Статично|ثابت
+cm_orbit=Yörünge (yatay)|Orbit (horizontal)|Orbit (horizontal)|Orbite (horizontale)|Órbita (horizontal)|Орбита (горизонт.)|مدار (أفقي)
+cm_sine=Sinüs salınımı|Sine wave|Sinus-Welle|Onde sinusoïdale|Onda senoidal|Синусоида|موجة جيبية
+cm_dolly=Dolly zoom|Dolly zoom|Dolly-Zoom|Dolly zoom|Dolly zoom|Долли-зум|دولي زوم
+cm_crane=Vinç (yukarı-aşağı)|Crane (up-down)|Kran (auf-ab)|Grue (haut-bas)|Grúa (arriba-abajo)|Кран (вверх-вниз)|رافعة (أعلى-أسفل)
+bob=Videoda kamera yukarı aşağı salınsın|Camera bobs up and down in video|Kamera schwankt im Video|La caméra oscille dans la vidéo|La cámara oscila en el vídeo|Камера покачивается в видео|تتأرجح الكاميرا في الفيديو
+ortho=Görünüm resimlerinde ortografik kamera|Orthographic camera for view images|Orthografische Kamera für Ansichten|Caméra orthographique pour les vues|Cámara ortográfica para las vistas|Ортографическая камера для видов|كاميرا متعامدة للمناظر
+iso=Ek olarak izometrik görünüm|Add isometric view|Isometrische Ansicht hinzufügen|Ajouter une vue isométrique|Añadir vista isométrica|Добавить изометрию|إضافة منظر أيزومتري
+qv=Hızlı bakış|Quick views|Schnellansichten|Vues rapides|Vistas rápidas|Быстрые виды|مناظر سريعة
+v_front=Ön|Front|Vorne|Avant|Frente|Спереди|أمام
+v_back=Arka|Back|Hinten|Arrière|Atrás|Сзади|خلف
+v_right=Sağ|Right|Rechts|Droite|Derecha|Справа|يمين
+v_left=Sol|Left|Links|Gauche|Izquierda|Слева|يسار
+v_top=Üst|Top|Oben|Dessus|Arriba|Сверху|أعلى
+v_bot=Alt|Bottom|Unten|Dessous|Abajo|Снизу|أسفل
+v_iso=İzometrik|Isometric|Isometrisch|Isométrique|Isométrica|Изометрия|أيزومتري
+resol=Çözünürlük|Resolution|Auflösung|Résolution|Resolución|Разрешение|الدقة
+sq=kare|square|quadratisch|carré|cuadrado|квадрат|مربع
+vert=dikey|vertical|hochkant|vertical|vertical|вертикально|عمودي
+fmt=Resim biçimi|Image format|Bildformat|Format d'image|Formato de imagen|Формат изображения|صيغة الصورة
+turns=Tur sayısı|Turns|Umdrehungen|Tours|Vueltas|Обороты|عدد الدورات
+dur=Video süresi|Video length|Videolänge|Durée de la vidéo|Duración del vídeo|Длина видео|مدة الفيديو
+sec=sn|s|s|s|s|с|ث
+q=Video kalitesi|Video quality|Videoqualität|Qualité vidéo|Calidad de vídeo|Качество видео|جودة الفيديو
+cap=Alt yazı ekle (ad ve ölçüler)|Add caption (name & size)|Bildunterschrift (Name & Maße)|Ajouter une légende (nom et taille)|Añadir pie (nombre y medidas)|Добавить подпись (имя и размеры)|إضافة تعليق (الاسم والأبعاد)
+capt=Özel alt yazı (boşsa otomatik)|Custom caption (auto if empty)|Eigene Beschriftung (leer = automatisch)|Légende perso (auto si vide)|Pie personalizado (auto si vacío)|Своя подпись (пусто = авто)|تعليق مخصص (تلقائي إن كان فارغًا)
+gif=Animasyonlu GIF de üret|Also make animated GIF|Auch animiertes GIF erzeugen|Créer aussi un GIF animé|Crear también GIF animado|Создать также GIF|إنشاء GIF متحرك أيضًا
+gif_q=GIF kalitesi|GIF quality|GIF-Qualität|Qualité GIF|Calidad GIF|Качество GIF|جودة GIF
+gq_low=Düşük (hızlı)|Low (fast)|Niedrig (schnell)|Bas (rapide)|Baja (rápido)|Низкое (быстро)|منخفض (سريع)
+gq_mid=Orta|Medium|Mittel|Moyen|Media|Среднее|متوسط
+gq_high=Yüksek (yavaş)|High (slow)|Hoch (langsam)|Élevé (lent)|Alta (lento)|Высокое (медленно)|عالي (بطيء)
+sheet=Katalog sayfası (6 görünüm tek resimde)|Contact sheet (6 views in one image)|Übersichtsblatt (6 Ansichten in einem Bild)|Planche contact (6 vues en une image)|Hoja resumen (6 vistas en una imagen)|Сводный лист (6 видов в одном)|ورقة ملخص (6 مناظر في صورة)
+save=Kaydetme|Saving|Speichern|Enregistrement|Guardado|Сохранение|الحفظ
+sv1=Tarayıcı indirmesi (soru sormaz)|Browser download (no prompts)|Browser-Download (ohne Nachfrage)|Téléchargement navigateur (sans question)|Descarga del navegador (sin preguntas)|Загрузка браузера (без вопросов)|تنزيل المتصفح (بدون أسئلة)
+sv2=Kayıt klasörü (bir kez seçilir)|Save folder (chosen once)|Speicherordner (einmal wählen)|Dossier d'enregistrement (choisi une fois)|Carpeta de guardado (se elige una vez)|Папка сохранения (выбор один раз)|مجلد الحفظ (يُختار مرة واحدة)
+pickdir=Kayıt klasörünü seç|Choose save folder|Speicherordner wählen|Choisir le dossier|Elegir carpeta|Выбрать папку|اختيار المجلد
+go=MP4 + görünümleri oluştur|Create MP4 + views|MP4 + Ansichten erstellen|Créer MP4 + vues|Crear MP4 + vistas|Создать MP4 + виды|إنشاء MP4 + المناظر
+onlyv=Sadece MP4|MP4 only|Nur MP4|MP4 seul|Solo MP4|Только MP4|MP4 فقط
+onlyi=Sadece resimler|Images only|Nur Bilder|Images seules|Solo imágenes|Только картинки|الصور فقط
+batch=Tüm modelleri sırayla işle|Process all models in order|Alle Modelle nacheinander|Traiter tous les modèles|Procesar todos los modelos|Обработать все модели|معالجة كل النماذج
+redl=Tüm dosyaları tekrar indir|Download all files again|Alle Dateien erneut laden|Retélécharger tous les fichiers|Descargar todo otra vez|Скачать все снова|تنزيل كل الملفات مجددًا
+dl=İndir|Download|Herunterladen|Télécharger|Descargar|Скачать|تنزيل
+close=Kapat|Close|Schließen|Fermer|Cerrar|Закрыть|إغلاق
+copy=Panoya kopyala|Copy to clipboard|In Zwischenablage|Copier|Copiar|Копировать|نسخ
+m_start=Bir model aç. Önizlemede sürükleyerek açıyı, tekerlekle yakınlaştırmayı değiştirebilirsin.|Open a model. Drag in the preview to rotate, use the wheel to zoom.|Öffne ein Modell. Ziehen zum Drehen, Mausrad zum Zoomen.|Ouvrez un modèle. Glissez pour tourner, molette pour zoomer.|Abre un modelo. Arrastra para girar y usa la rueda para hacer zoom.|Откройте модель. Перетаскивайте для вращения, колесо — масштаб.|افتح نموذجًا. اسحب للتدوير واستخدم العجلة للتكبير.
+m_ready=Model hazır.|Model ready.|Modell bereit.|Modèle prêt.|Modelo listo.|Модель готова.|النموذج جاهز.
+m_read=Okunuyor: {0}|Reading: {0}|Lese: {0}|Lecture : {0}|Leyendo: {0}|Чтение: {0}|قراءة: {0}
+m_unsup=Desteklenmeyen dosya. STL, 3MF veya OBJ aç.|Unsupported file. Open STL, 3MF or OBJ.|Nicht unterstützte Datei. STL, 3MF oder OBJ öffnen.|Fichier non pris en charge. Ouvrez STL, 3MF ou OBJ.|Archivo no compatible. Abre STL, 3MF u OBJ.|Неподдерживаемый файл. Откройте STL, 3MF или OBJ.|ملف غير مدعوم. افتح STL أو 3MF أو OBJ.
+m_info={0}: {1} üçgen, {2}|{0}: {1} triangles, {2}|{0}: {1} Dreiecke, {2}|{0} : {1} triangles, {2}|{0}: {1} triángulos, {2}|{0}: {1} треуг., {2}|{0}: {1} مثلث، {2}
+m_stats=Hacim {0} cm³ · Yüzey {1} cm² · PLA ≈ {2} g (tam dolu)|Volume {0} cm³ · Surface {1} cm² · PLA ≈ {2} g (solid)|Volumen {0} cm³ · Fläche {1} cm² · PLA ≈ {2} g (massiv)|Volume {0} cm³ · Surface {1} cm² · PLA ≈ {2} g (plein)|Volumen {0} cm³ · Superficie {1} cm² · PLA ≈ {2} g (macizo)|Объём {0} см³ · Площадь {1} см² · PLA ≈ {2} г (сплошной)|الحجم {0} سم³ · المساحة {1} سم² · PLA ≈ {2} غ (مصمت)
+m_view={0}: {1} görünümü|{0}: {1} view|{0}: Ansicht {1}|{0} : vue {1}|{0}: vista {1}|{0}: вид {1}|{0}: منظر {1}
+m_video={0} video: kare {1} / {2}|{0} video: frame {1} / {2}|{0} Video: Bild {1} / {2}|{0} vidéo : image {1} / {2}|{0} vídeo: fotograma {1} / {2}|{0} видео: кадр {1} / {2}|{0} فيديو: إطار {1} / {2}
+m_gif={0}: GIF kare {1} / {2}|{0}: GIF frame {1} / {2}|{0}: GIF-Bild {1} / {2}|{0} : image GIF {1} / {2}|{0}: fotograma GIF {1} / {2}|{0}: кадр GIF {1} / {2}|{0}: إطار GIF {1} / {2}
+m_rec=Video: gerçek zamanlı kayıt…|Video: real-time recording…|Video: Echtzeitaufnahme…|Vidéo : enregistrement en temps réel…|Vídeo: grabación en tiempo real…|Видео: запись в реальном времени…|فيديو: تسجيل في الوقت الفعلي…
+m_save=Kaydediliyor…|Saving…|Speichere…|Enregistrement…|Guardando…|Сохранение…|جارٍ الحفظ…
+m_done={0}: {1} dosya {2}.|{0}: {1} files {2}.|{0}: {1} Dateien {2}.|{0} : {1} fichiers {2}.|{0}: {1} archivos {2}.|{0}: {1} файлов {2}.|{0}: {1} ملفات {2}.
+m_dlok=indirildi|downloaded|heruntergeladen|téléchargés|descargados|скачано|تم تنزيلها
+m_dirok=“{0}” klasörüne kaydedildi|saved to folder “{0}”|im Ordner „{0}“ gespeichert|enregistrés dans « {0} »|guardados en «{0}»|сохранено в папку «{0}»|حُفظت في المجلد «{0}»
+m_dirset=Kayıt klasörü: {0}|Save folder: {0}|Speicherordner: {0}|Dossier : {0}|Carpeta: {0}|Папка: {0}|المجلد: {0}
+m_copied=Panoya kopyalandı.|Copied to clipboard.|In Zwischenablage kopiert.|Copié dans le presse-papiers.|Copiado al portapapeles.|Скопировано.|تم النسخ.
+e_stl=Geçerli bir STL değil.|Not a valid STL file.|Keine gültige STL-Datei.|Fichier STL invalide.|Archivo STL no válido.|Недопустимый STL.|ملف STL غير صالح.
+e_obj=OBJ içinde yüzey bulunamadı.|No faces found in OBJ.|Keine Flächen in OBJ gefunden.|Aucune face dans l'OBJ.|No hay caras en el OBJ.|В OBJ нет граней.|لا توجد أوجه في OBJ.
+e_3mf=3MF okunamadı|Could not read 3MF|3MF nicht lesbar|Lecture 3MF impossible|No se pudo leer el 3MF|Не удалось прочитать 3MF|تعذّرت قراءة 3MF
+e_h264=Bu çözünürlük/FPS için H.264 desteklenmiyor. Daha düşük çözünürlük dene.|H.264 is not supported for this resolution/FPS. Try a lower resolution.|H.264 wird für diese Auflösung/FPS nicht unterstützt. Niedrigere Auflösung wählen.|H.264 non pris en charge pour cette résolution/FPS. Essayez plus bas.|H.264 no es compatible con esta resolución/FPS. Prueba una menor.|H.264 не поддерживается для этого разрешения/FPS. Выберите меньше.|H.264 غير مدعوم لهذه الدقة/FPS. جرّب دقة أقل.
+e_rec=Bu tarayıcı video kaydını desteklemiyor. Chrome veya Edge kullan.|This browser can't record video. Use Chrome or Edge.|Dieser Browser kann kein Video aufnehmen. Chrome oder Edge verwenden.|Ce navigateur ne peut pas enregistrer. Utilisez Chrome ou Edge.|Este navegador no puede grabar vídeo. Usa Chrome o Edge.|Браузер не умеет записывать видео. Используйте Chrome или Edge.|هذا المتصفح لا يسجل الفيديو. استخدم Chrome أو Edge.
+e_dir=Klasör seçilemedi|Could not choose folder|Ordner nicht wählbar|Impossible de choisir le dossier|No se pudo elegir la carpeta|Не удалось выбрать папку|تعذّر اختيار المجلد`;
+
+const $ = id => document.getElementById(id);
+const cv = $('cv');
+const renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true});
+renderer.setPixelRatio(1);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(35, 16/9, 0.1, 100);
+const ocam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 50);
+const root = new THREE.Group(), pivot = new THREE.Group(), upG = new THREE.Group(), user = new THREE.Group();
+scene.add(root); root.add(pivot); pivot.add(upG); upG.add(user);
+
+/* ---------- Işıklar (zenginleştirilmiş) ---------- */
+const hemi = new THREE.HemisphereLight(0xffffff, 0x6d7a85, 0.75); scene.add(hemi);
+const key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(3, 5, 4); key.castShadow = true;
+Object.assign(key.shadow.camera, {left: -3.2, right: 3.2, top: 3.2, bottom: -3.2, near: 0.5, far: 15});
+key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02; key.shadow.radius = 4;
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xffffff, 0.3); rim.position.set(-4, 2, -3); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, 0.15); fill.position.set(2, 1, -4); scene.add(fill);
+
+/* ---------- Zemin ---------- */
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({opacity: 0.24}));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+/* ---------- Contact shadow ---------- */
+const contactCanvas = document.createElement('canvas'); contactCanvas.width = contactCanvas.height = 256;
+const cg = contactCanvas.getContext('2d');
+const cgRad = cg.createRadialGradient(128, 128, 2, 128, 128, 122);
+cg
+
+cgRad.addColorStop(0, 'rgba(12,12,12,.62)');
+cgRad.addColorStop(.22, 'rgba(12,12,12,.42)');
+cgRad.addColorStop(.62, 'rgba(12,12,12,.13)');
+cgRad.addColorStop(1, 'rgba(12,12,12,0)');
+cg.fillStyle = cgRad; cg.fillRect(0, 0, 256, 256);
+const contactShadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.55, .95),
+  new THREE.MeshBasicMaterial({map: new THREE.CanvasTexture(contactCanvas), transparent: true, depthWrite: false, opacity: .78})
+);
+contactShadow.rotation.x = -Math.PI / 2;
+contactShadow.position.y = -0.004;
+contactShadow.renderOrder = -1;
+contactShadow.visible = false;
+scene.add(contactShadow);
+
+/* ---------- Malzeme ---------- */
+const mat = new THREE.MeshPhysicalMaterial({
+  color: 0xd8d2c6, roughness: 0.52, metalness: 0.03,
+  clearcoat: 0.08, clearcoatRoughness: 0.22, reflectivity: 0.35
+});
+const MATS = {
+  plastik: [.5, .04, .08],
+  mat:     [.88, 0, .0],
+  parlak:  [.18, .08, .28],
+  kil:     [.96, 0, .0],
+  metal:   [.35, .85, .05],
+  cam:     [.05, .0, .9]
+};
+
+let paused = false, mesh = null, models = [], fileName = 'model', dims = '', offset = 0;
+let busy = false, W = 1920, H = 1080, bgTex = null, normK = 1, photoMatch = null;
+const photos = []; let selPhoto = -1;
+
+const val = id => $(id).value;
+const num = id => parseFloat(val(id)) || 0;
+const n0  = id => parseFloat(val(id)) || 0;
+const tick  = () => new Promise(r => setTimeout(r, 0));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p) * 100).toFixed(1) + '%'; };
+
+function setMsg(t, err){
+  $('msg').textContent = t;
+  $('msg').className = err ? 'err' : '';
+  const o = $('toast');
+  if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none';
+}
+
+/* ---------- Çeviri ---------- */
+const LANGS = ['tr', 'en', 'de', 'fr', 'es', 'ru', 'ar'];
+const DICT = {};
+DICT_RAW.split('\n').forEach(l => {
+  const i = l.indexOf('='); if(i > 0) DICT[l.slice(0, i)] = l.slice(i + 1).split('|');
+});
+let LANG = 'tr';
+function T(k, ...a){
+  const d = DICT[k]; if(!d) return k;
+  let s = d[LANGS.indexOf(LANG)] || d[0];
+  a.forEach((v, i) => s = s.split('{' + i + '}').join(v));
+  return s;
+}
+function detectLang(){
+  try{ const sv = localStorage.getItem('m3dlang'); if(sv && LANGS.includes(sv)) return sv; }catch(e){}
+  for(const l of (navigator.languages || [navigator.language || 'tr'])){
+    const c = String(l).slice(0, 2).toLowerCase();
+    if(LANGS.includes(c)) return c;
+  }
+  return 'tr';
+}
+
+/* ---------- Ayarları hatırla ---------- */
+const SET = ['bg','cb','cb2','blur','sh','cm','mat','dir','el','zm','wf','ortho','res','fmt',
+             'fps','turns','dur','br','bob','cap','iso','sv','la','lw','ls','sa','vs','ct','ts',
+             'capt','gif','sheet','camo','gifq','up'];
+const isChk = i => $(i).type === 'checkbox';
+function saveSet(){
+  try{
+    const o = {};
+    SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value);
+    localStorage.setItem('m3dset3', JSON.stringify(o));
+  }catch(e){}
+}
+function loadSet(){
+  try{
+    const o = JSON.parse(localStorage.getItem('m3dset3') || '{}');
+    SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } });
+  }catch(e){}
+}
+
+/* ---------- Prosedürel doku yardımcıları ---------- */
+function rng(seed){ return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+function ctex(w, h, fn, rx = 1, ry = 1){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  fn(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(rx, ry);
+  t.anisotropy = 8;
+  return t;
+}
+const Mt = o => new THREE.MeshStandardMaterial(Object.assign({roughness: .85, metalness: 0}, o));
+const B  = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+const Cy = (a, b, h) => new THREE.CylinderGeometry(a, b, h, 28);
+const Sp = r => new THREE.SphereGeometry(r, 22, 16);
+
+function woodMat(dark){
+  return Mt({
+    roughness: .6,
+    map: ctex(1024, 512, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, 0, h);
+      l.addColorStop(0, dark ? '#6a4529' : '#b5834c');
+      l.addColorStop(1, dark ? '#4e311b' : '#94652f');
+      g.fillStyle = l; g.fillRect(0, 0, w, h);
+      const r = rng(dark ? 3 : 5);
+      for(let i = 0; i < 420; i++){
+        const y = r() * h;
+        g.strokeStyle = `rgba(${r() < .6 ? '50,28,10' : '255,230,190'},${.03 + r() * .09})`;
+        g.lineWidth = .5 + r() * 2.2;
+        g.beginPath(); g.moveTo(0, y);
+        for(let x = 0; x <= w; x += 64) g.lineTo(x, y + Math.sin(x * .01 + i) * 3 + (r() - .5) * 2);
+        g.stroke();
+      }
+      for(let k = 1; k < 5; k++){ g.fillStyle = 'rgba(30,15,5,.3)'; g.fillRect(0, k * h / 5 - 1, w, 2); }
+    }, 3, 2)
+  });
+}
+function wallMat(c1, c2){
+  return Mt({
+    roughness: .95,
+    map: ctex(512, 512, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, 0, h);
+      l.addColorStop(0, c1); l.addColorStop(1, c2);
+      g.fillStyle = l; g.fillRect(0, 0, w, h);
+      const r = rng(9);
+      for(let i = 0; i < 5000; i++){
+        g.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,255,255'},${r() * .04})`;
+        g.fillRect(r() * w, r() * h, 2, 2);
+      }
+    })
+  });
+}
+
+/* ---------- 3D ortamlar ---------- */
+const envG = new THREE.Group(); scene.add(envG);
+let envKind = null;
+const ENV3D = ['office', 'shelf', 'workshop', 'desk', 'studio_pro', 'loft', 'minimal', 'darkroom'];
+const envBg = new THREE.Color(0xc4cacf);
+let bakeKey = '', envShow = true, viewHide = false;
+
+function add(geo, mt, x, y, z, cast = true, ry = 0, rz = 0){
+  const m = new THREE.Mesh(geo, mt);
+  m.position.set(x, y, z);
+  m.rotation.set(0, ry, rz);
+  m.castShadow = cast; m.receiveShadow = true;
+  envG.add(m);
+  return m;
+}
+
+function setEnv(kind){
+  if(kind === envKind) return;
+  envKind = kind;
+  envG.traverse(o => { if(o.geometry && o.geometry.dispose) o.geometry.dispose(); });
+  while(envG.children.length) envG.remove(envG.children[0]);
+  if(!kind) return;
+  const r = rng(21), P = (w, h) => new THREE.PlaneGeometry(w, h);
+  const dk = Mt({color: '#25292d', roughness: .5});
+  const steel = Mt({color: '#9aa3a9', metalness: .4, roughness: .45});
+  const dark = (kind === 'shelf' || kind === 'workshop' || kind === 'darkroom');
+
+  /* ---------- Zemin (ortak) ---------- */
+  if(kind === 'studio_pro'){
+    add(P(14, 14), Mt({color: '#e8e8e8', roughness: .9}), 0, -.001, -1, false);
+  } else if(kind === 'minimal'){
+    add(P(14, 14), Mt({color: '#f2f2f0', roughness: .95}), 0, -.001, -1, false);
+  } else if(kind === 'loft'){
+    add(B(10, .14, 4.4), woodMat(true), 0, -.07, -.9, false);
+  } else if(kind === 'darkroom'){
+    add(P(14, 14), Mt({color: '#0a0c10', roughness: .35, metalness: .1}), 0, -.001, -1, false);
+  } else {
+    add(B(10, .14, 4.4), woodMat(dark), 0, -.07, -.9, false);
+  }
+
+  /* ---------- Studio Pro ---------- */
+  if(kind === 'studio_pro'){
+    /* Sonsuz beyaz arka plan */
+    add(P(22, 11), wallMat('#f6f6f6', '#dcdcdc'), 0, 4.2, -3.4, false);
+    /* Softbox 1 */
+    const soft1 = add(B(1.4, .9, .05), Mt({color: '#ffffff', emissive: '#fff5e0', emissiveIntensity: .9, roughness: .9}), -3.5, 2.6, -2.6, false, .3);
+    soft1.rotation.x = -.35;
+    add(B(.08, .08, 1.6), steel, -3.5, 2.15, -2.0, false, .3, .3);
+    /* Softbox 2 */
+    const soft2 = add(B(1.4, .9, .05), Mt({color: '#ffffff', emissive: '#e8f2ff', emissiveIntensity: .7, roughness: .9}), 3.5, 2.6, -2.6, false, -.3);
+    soft2.rotation.x = -.35;
+    add(B(.08, .08, 1.6), steel, 3.5, 2.15, -2.0, false, -.3, .3);
+    /* Reflektör */
+    add(B(2.2, 1.2, .04), Mt({color: '#d8dde3', metalness: .6, roughness: .3}), 0, 1.4, -3.1, false);
+    /* Tripod sehpa */
+    for(let k = 0; k < 3; k++){
+      const a = k * Math.PI * 2 / 3;
+      add(Cy(.02, .02, 1.5), steel, Math.cos(a) * .4, .75, -1.8 + Math.sin(a) * .4, false, 0, 0).rotation.z = Math.cos(a) * .35;
+    }
+  }
+
+  /* ---------- Loft ---------- */
+  if(kind === 'loft'){
+    /* Tuğla duvar */
+    const brick = ctex(1024, 512, (g, w, h) => {
+      g.fillStyle = '#8a5a45'; g.fillRect(0, 0, w, h);
+      const r = rng(11), bw = 64, bh = 26, gap = 4;
+      for(let row = 0; row < h / (bh + gap); row++){
+        const off = (row % 2) * (bw / 2);
+        for(let col = -1; col < w / (bw + gap) + 1; col++){
+          const x = col * (bw + gap) + off, y = row * (bh + gap);
+          const tint = 60 + r() * 40;
+          g.fillStyle = `rgb(${120 + tint}, ${70 + tint * .55}, ${55 + tint * .45})`;
+          g.fillRect(x + gap / 2, y + gap / 2, bw - gap, bh - gap);
+        }
+      }
+    }, 4, 3);
+    add(P(22, 11), Mt({map: brick, roughness: .95}), 0, 4.2, -3.4, false);
+    /* Büyük fabrika penceresi */
+    const win = ctex(512, 384, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, 0, h);
+      l.addColorStop(0, '#f0d9a8'); l.addColorStop(.5, '#f5e5c0'); l.addColorStop(1, '#c9d4de');
+      g.fillStyle = l; g.fillRect(0, 0, w, h);
+      g.fillStyle = '#2a2a2a';
+      for(let i = 0; i <= 4; i++) g.fillRect(0, i * h / 4 - 3, w, 6);
+      for(let i = 0; i <= 3; i++) g.fillRect(i * w / 3 - 3, 0, 6, h);
+    });
+    add(P(3.6, 2.6), new THREE.MeshBasicMaterial({map: win, toneMapped: false}), -2.5, 2.2, -3.37, false);
+    const fr = Mt({color: '#3a3a3a', roughness: .6});
+    [[3.9, .12, -2.5, 3.5], [3.9, .12, -2.5, .9], [.12, 2.7, -4.4, 2.2], [.12, 2.7, -.6, 2.2]].forEach(([w, h, x, y]) => add(B(w, h, .1), fr, x, y, -3.33, false));
+    /* Beton sütun */
+    add(B(.35, 5.5, .35), Mt({color: '#6a6a6a', roughness: .95}), 2.8, 2.75, -3.0, false);
+    /* Asma lamba */
+    add(Cy(.02, .02, 1.2), steel, -1.0, 3.6, -1.5, false);
+    add(Cy(.35, .25, .18), Mt({color: '#d4b56a', metalness: .7, roughness: .35}), -1.0, 2.9, -1.5, false);
+    const bulb = new THREE.PointLight(0xffd68a, .8, 6);
+    bulb.position.set(-1.0, 2.85, -1.5);
+    envG.add(bulb);
+    /* Ahşap palet */
+    add(B(1.6, .12, 1.1), woodMat(true), 2.2, .06, -1.8, true, .3);
+  }
+
+  /* ---------- Minimal galeri ---------- */
+  if(kind === 'minimal'){
+    add(P(22, 11), Mt({color: '#fafaf8', roughness: 1}), 0, 4.2, -3.4, false);
+    /* Kaide */
+    add(B(1.2, .9, 1.2), Mt({color: '#ffffff', roughness: .9}), -2.6, .45, -1.8, true);
+    add(B(1.24, .04, 1.24), Mt({color: '#e6e6e4', roughness: .9}), -2.6, .92, -1.8, false);
+    /* Çerçeve */
+    add(B(.04, 1.4, 1.0), Mt({color: '#1a1a1a'}), -3.35, 2.2, -1.0, false);
+    /* Spot ışıklar */
+    for(let i = -2; i <= 2; i++){
+      add(Cy(.04, .04, .3), Mt({color: '#e0e0e0'}), i * 1.8, 4.05, -2.5, false);
+      const sp = new THREE.PointLight(0xffffff, .35, 5);
+      sp.position.set(i * 1.8, 3.9, -2.5);
+      envG.add(sp);
+    }
+  }
+
+  /* ---------- Dark Room ---------- */
+  if(kind === 'darkroom'){
+    add(P(22, 11), Mt({color: '#0d1014', roughness: .8}), 0, 4.2, -3.4, false);
+    /* Neon çizgi */
+    for(let i = -3; i <= 3; i++){
+      add(B(.6, .04, .02), Mt({color: '#1a1a1a', emissive: '#ff3b6b', emissiveIntensity: 1.6}), i * .9, 3.4, -3.35, false);
+    }
+    /* Zemin ışıması */
+    const glow = new THREE.PointLight(0xff3b6b, .5, 8);
+    glow.position.set(0, 1.2, -2.5);
+    envG.add(glow);
+    add(Cy(.8, .8, .05), Mt({color: '#0a0a0a', roughness: .3}), 0, .025, -1.5, false);
+  }
+
+  /* ---------- Office ---------- */
+  if(kind === 'desk' || kind === 'office'){
+    add(P(22, 11), wallMat(kind === 'office' ? '#dde0dd' : '#e2e5e8',
+      kind === 'office' ? '#c2c8c5' : '#bcc4ca'), 0, 4.2, -3.4, false);
+  }
+  if(kind === 'office'){
+    const sky = ctex(512, 320, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, 0, h);
+      l.addColorStop(0, '#79b4ee'); l.addColorStop(1, '#e4f1fb');
+      g.fillStyle = l; g.fillRect(0, 0, w, h);
+      const q = rng(4);
+      g.fillStyle = 'rgba(255,255,255,.7)';
+      for(let i = 0; i < 6; i++){ g.beginPath(); g.ellipse(q() * w, q() * h * .5, 50 + q() * 60, 14 + q() * 12, 0, 0, 7); g.fill(); }
+      for(let i = 0; i < 12; i++){ const bw = w / 12, bh = h * (.12 + q() * .3); g.fillStyle = '#8fa2b3'; g.fillRect(i * bw, h - bh, bw - 2, bh); }
+    });
+    add(P(3.2, 1.9), new THREE.MeshBasicMaterial({map: sky, toneMapped: false}), -2.7, 2.0, -3.37, false);
+    const fr = Mt({color: '#f2f3f1'});
+    [[3.45, .14, -2.7, 3.0], [3.45, .14, -2.7, 1.0], [.14, 2.1, -4.4, 2.0], [.14, 2.1, -1.0, 2.0], [.07, 1.9, -2.7, 2.0], [3.2, .07, -2.7, 2.0]]
+      .forEach(([w, h, x, y]) => add(B(w, h, .1), fr, x, y, -3.33, false));
+    const scr = ctex(512, 288, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, w, h);
+      l.addColorStop(0, '#2c5aa0'); l.addColorStop(1, '#6fa3dc');
+      g.fillStyle = l; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,255,255,.9)'; g.fillRect(40, 30, 250, 170);
+      g.fillStyle = '#d6dde5'; g.fillRect(40, 30, 250, 22);
+      g.fillStyle = 'rgba(240,244,248,.85)'; g.fillRect(310, 60, 160, 120);
+      g.fillStyle = 'rgba(20,30,50,.85)'; g.fillRect(0, h - 26, w, 26);
+    });
+    add(B(.18, .55, .1), dk, 2.3, .28, -2.4);
+    add(B(.9, .05, .55), dk, 2.3, .025, -2.3);
+    add(B(2.5, 1.5, .1), dk, 2.3, 1.3, -2.35);
+    add(P(2.36, 1.36), new THREE.MeshBasicMaterial({map: scr, toneMapped: false}), 2.3, 1.3, -2.295, false);
+    add(Cy(.3, .3, .05), dk, -2.2, .025, -2.2);
+    add(B(.05, 1.1, .05), steel, -2.2, .6, -2.2, true, 0, .15);
+    add(Cy(.12, .32, .4), Mt({color: '#d9b04a', emissive: '#4a3508'}), -1.95, 1.3, -2.2, true, 0, .3);
+    add(Cy(.22, .17, .3), Mt({color: '#b5573a'}), -3.2, .15, -2.2);
+    for(let k = 0; k < 8; k++){
+      const m = add(Sp(.2), Mt({color: new THREE.Color().setHSL(.3 + r() * .05, .5, .22 + r() * .12)}),
+        -3.2 + (r() - .5) * .35, .6 + r() * .45, -2.2 + (r() - .5) * .3);
+      m.scale.set(.6, 1.5, .6); m.rotation.z = (r() - .5) * 1.2;
+    }
+    add(Cy(.14, .12, .22), Mt({color: '#f2f2f0', roughness: .3}), 1.7, .11, -1.1);
+    add(B(.9, .07, .65), Mt({color: '#2f5d8a'}), -1.8, .035, -1.1, true, .3);
+    add(B(.85, .07, .6), Mt({color: '#d9d5cc'}), -1.8, .105, -1.1, true, .25);
+  }
+
+  /* ---------- Shelf ---------- */
+  if(kind === 'shelf'){
+    add(B(10.4, 6, .1), woodMat(true), 0, 2.8, -3.4, false);
+    add(B(.12, 6, .9), woodMat(true), -5.2, 2.8, -2.95, false);
+    add(B(.12, 6, .9), woodMat(true), 5.2, 2.8, -2.95, false);
+    for(let row = 0; row < 4; row++){
+      const y0 = row * 1.25;
+      if(row) add(B(10.3, .08, .9), woodMat(true), 0, y0 - .04, -2.95, false);
+      let x = -4.95;
+      while(x < 4.9){
+        const w = .08 + r() * .13, h = .6 + r() * .5, tilt = r() < .04 ? .25 : 0;
+        if(r() < .07){ x += .3 + r() * .5; continue; }
+        add(B(w, h, .55 + r() * .2),
+          Mt({color: new THREE.Color().setHSL(r(), .18 + r() * .27, .2 + r() * .2), roughness: .7}),
+          x + w / 2, y0 + h / 2, -3.05 + r() * .1, false, 0, -tilt);
+        x += w + .008;
+      }
+    }
+    add(Sp(.35), Mt({color: '#2f6f9c', roughness: .4}), 3.9, 2.05, -3.0, true);
+    add(Cy(.05, .05, .25), steel, 3.9, 1.5, -3.0);
+  }
+
+  /* ---------- Workshop ---------- */
+  if(kind === 'workshop'){
+    const peg = ctex(512, 512, (g, w, h) => {
+      g.fillStyle = '#b4906a'; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(40,24,10,.75)';
+      for(let y = 16; y < h; y += 32) for(let x = 16; x < w; x += 32){ g.beginPath(); g.arc(x, y, 4.5, 0, 7); g.fill(); }
+    }, 8, 4);
+    add(P(22, 11), Mt({map: peg, roughness: .9}), 0, 4.2, -3.4, false);
+    const wd = Mt({color: '#a9784a'}), red = Mt({color: '#c0392b', roughness: .5});
+    add(B(.07, 1.1, .07), wd, -3.0, 1.5, -3.3, false);
+    add(B(.42, .17, .14), steel, -3.0, 2.15, -3.3, false);
+    add(B(.09, 1.3, .03), steel, -1.8, 1.6, -3.3, false, 0, .1);
+    add(B(.09, 1.2, .03), steel, -1.5, 1.6, -3.3, false, 0, -.08);
+    add(B(1.4, .3, .02), steel, .5, 1.9, -3.3, false);
+    add(B(.3, .22, .05), red, 1.35, 1.9, -3.3, false);
+    for(let k = 0; k < 5; k++){
+      add(Cy(.025, .025, .6), steel, 2.0 + k * .28, 1.9, -3.3, false);
+      add(Cy(.06, .06, .3), k % 2 ? red : Mt({color: '#d9a441'}), 2.0 + k * .28, 1.45, -3.3, false);
+    }
+    add(B(1.5, .45, .6), red, -2.6, .225, -2.2);
+    add(B(.7, .06, .08), dk, -2.6, .5, -2.2);
+    add(Cy(.3, .3, .45), steel, 2.4, .225, -2.2);
+    add(Cy(.26, .26, .35), Mt({color: '#d9a441', metalness: .3}), 1.8, .175, -2.4);
+  }
+}
+
+/* ---------- Arka plan ---------- */
+function drawBG(solid){
+  const t = val('bg');
+  const e3 = ENV3D.includes(t);
+  setEnv(e3 ? t : null);
+  renderer.toneMapping = e3 ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+  renderer.toneMappingExposure = .85;
+  bakeKey = '';
+  if(e3){
+    cv.classList.remove('tr');
+    scene.background = envBg;
+    renderer.setClearColor(0x000000, 1);
+    return;
+  }
+  if(t === 'transparent' && !solid){
+    scene.background = null;
+    renderer.setClearColor(0x000000, 0);
+    cv.classList.add('tr');
+    return;
+  }
+  cv.classList.remove('tr');
+
+  const base = document.createElement('canvas'); base.width = W; base.height = H;
+  const g = base.getContext('2d');
+  const c1 = val('cb'), c2 = val('cb2'), r = rng(7);
+  const lin = (y0, y1, a, b, h0, h1) => {
+    const l = g.createLinearGradient(0, y0, 0, y1);
+    l.addColorStop(0, a); l.addColorStop(1, b);
+    g.fillStyle = l; g.fillRect(0, h0, W, h1 - h0);
+  };
+  const rect = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
+
+  const SC = {
+    solid(){ rect(0, 0, W, H, c1); },
+    grad(){ lin(0, H, c1, c2, 0, H); },
+    studio(){
+      const q = g.createRadialGradient(W/2, H*.45, 0, W/2, H*.5, Math.max(W, H)*.72);
+      q.addColorStop(0, c1); q.addColorStop(1, c2);
+      g.fillStyle = q; g.fillRect(0, 0, W, H);
+    },
+    concrete(){
+      lin(0, H, '#b4b8bb', '#8d9296', 0, H);
+      for(let i = 0; i < 9000; i++){
+        g.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,255,255'},${r() * .07})`;
+        const s = 1 + r() * 3 * W / 1280;
+        g.fillRect(r() * W, r() * H, s, s);
+      }
+    },
+    outdoor(){
+      const hz = H * .5;
+      lin(0, hz, '#6fb1e8', '#dcefff', 0, hz);
+      lin(hz, H, '#7fb05a', '#43702d', hz, H);
+    },
+    /* --- YENİ --- */
+    forest(){
+      const hz = H * .55;
+      const sky = g.createLinearGradient(0, 0, 0, hz);
+      sky.addColorStop(0, '#a8d8f0'); sky.addColorStop(.7, '#dce8e0'); sky.addColorStop(1, '#c8d4b8');
+      g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+      /* Uzak ağaçlar */
+      const layers = [
+        {y: hz - 40, c: '#8aa878', n: 30, s: 1.0},
+        {y: hz - 20, c: '#5a7850', n: 26, s: 1.15},
+        {y: hz - 5,  c: '#3a5535', n: 22, s: 1.3}
+      ];
+      layers.forEach(L => {
+        for(let i = 0; i < L.n; i++){
+          const x = (i + .5) * W / L.n + (r() - .5) * 30;
+          const h = (60 + r() * 80) * L.s;
+          g.fillStyle = L.c;
+          g.beginPath();
+          g.moveTo(x, L.y);
+          g.lineTo(x - h * .45, L.y);
+          g.lineTo(x, L.y - h);
+          g.lineTo(x + h * .45, L.y);
+          g.closePath(); g.fill();
+        }
+      });
+      /* Zemin - orman tabanı */
+      lin(hz, H, '#4a6038', '#2a3a22', hz, H);
+      for(let i = 0; i < 2000; i++){
+        g.fillStyle = `rgba(${r() < .5 ? '80,100,60' : '30,40,20'},${r() * .5})`;
+        g.fillRect(r() * W, hz + r() * (H - hz), 2 + r() * 4, 2 + r() * 3);
+      }
+      /* Işık huzmeleri */
+      g.globalCompositeOperation = 'screen';
+      for(let i = 0; i < 5; i++){
+        const x = r() * W;
+        const grd = g.createLinearGradient(x, 0, x + 100, hz);
+        grd.addColorStop(0, 'rgba(255,245,200,.35)');
+        grd.addColorStop(1, 'rgba(255,245,200,0)');
+        g.fillStyle = grd;
+        g.beginPath();
+        g.moveTo(x, 0); g.lineTo(x + 80, 0); g.lineTo(x + 200, hz); g.lineTo(x + 120, hz);
+        g.closePath(); g.fill();
+      }
+      g.globalCompositeOperation = 'source-over';
+    },
+    beach(){
+      const hz = H * .55;
+      const sky = g.createLinearGradient(0, 0, 0, hz);
+      sky.addColorStop(0, '#7bb8e0'); sky.addColorStop(.6, '#ffd9a8'); sky.addColorStop(1, '#ffb88c');
+      g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+      /* Güneş */
+      const sunX = W * .7, sunY = hz * .55, sunR = H * .08;
+      const sunGrad = g.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 3);
+      sunGrad.addColorStop(0, 'rgba(255,250,220,.95)');
+      sunGrad.addColorStop(.3, 'rgba(255,230,180,.6)');
+      sunGrad.addColorStop(1, 'rgba(255,220,160,0)');
+      g.fillStyle = sunGrad; g.fillRect(0, 0, W, hz);
+      g.beginPath(); g.arc(sunX, sunY, sunR, 0, 7); g.fillStyle = '#fff5d8'; g.fill();
+      /* Deniz */
+      lin(hz, H * .72, '#4a9cc4', '#6bb6d8', hz, H * .72);
+      for(let i = 0; i < 400; i++){
+        g.fillStyle = `rgba(255,255,255,${.15 + r() * .5})`;
+        g.fillRect(r() * W, hz + r() * (H * .17 - hz), 8 + r() * 30, 1 + r() * 2);
+      }
+      /* Kum */
+      lin(H * .72, H, '#e8c88a', '#d4a868', H * .72, H);
+      for(let i = 0; i < 3000; i++){
+        g.fillStyle = `rgba(${r() < .5 ? '160,120,60' : '255,240,200'},${r() * .5})`;
+        g.fillRect(r() * W, H * .72 + r() * (H * .28), 2, 2);
+      }
+    },
+    citynight(){
+      const hz = H * .65;
+      const sky = g.createLinearGradient(0, 0, 0, hz);
+      sky.addColorStop(0, '#0a1024'); sky.addColorStop(.5, '#1a2a4a'); sky.addColorStop(1, '#4a3a5a');
+      g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+      /* Yıldızlar */
+      for(let i = 0; i < 200; i++){
+        g.fillStyle = `rgba(255,255,255,${.3 + r() * .7})`;
+        const s = .5 + r() * 1.5;
+        g.fillRect(r() * W, r() * hz * .7, s, s);
+      }
+      /* Ay */
+      const mx = W * .78, my = hz * .3, mr = H * .04;
+      const moonGlow = g.createRadialGradient(mx, my, 0, mx, my, mr * 4);
+      moonGlow.addColorStop(0, 'rgba(230,240,255,.8)');
+      moonGlow.addColorStop(1, 'rgba(230,240,255,0)');
+      g.fillStyle = moonGlow; g.fillRect(0, 0, W, hz);
+      g.beginPath(); g.arc(mx, my, mr, 0, 7); g.fillStyle = '#e8f0ff'; g.fill();
+      /* Binalar */
+      const cols = ['#0a0f18', '#0d1219', '#101520'];
+      let x = 0;
+      while(x < W){
+        const w = 40 + r() * 100;
+        const h = H * (.15 + r() * .35);
+        const bx = x, by = hz - h;
+        g.fillStyle = cols[Math.floor(r() * cols.length)];
+        g.fillRect(bx, by, w, h);
+        /* Pencereler */
+        for(let wy = by + 8; wy < hz - 8; wy += 14){
+          for(let wx = bx + 6; wx < bx + w - 6; wx += 10){
+            if(r() < .35){
+              const warm = r();
+              g.fillStyle = warm < .6 ? `rgba(255,220,140,${.4 + r() * .6})` : `rgba(180,220,255,${.3 + r() * .5})`;
+              g.fillRect(wx, wy, 4, 6);
+            }
+          }
+        }
+        x += w + 2 + r() * 6;
+      }
+      /* Zemin yansıması */
+      lin(hz, H, '#15192a', '#050810', hz, H);
+      for(let i = 0; i < 300; i++){
+        g.fillStyle = `rgba(255,220,140,${r() * .15})`;
+        g.fillRect(r() * W, hz + r() * (H - hz), 2, 2 + r() * 4);
+      }
+    },
+    gradient_pro(){
+      /* Çok renkli radyal degrade */
+      const cx = W * .5, cy = H * .45;
+      const R = Math.max(W, H) * .9;
+      const grd = g.createRadialGradient(cx, cy, 0, cx, cy, R);
+      const stops = [
+        [0, '#ff5e7e'],
+        [.2, '#ff9a5c'],
+        [.4, '#ffd86c'],
+        [.6, '#7de0c0'],
+        [.8, '#5a8aff'],
+        [1, '#3a2b7a']
+      ];
+      stops.forEach(([p, c]) => grd.addColorStop(p, c));
+      g.fillStyle = grd; g.fillRect(0, 0, W, H);
+      /* Vinyet */
+      const v = g.createRadialGradient(cx, cy, R * .5, cx, cy, R);
+      v.addColorStop(0, 'rgba(0,0,0,0)');
+      v.addColorStop(1, 'rgba(0,0,0,.45)');
+      g.fillStyle = v; g.fillRect(0, 0, W, H);
+    }
+  };
+
+  /* Preset fotoğraf sahneleri (prosedürel) */
+  const PRESET_SCENES = {
+    p1(){ /* Masa */
+      lin(0, H * .4, '#f0ebe4', '#d8d0c4', 0, H * .4);
+      lin(H * .4, H, '#8a6a4a', '#5a4230', H * .4, H);
+      /* Ahşap çizgiler */
+      for(let i = 0; i < 200; i++){
+        g.strokeStyle = `rgba(40,20,8,${.05 + r() * .12})`;
+        g.lineWidth = 1 + r() * 2;
+        const y = H * .4 + r() * H * .6;
+        g.beginPath(); g.moveTo(0, y); g.lineTo(W, y + (r() - .5) * 10); g.stroke();
+      }
+    },
+    p2(){ /* Pencere ışığı */
+      lin(0, H, '#eae4dc', '#b8b0a4', 0, H);
+      /* Pencere */
+      const wx = W * .55, wy = H * .1, ww = W * .4, wh = H * .6;
+      g.fillStyle = '#f0f0e8'; g.fillRect(wx, wy, ww, wh);
+      const wl = g.createLinearGradient(wx, wy, wx, wy + wh);
+      wl.addColorStop(0, '#fff8e0'); wl.addColorStop(1, '#e0d8b8');
+      g.fillStyle = wl; g.fillRect(wx + 8, wy + 8, ww - 16, wh - 16);
+      /* Çerçeve */
+      g.fillStyle = '#3a3a3a';
+      g.fillRect(wx, wy, ww, 6); g.fillRect(wx, wy + wh - 6, ww, 6);
+      g.fillRect(wx, wy, 6, wh); g.fillRect(wx + ww - 6, wy, 6, wh);
+      g.fillRect(wx + ww / 2 - 3, wy, 6, wh);
+      g.fillRect(wx, wy + wh / 2 - 3, ww, 6);
+      /* Işık huzmesi */
+      g.globalCompositeOperation = 'screen';
+      const beam = g.createLinearGradient(wx, wy, wx - W * .3, wy + wh);
+      beam.addColorStop(0, 'rgba(255,245,210,.7)');
+      beam.addColorStop(1, 'rgba(255,245,210,0)');
+      g.fillStyle = beam;
+      g.beginPath(); g.moveTo(wx, wy); g.lineTo(wx + ww, wy); g.lineTo(wx - W * .1, H); g.lineTo(0, H); g.closePath(); g.fill();
+      g.globalCompositeOperation = 'source-over';
+    },
+    p3(){ /* Bitki */
+      lin(0, H, '#f0e8d8', '#c0b89c', 0, H);
+      /* Saksı */
+      const px = W * .5, py = H * .75, pw = W * .18, ph = H * .18;
+      g.fillStyle = '#b8704a'; g.fillRect(px - pw / 2, py, pw, ph);
+      g.fillStyle = '#8a4e30'; g.fillRect(px - pw / 2, py, pw, 8);
+      /* Yapraklar */
+      for(let i = 0; i < 30; i++){
+        const a = r() * Math.PI * 2, len = 80 + r() * 180;
+        const ex = px + Math.cos(a) * len, ey = py - Math.abs(Math.sin(a)) * len * 1.2;
+        g.strokeStyle = `rgba(${60 + r() * 40},${100 + r() * 60},${50 + r() * 30},.85)`;
+        g.lineWidth = 4 + r() * 6;
+        g.lineCap = 'round';
+        g.beginPath(); g.moveTo(px, py); g.quadraticCurveTo(px + Math.cos(a) * len * .5, py - len * .5, ex, ey); g.stroke();
+      }
+    },
+    p4(){ /* Kitaplık */
+      lin(0, H, '#e8e0d0', '#b8a890', 0, H);
+      /* Raflar */
+      for(let s = 0; s < 4; s++){
+        const y = H * .15 + s * H * .2;
+        g.fillStyle = '#5a3f2a'; g.fillRect(W * .1, y, W * .8, 8);
+        /* Kitaplar */
+        let x = W * .12;
+        while(x < W * .88){
+          const w = 12 + r() * 30, h = 60 + r() * 40;
+          const col = `hsl(${r() * 360}, ${30 + r() * 40}%, ${25 + r() * 30}%)`;
+          g.fillStyle = col; g.fillRect(x, y - h, w, h);
+          g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(x + w - 3, y - h, 3, h);
+          x += w + 2;
+          if(r() < .06) x += 10;
+        }
+      }
+    },
+    p5(){ /* Ayna görüntü */
+      lin(0, H * .5, '#e0e8ee', '#a8b4c0', 0, H * .5);
+      lin(H * .5, H, '#8a94a0', '#5a6470', H * .5, H);
+      /* Yansıma efekti */
+      g.globalAlpha = .35;
+      lin(0, H * .5, '#ffffff', '#c0c8d0', 0, H * .5);
+      g.globalAlpha = 1;
+    },
+    p6(){ /* Gün batımı */
+      const hz = H * .6;
+      const sky = g.createLinearGradient(0, 0, 0, hz);
+      sky.addColorStop(0, '#2a1a4a'); sky.addColorStop(.4, '#d04a5a'); sky.addColorStop(.7, '#ff9a5c'); sky.addColorStop(1, '#ffd08a');
+      g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+      /* Güneş */
+      const sx = W * .5, sy = hz * .85, sr = H * .1;
+      const sgr = g.createRadialGradient(sx, sy, 0, sx, sy, sr * 3);
+      sgr.addColorStop(0, 'rgba(255,240,180,.95)');
+      sgr.addColorStop(.4, 'rgba(255,180,120,.6)');
+      sgr.addColorStop(1, 'rgba(255,120,80,0)');
+      g.fillStyle = sgr; g.fillRect(0, 0, W, hz);
+      g.beginPath(); g.arc(sx, sy, sr, 0, 7); g.fillStyle = '#fff5d8'; g.fill();
+      /* Zemin */
+      lin(hz, H, '#3a2a2a', '#1a1010', hz, H);
+    },
+    p7(){ /* Sabah serinliği */
+      lin(0, H, '#d8e8f0', '#8aa8b8', 0, H);
+      /* Sis */
+      for(let i = 0; i < 8; i++){
+        const y = H * .3 + i * H * .06;
+        g.fillStyle = `rgba(255,255,255,${.05 + r() * .1})`;
+        g.fillRect(0, y, W, H * .08);
+      }
+    },
+    p8(){ /* Gece lambası */
+      lin(0, H, '#0a0a14', '#1a1a2a', 0, H);
+      /* Lamba ışığı */
+      const lx = W * .5, ly = H * .55, lr = H * .25;
+      const lgr = g.createRadialGradient(lx, ly, 0, lx, ly, lr);
+      lgr.addColorStop(0, 'rgba(255,200,120,.85)');
+      lgr.addColorStop(.5, 'rgba(255,150,80,.35)');
+      lgr.addColorStop(1, 'rgba(255,120,60,0)');
+      g.fillStyle = lgr; g.fillRect(0, 0, W, H);
+    },
+    p9(){ /* Siyah-beyaz */
+      lin(0, H, '#e0e0e0', '#505050', 0, H);
+      for(let i = 0; i < 3000; i++){
+        g.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,255,255'},${r() * .15})`;
+        g.fillRect(r() * W, r() * H, 2, 2);
+      }
+    },
+    p10(){ /* Aydınlık ofis */
+      lin(0, H, '#f4f4f0', '#d0d0c8', 0, H);
+      /* Masa üstü */
+      lin(H * .55, H, '#b8b0a0', '#8a8270', H * .55, H);
+      /* Pencere ışığı */
+      g.fillStyle = 'rgba(255,250,220,.5)';
+      g.fillRect(0, 0, W * .4, H * .7);
+    },
+    /* --- YENİ --- */
+    p11(){ /* Stüdyo beyaz */
+      const q = g.createRadialGradient(W * .5, H * .4, 0, W * .5, H * .5, Math.max(W, H) * .75);
+      q.addColorStop(0, '#ffffff'); q.addColorStop(.7, '#e8e8e8'); q.addColorStop(1, '#c0c0c0');
+      g.fillStyle = q; g.fillRect(0, 0, W, H);
+    },
+    p12(){ /* Sinematik */
+      const q = g.createRadialGradient(W * .5, H * .45, 0, W * .5, H * .5, Math.max(W, H) * .8);
+      q.addColorStop(0, '#4a5a7a'); q.addColorStop(.6, '#2a3040'); q.addColorStop(1, '#0a0e18');
+      g.fillStyle = q; g.fillRect(0, 0, W, H);
+      /* Altın vurgu */
+      g.globalCompositeOperation = 'screen';
+      const a = g.createLinearGradient(0, H * .3, W, H * .7);
+      a.addColorStop(0, 'rgba(255,180,80,0)');
+      a.addColorStop(.5, 'rgba(255,180,80,.3)');
+      a.addColorStop(1, 'rgba(255,180,80,0)');
+      g.fillStyle = a; g.fillRect(0, 0, W, H);
+      g.globalCompositeOperation = 'source-over';
+    },
+    p13(){ /* Soft pembe */
+      lin(0, H, '#ffe0ec', '#f0a8c8', 0, H);
+      for(let i = 0; i < 500; i++){
+        g.fillStyle = `rgba(255,255,255,${r() * .5})`;
+        g.beginPath(); g.arc(r() * W, r() * H, 2 + r() * 6, 0, 7); g.fill();
+      }
+    },
+    p14(){ /* Mavi saat */
+      const hz = H * .55;
+      const s = g.createLinearGradient(0, 0, 0, hz);
+      s.addColorStop(0, '#1a2450'); s.addColorStop(.5, '#3a5a8c'); s.addColorStop(1, '#7a9ac0');
+      g.fillStyle = s; g.fillRect(0, 0, W, hz);
+      lin(hz, H, '#2a3a5a', '#0a1020', hz, H);
+    },
+    p15(){ /* Yeşil doğa */
+      const hz = H * .5;
+      const s = g.createLinearGradient(0, 0, 0, hz);
+      s.addColorStop(0, '#a8d8e8'); s.addColorStop(1, '#d8e8c0');
+      g.fillStyle = s; g.fillRect(0, 0, W, hz);
+      lin(hz, H, '#5a8850', '#2a4a25', hz, H);
+      for(let i = 0; i < 30; i++){
+        const x = r() * W;
+        g.strokeStyle = `rgba(${40 + r() * 40},${80 + r() * 40},${40 + r() * 30},.8)`;
+        g.lineWidth = 3 + r() * 5;
+        g.beginPath(); g.moveTo(x, H); g.quadraticCurveTo(x + (r() - .5) * 30, H * .75, x + (r() - .5) * 60, hz); g.stroke();
+      }
+    }
+  };
+
+  const PRESETS = {
+    p1:{}, p2:{}, p3:{}, p4:{}, p5:{}, p6:{}, p7:{}, p8:{}, p9:{}, p10:{},
+    p11:{}, p12:{}, p13:{}, p14:{}, p15:{}
+  };
+
+  let kind = t;
+  if(t === 'transparent' || (!SC[t] && !PRESET_SCENES[t])) kind = 'solid';
+  if(PRESET_SCENES[t]) PRESET_SCENES[t]();
+  else if(t === 'photo'){
+    const p = photos[selPhoto];
+    if(p){
+      const k = Math.max(W / p.img.width, H / p.img.height);
+      const w = p.img.width * k, h = p.img.height * k;
+      g.drawImage(p.img, (W - w) / 2, (H - h) / 2, w, h);
+    } else SC.solid();
+  }
+  else SC[kind]();
+
+  /* Renk tonu bindirmesi */
+  const ts = num('ts') / 100;
+  if(ts > 0 && t !== 'solid' && t !== 'transparent'){
+    g.globalCompositeOperation = 'soft-light';
+    g.globalAlpha = Math.min(1, ts * 1.6);
+    g.fillStyle = val('ct');
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1;
+  }
+
+  /* Arka plan bulanıklığı */
+  let out = base;
+  const b = num('blur') * H / 1080;
+  if(b > 0 && t !== 'transparent' && t !== 'solid'){
+    out = document.createElement('canvas');
+    out.width = W; out.height = H;
+    const o = out.getContext('2d');
+    o.filter = `blur(${b}px)`;
+    o.drawImage(base, -b * 2, -b * 2, W + b * 4, H + b * 4);
+  }
+
+  if(bgTex) bgTex.dispose();
+  bgTex = new THREE.CanvasTexture(out);
+  scene.background = bgTex;
+  renderer.setClearColor(0x000000, 1);
+}
+/* ---------- Boyut & kamera ---------- */
+function sizeFromUI(){
+  [W, H] = val('res').split('x').map(Number);
+  renderer.setSize(W, H, false);
+  cam.aspect = W / H;
+  applyView();
+  drawBG();
+}
+function applyView(){
+  const v = n0('vs') / 100;
+  if(v){
+    cam.setViewOffset(W, H, 0, -v * H, W, H);
+    ocam.setViewOffset(W, H, 0, -v * H, W, H);
+  } else {
+    cam.clearViewOffset();
+    ocam.clearViewOffset();
+  }
+}
+function camDist(){
+  const fv = THREE.MathUtils.degToRad(cam.fov);
+  const fh = 2 * Math.atan(Math.tan(fv / 2) * cam.aspect);
+  return 1.25 / Math.sin(Math.min(fv, fh) / 2) * num('zm');
+}
+function placeCamera(extra = 0){
+  const d = camDist();
+  const e = THREE.MathUtils.degToRad(num('el') + extra);
+  cam.up.set(0, 1, 0);
+  cam.position.set(0, Math.sin(e) * d, Math.cos(e) * d);
+  cam.lookAt(0, 0, 0);
+}
+
+/* ---------- Kamera hareketleri (YENİ) ---------- */
+function applyCamMotion(t){
+  const m = val('camo');
+  if(m === 'none') return {extra: 0, orbitY: 0, dollyK: 1};
+  if(m === 'orbit')  return {extra: 0, orbitY: Math.sin(t * Math.PI * 2) * .35, dollyK: 1};
+  if(m === 'sine')   return {extra: Math.sin(t * Math.PI * 4) * 8, orbitY: 0, dollyK: 1};
+  if(m === 'dolly')  return {extra: 0, orbitY: 0, dollyK: 1 + Math.sin(t * Math.PI * 2) * .18};
+  if(m === 'crane')  return {extra: Math.cos(t * Math.PI * 2) * 22, orbitY: 0, dollyK: 1};
+  return {extra: 0, orbitY: 0, dollyK: 1};
+}
+
+function frame(t){
+  if(t === null){
+    placeCamera();
+    return;
+  }
+  const mo = applyCamMotion(t);
+  pivot.rotation.y = offset + num('dir') * Math.PI * 2 * num('turns') * t + mo.orbitY;
+  const oldZm = num('zm');
+  if(mo.dollyK !== 1){
+    const zd = camDist() / num('zm') * mo.dollyK;
+    const e = THREE.MathUtils.degToRad(num('el') + mo.extra + ($('bob').checked ? 10 * Math.sin(2 * Math.PI * t) : 0));
+    cam.up.set(0, 1, 0);
+    cam.position.set(0, Math.sin(e) * zd, Math.cos(e) * zd);
+    cam.lookAt(0, 0, 0);
+  } else {
+    placeCamera(mo.extra + ($('bob').checked ? 10 * Math.sin(2 * Math.PI * t) : 0));
+  }
+}
+
+/* ---------- Model transformasyonu ---------- */
+const floorOn = () => $('sh').checked && !envKind;
+
+function fitFloor(){
+  if(!mesh) return;
+  mesh.updateMatrixWorld(true);
+  const p = mesh.geometry.attributes.position.array;
+  const m = mesh.matrixWorld.elements;
+  let mn = Infinity, minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+  for(let i = 0; i < p.length; i += 3){
+    const x = m[0] * p[i] + m[4] * p[i+1] + m[8] * p[i+2] + m[12];
+    const y = m[1] * p[i] + m[5] * p[i+1] + m[9] * p[i+2] + m[13];
+    const z = m[2] * p[i] + m[6] * p[i+1] + m[10] * p[i+2] + m[14];
+    if(y < mn) mn = y;
+    if(x < minX) minX = x; if(x > maxX) maxX = x;
+    if(z < minZ) minZ = z; if(z > maxZ) maxZ = z;
+  }
+  floor.position.y = mn - 0.002;
+  envG.position.y = floor.position.y;
+  const w = Math.max(.55, (maxX - minX) * 1.15);
+  const d = Math.max(.32, (maxZ - minZ) * .8);
+  contactShadow.position.set((minX + maxX) * .5, floor.position.y + .004, (minZ + maxZ) * .5 + .02);
+  contactShadow.scale.set(w / 1.55, d / .95, 1);
+}
+function applyTransform(){
+  if(!mesh) return;
+  const d = Math.PI / 180;
+  const z = val('up') === 'z';
+  const k = normK;
+  upG.rotation.x = z ? -Math.PI / 2 : 0;
+  user.rotation.set(n0('rx') * d, n0('ry') * d, n0('rz') * d, 'XYZ');
+  user.scale.setScalar(num('sc'));
+  root.position.set(
+    n0('px') * k,
+    (z ? n0('pz') : n0('py')) * k,
+    (z ? -n0('py') : n0('pz')) * k
+  );
+  $('vSc').textContent = num('sc').toFixed(2);
+  fitFloor();
+}
+const orient = applyTransform;
+
+/* ---------- Işıklandırma ---------- */
+function applyLight(){
+  const az = n0('la') * Math.PI / 180;
+  const w  = n0('lw') / 100;
+  const st = num('ls');
+  const base = new THREE.Color(1, 1, 1);
+  const ts = num('ts') / 100;
+  if(w > 0) base.lerp(new THREE.Color(1, .78, .55), w);
+  else      base.lerp(new THREE.Color(.7, .82, 1), -w);
+  base.lerp(new THREE.Color(val('ct')), ts * .6);
+
+  const isPhoto = PRESETS_SCENES_KEYS.includes(val('bg')) || val('bg') === 'photo';
+  const isDark  = val('bg') === 'darkroom';
+  const photoBoost = isPhoto ? 1.12 : 1;
+
+  key.color.copy(base);
+  key.intensity = .9 * st * photoBoost * (isDark ? 1.4 : 1);
+  key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
+  hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .55);
+  hemi.intensity = (isPhoto ? .62 : isDark ? .35 : .75) * st;
+  rim.color.copy(base).lerp(new THREE.Color(1, 1, 1), .3);
+  rim.intensity = (isPhoto ? .16 : isDark ? .55 : .3) * st;
+  fill.intensity = (isPhoto ? .1 : .15) * st;
+
+  floor.material.opacity = num('sa') * (isPhoto ? .78 : 1);
+  contactShadow.visible = !!(isPhoto && $('sh').checked && mesh);
+  contactShadow.material.opacity = Math.min(.85, .35 + num('sa') * .72);
+  if(contactShadow.visible){
+    contactShadow.position.y = floor.position.y + .002;
+    contactShadow.scale.set(1, 1, 1);
+  }
+}
+
+/* ---------- Görünüm uygulaması ---------- */
+function applyLook(){
+  const m = MATS[val('mat')] || MATS.plastik;
+  mat.roughness = m[0];
+  mat.metalness = m[1];
+  mat.clearcoat = m[2];
+  mat.clearcoatRoughness = val('mat') === 'parlak' ? .14 : .22;
+  if(val('mat') === 'cam'){
+    mat.transmission = 0;
+    mat.transparent = true;
+    mat.opacity = .55;
+  } else {
+    mat.transparent = false;
+    mat.opacity = 1;
+  }
+  mat.color.set(val('cm'));
+  mat.wireframe = $('wf').checked;
+  applyLight();
+  applyView();
+  drawBG();
+  key.castShadow = $('sh').checked;
+  $('cols').style.display = ['solid', 'grad', 'studio', 'transparent', 'gradient_pro'].includes(val('bg')) ? 'flex' : 'none';
+  labels();
+}
+
+/* ---------- Model parse (STL / OBJ / 3MF) ---------- */
+function parseSTL(buf){
+  const dv = new DataView(buf);
+  const head = new TextDecoder().decode(new Uint8Array(buf, 0, Math.min(80, buf.byteLength))).trim().toLowerCase();
+  if(buf.byteLength >= 84){
+    const n = dv.getUint32(80, true);
+    if(84 + n * 50 === buf.byteLength || (!head.startsWith('solid') && 84 + n * 50 < buf.byteLength)){
+      const p = new Float32Array(n * 9);
+      let o = 84;
+      for(let i = 0; i < n; i++){
+        o += 12;
+        for(let j = 0; j < 9; j++){ p[i*9+j] = dv.getFloat32(o, true); o += 4; }
+        o += 2;
+      }
+      return p;
+    }
+  }
+  const txt = new TextDecoder().decode(buf);
+  const re = /vertex\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)/g;
+  const a = []; let m;
+  while((m = re.exec(txt))) a.push(+m[1], +m[2], +m[3]);
+  if(!a.length || a.length % 9) throw new Error(T('e_stl'));
+  return new Float32Array(a);
+}
+function parseOBJ(buf){
+  const V = [], out = [];
+  for(const ln of new TextDecoder().decode(buf).split(/\r?\n/)){
+    if(ln.startsWith('v ')){
+      const p = ln.trim().split(/\s+/);
+      V.push([+p[1], +p[2], +p[3]]);
+    } else if(ln.startsWith('f ')){
+      const ix = ln.trim().split(/\s+/).slice(1).map(t => {
+        const k = parseInt(t); return k < 0 ? V.length + k : k - 1;
+      });
+      for(let i = 1; i < ix.length - 1; i++)
+        for(const k of [ix[0], ix[i], ix[i+1]]) out.push(...V[k]);
+    }
+  }
+  if(!out.length) throw new Error(T('e_obj'));
+  return Float32Array.from(out);
+}
+async function unzip(buf){
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  let e = u8.length - 22;
+  while(e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+  if(e < 0) throw new Error(T('e_3mf') + ' (zip)');
+  const n = dv.getUint16(e + 10, true), files = {};
+  let p = dv.getUint32(e + 16, true);
+  for(let i = 0; i < n; i++){
+    if(dv.getUint32(p, true) !== 0x02014b50) throw new Error(T('e_3mf') + ' (zip dir)');
+    const nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+    files[new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl))] = {
+      method: dv.getUint16(p + 10, true), csize: dv.getUint32(p + 20, true), lo: dv.getUint32(p + 42, true)
+    };
+    p += 46 + nl + el + cl;
+  }
+  return {files, async read(name){
+    const f = files[name];
+    if(f.csize === 0xFFFFFFFF || f.lo === 0xFFFFFFFF) throw new Error(T('e_3mf') + ' (zip64)');
+    const s = f.lo + 30 + dv.getUint16(f.lo + 26, true) + dv.getUint16(f.lo + 28, true);
+    const d = u8.subarray(s, s + f.csize);
+    if(f.method === 0) return d;
+    if(f.method !== 8) throw new Error(T('e_3mf') + ' (method ' + f.method + ')');
+    return new Uint8Array(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+  }};
+}
+async function parse3MF(buf){
+  const z = await unzip(buf);
+  const names = Object.keys(z.files).filter(k => !k.endsWith('/'));
+  const find = p => names.find(k => k.toLowerCase() === p.replace(/^\//, '').toLowerCase());
+  const attr = (el, ln) => { for(const a of el.attributes) if(a.localName === ln) return a.value; return null; };
+  const tfm = s => s ? s.trim().split(/\s+/).map(Number) : null;
+  const ap = (a, p) => a ? [
+    a[0]*p[0] + a[3]*p[1] + a[6]*p[2] + a[9],
+    a[1]*p[0] + a[4]*p[1] + a[7]*p[2] + a[10],
+    a[2]*p[0] + a[5]*p[1] + a[8]*p[2] + a[11]
+  ] : p;
+  const docs = {};
+  const load = async path => {
+    const n = find(path); if(!n) return null;
+    if(!docs[n]){
+      const xml = new DOMParser().parseFromString(new TextDecoder().decode(await z.read(n)), 'application/xml');
+      if(xml.getElementsByTagName('parsererror').length) throw new Error(T('e_3mf') + ' (xml ' + n + ')');
+      const objs = {};
+      for(const o of xml.getElementsByTagName('object')){
+        const m = o.getElementsByTagName('mesh')[0], ob = {};
+        if(m){
+          ob.v = [];
+          for(const v of m.getElementsByTagName('vertex')) ob.v.push([+v.getAttribute('x'), +v.getAttribute('y'), +v.getAttribute('z')]);
+          ob.t = [];
+          for(const t of m.getElementsByTagName('triangle')) ob.t.push([+t.getAttribute('v1'), +t.getAttribute('v2'), +t.getAttribute('v3')]);
+        } else {
+          ob.c = [...o.getElementsByTagName('component')].map(c => ({
+            id: c.getAttribute('objectid'), path: attr(c, 'path'), tf: c.getAttribute('transform')
+          }));
+        }
+        objs[o.getAttribute('id')] = ob;
+      }
+      docs[n] = {xml, objs, name: n};
+    }
+    return docs[n];
+  };
+  const out = [];
+  const emit = async (path, id, mats, depth) => {
+    const d = await load(path);
+    const o = d && d.objs[id];
+    if(!o || depth > 8) return;
+    if(o.t){
+      for(const t of o.t)
+        for(const k of t){
+          let p = o.v[k]; if(!p) continue;
+          for(const mt of mats) p = ap(mt, p);
+          out.push(p[0], p[1], p[2]);
+        }
+    } else {
+      for(const c of o.c) await emit(c.path || path, c.id, [tfm(c.tf), ...mats], depth + 1);
+    }
+  };
+  const rootPath = names.find(k => /^3d\/3dmodel\.model$/i.test(k)) || names.find(k => /\.model$/i.test(k));
+  if(!rootPath) throw new Error(T('e_3mf') + ' (no model: ' + names.slice(0, 6).join(', ') + ')');
+  const rd = await load(rootPath);
+  const items = [...rd.xml.getElementsByTagName('item')];
+  for(const it of items) await emit(attr(it, 'path') || rootPath, it.getAttribute('objectid'), [tfm(it.getAttribute('transform'))], 0);
+  if(!out.length) for(const id of Object.keys(rd.objs)) await emit(rootPath, id, [], 0);
+  if(!out.length) for(const n of names.filter(k => /\.model$/i.test(k))){
+    const d = await load(n);
+    for(const id of Object.keys(d.objs)) await emit(n, id, [], 0);
+  }
+  if(!out.length) throw new Error(T('e_3mf') + ' (no triangles)');
+  return Float32Array.from(out);
+}
+
+/* ---------- İstatistik (hacim + yüzey) ---------- */
+function stats(pos){
+  let v = 0, a = 0;
+  for(let i = 0; i < pos.length; i += 9){
+    const ax = pos[i], ay = pos[i+1], az = pos[i+2];
+    const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
+    const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
+    v += (ax * (by * cz - bz * cy) + ay * (bz * cx - bx * cz) + az * (bx * cy - by * cx)) / 6;
+    const ux = bx - ax, uy = by - ay, uz = bz - az;
+    const wx = cx - ax, wy = cy - ay, wz = cz - az;
+    a += .5 * Math.hypot(uy * wz - uz * wy, uz * wx - ux * wz, ux * wy - uy * wx);
+  }
+  return {v: Math.abs(v) / 1000, a: a / 100};
+}
+let curM = null;
+function refreshInfo(){
+  if(!curM){ $('info').textContent = ''; $('stats').textContent = ''; return; }
+  $('info').textContent = T('m_info', curM.name, (curM.pos.length / 9).toLocaleString(LANG), dims);
+  $('stats').textContent = T('m_stats', curM.st.v.toFixed(2), curM.st.a.toFixed(1), (curM.st.v * 1.24).toFixed(1));
+}
+
+/* ---------- Model yükleme ---------- */
+function setModel(i){
+  const m = models[i]; if(!m) return;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(m.pos.slice(), 3));
+  g.computeBoundingBox();
+  const c = new THREE.Vector3(), sz = new THREE.Vector3();
+  g.boundingBox.getCenter(c);
+  g.boundingBox.getSize(sz);
+  g.translate(-c.x, -c.y, -c.z);
+  g.computeBoundingSphere();
+  const k = 1 / g.boundingSphere.radius;
+  g.scale(k, k, k);
+  g.computeBoundingBox();
+  g.computeVertexNormals();
+  if(mesh){ user.remove(mesh); mesh.geometry.dispose(); }
+  mesh = new THREE.Mesh(g, mat);
+  mesh.castShadow = true;
+  user.add(mesh);
+  normK = k;
+  ['rx','ry','rz','px','py','pz'].forEach(i => $(i).value = 0);
+  $('sc').value = 1;
+  $('up').value = m.ext === 'obj' ? 'y' : 'z';
+  orient();
+  fileName = m.name;
+  dims = `${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm`;
+  curM = m;
+  if(!m.st) m.st = stats(m.pos);
+  refreshInfo();
+  $('stage').classList.add('has');
+  ['all','onlyV','onlyI','batch'].forEach(x => $(x).disabled = false);
+  $('models').value = i;
+  setMsg(T('m_ready'));
+}
+
+function addPhoto(f){
+  const im = new Image(), url = URL.createObjectURL(f);
+  im.onload = () => {
+    photos.push({img: im, url});
+    selPhoto = photos.length - 1;
+    $('bg').value = 'photo';
+    renderPhotos();
+    sceneDefaults();
+  };
+  im.src = url;
+}
+function renderPhotos(){
+  $('photos').innerHTML = '';
+  photos.forEach((p, i) => {
+    const t = document.createElement('img');
+    t.src = p.url;
+    t.className = i === selPhoto ? 'sel' : '';
+    t.onclick = () => { selPhoto = i; $('bg').value = 'photo'; renderPhotos(); sceneDefaults(); };
+    $('photos').appendChild(t);
+  });
+}
+async function loadFiles(list){
+  const fs = [...list];
+  const imgs = fs.filter(f => f.type.startsWith('image/'));
+  imgs.forEach(addPhoto);
+  const ms = fs.filter(f => /\.(stl|3mf|obj)$/i.test(f.name));
+  if(!ms.length){ if(!imgs.length) setMsg(T('m_unsup'), true); return; }
+  const fresh = [];
+  for(const f of ms){
+    try{
+      setMsg(T('m_read', f.name));
+      await tick();
+      const buf = await f.arrayBuffer();
+      const ext = f.name.split('.').pop().toLowerCase();
+      fresh.push({
+        name: f.name.replace(/\.[^.]+$/, ''),
+        ext,
+        pos: ext === '3mf' ? await parse3MF(buf) : ext === 'obj' ? parseOBJ(buf) : parseSTL(buf)
+      });
+    }catch(e){
+      setMsg(`${f.name}: ${e.message || e}`, true);
+      console.error(e);
+    }
+  }
+  if(!fresh.length) return;
+  models = fresh;
+  $('models').innerHTML = '';
+  models.forEach((m, i) => {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = m.name;
+    $('models').appendChild(o);
+  });
+  const many = models.length > 1;
+  $('models').style.display = many ? 'block' : 'none';
+  $('batch').style.display = many ? 'block' : 'none';
+  setModel(0);
+}
+
+/* ---------- Dosya seçme / sürükle-bırak ---------- */
+$('open').onclick = () => $('file').click();
+$('file').onchange = e => { loadFiles(e.target.files); e.target.value = ''; };
+$('models').onchange = e => setModel(+e.target.value);
+const st = $('stage');
+['dragenter','dragover'].forEach(n => st.addEventListener(n, e => { e.preventDefault(); st.classList.add('over'); }));
+['dragleave','drop'].forEach(n => st.addEventListener(n, e => { e.preventDefault(); st.classList.remove('over'); }));
+st.addEventListener('drop', e => loadFiles(e.dataTransfer.files));
+$('pickPhoto').onclick = () => $('photo').click();
+$('photo').onchange = e => { [...e.target.files].forEach(addPhoto); e.target.value = ''; };
+
+/* ---------- Fare / dokunma kontrolleri ---------- */
+let drag = null;
+const ptrs = new Map();
+let pinch = 0;
+const pd = () => { const a = [...ptrs.values()]; return Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); };
+function setZoom(v){
+  $('zm').value = Math.max(.3, Math.min(4, v));
+  labels();
+  saveSet();
+}
+cv.addEventListener('pointerdown', e => {
+  ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  cv.setPointerCapture(e.pointerId);
+  drag = ptrs.size === 1 ? {x: e.clientX, y: e.clientY} : null;
+  if(ptrs.size === 2) pinch = pd();
+});
+const up = e => { ptrs.delete(e.pointerId); drag = null; };
+cv.addEventListener('pointerup', up);
+cv.addEventListener('pointercancel', up);
+cv.addEventListener('pointermove', e => {
+  if(!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if(ptrs.size === 2){
+    const d = pd();
+    if(d > 0) setZoom(num('zm') * pinch / d);
+    pinch = d;
+    return;
+  }
+  if(!drag) return;
+  offset += (e.clientX - drag.x) * 0.01;
+  $('el').value = Math.max(-20, Math.min(85, num('el') + (e.clientY - drag.y) * 0.3));
+  drag = {x: e.clientX, y: e.clientY};
+  labels();
+});
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  setZoom(num('zm') * Math.exp(e.deltaY * 0.0012));
+}, {passive: false});
+cv.addEventListener('dblclick', () => { setZoom(1); offset = 0; });
+
+/* ---------- Transform girdileri ---------- */
+['rx','ry','rz','px','py','pz','sc'].forEach(i => $(i).addEventListener('input', applyTransform));
+[['bx','rx'], ['by','ry'], ['bz','rz']].forEach(([b, f]) => $(b).onclick = () => {
+  $(f).value = ((n0(f) + 90 + 180) % 360) - 180;
+  applyTransform();
+});
+$('trReset').onclick = () => {
+  ['rx','ry','rz','px','py','pz'].forEach(i => $(i).value = 0);
+  $('sc').value = 1;
+  applyTransform();
+};
+
+/* ---------- Etiketler ---------- */
+function labels(){
+  $('vDur').textContent = val('dur') + ' ' + T('sec');
+  $('vBr').textContent = val('br') + ' Mbps';
+  $('vEl').textContent = Math.round(num('el')) + '°';
+  $('vZm').textContent = num('zm').toFixed(2);
+  $('vBl').textContent = val('blur');
+  $('vLa').textContent = Math.round(n0('la')) + '°';
+  $('vLw').textContent = Math.round(n0('lw'));
+  $('vLs').textContent = num('ls').toFixed(2);
+  $('vSa').textContent = num('sa').toFixed(2);
+  $('vVs').textContent = Math.round(n0('vs')) + '%';
+}
+['dur','br','el','zm','blur'].forEach(i => $(i).addEventListener('input', labels));
+['cm','cb','cb2','wf','sh','bg','mat','blur'].forEach(i => $(i).addEventListener('input', applyLook));
+$('up').onchange = applyTransform;
+$('res').onchange = sizeFromUI;
+document.querySelector('aside').addEventListener('input', saveSet);
+
+/* ---------- Ana döngü ---------- */
+function loop(now){
+  if(!busy){
+    if(mesh) frame(drag ? null : paused ? 0 : (now / 1000 % num('dur')) / num('dur'));
+    renderFrame(cam);
+  }
+  requestAnimationFrame(loop);
+}
+/* ---------- Çıktı kaynağı (canvas + opsiyonel alt yazı) ---------- */
+const comp = document.createElement('canvas');
+function src(){
+  if(!$('cap').checked) return cv;
+  comp.width = W; comp.height = H;
+  const g = comp.getContext('2d');
+  g.drawImage(cv, 0, 0);
+  const fs = Math.round(H / 38);
+  g.font = `600 ${fs}px "IBM Plex Sans",system-ui,sans-serif`;
+  g.textBaseline = 'bottom';
+  g.shadowColor = 'rgba(0,0,0,.6)';
+  g.shadowBlur = fs / 4;
+  g.fillStyle = '#fff';
+  g.fillText(val('capt').trim() || `${fileName}   ${dims}`, fs, H - fs * .8);
+  return comp;
+}
+const blobOf = mime => new Promise(r => src().toBlob(r, mime, 0.95));
+
+/* ---------- Görünüm tanımları ---------- */
+const VIEWS = [
+  ['on',   'Ön',   [0, 0, 1],  [0, 1, 0],  'v_front'],
+  ['arka', 'Arka', [0, 0, -1], [0, 1, 0],  'v_back'],
+  ['sag',  'Sağ',  [1, 0, 0],  [0, 1, 0],  'v_right'],
+  ['sol',  'Sol',  [-1, 0, 0], [0, 1, 0],  'v_left'],
+  ['ust',  'Üst',  [0, 1, 0],  [0, 0, -1], 'v_top'],
+  ['alt',  'Alt',  [0, -1, 0], [0, 0, 1],  'v_bot']
+];
+const ISO = ['izo', 'Iso', [1, .8, 1], [0, 1, 0], 'v_iso'];
+
+async function renderView(v, mime){
+  let c = cam;
+  const d = camDist();
+  const n = Math.hypot(...v[2]);
+  const dir = v[2].map(x => x / n);
+  viewHide = v[0] === 'ust' || v[0] === 'alt';
+  envShow = v[0] !== 'alt';
+  envG.rotation.y = Math.hypot(dir[0], dir[2]) > .01 ? Math.atan2(dir[0], dir[2]) : 0;
+  if($('ortho').checked){
+    const s = 1.25 * num('zm');
+    const hh = s * Math.max(1, H / W);
+    Object.assign(ocam, {left: -hh * W / H, right: hh * W / H, top: hh, bottom: -hh});
+    ocam.updateProjectionMatrix();
+    c = ocam;
+  }
+  c.up.set(...v[3]);
+  c.position.set(...dir.map(x => x * (c === ocam ? 5 : d)));
+  c.lookAt(0, 0, 0);
+  pivot.rotation.y = 0;
+  applyView();
+  renderFrame(c);
+  viewHide = false;
+  envShow = true;
+  envG.rotation.y = 0;
+  cam.up.set(0, 1, 0);
+  return blobOf(mime);
+}
+
+/* ---------- WebCodecs video encoder (en hızlı) ---------- */
+async function encodeWebCodecs(fps, N, base, span){
+  const w = W & ~1, h = H & ~1;
+  const muxer = new Mp4Muxer.Muxer({
+    target: new Mp4Muxer.ArrayBufferTarget(),
+    video: {codec: 'avc', width: w, height: h},
+    fastStart: 'in-memory'
+  });
+  let fail = null;
+  const enc = new VideoEncoder({
+    output: (c, m) => muxer.addVideoChunk(c, m),
+    error: e => fail = e
+  });
+  const cfg = {
+    codec: 'avc1.64002A',
+    width: w, height: h,
+    bitrate: num('br') * 1e6,
+    framerate: fps
+  };
+  if(!(await VideoEncoder.isConfigSupported(cfg)).supported) throw new Error(T('e_h264'));
+  enc.configure(cfg);
+  for(let i = 0; i < N; i++){
+    if(fail) throw fail;
+    frame(i / N);
+    renderFrame(cam);
+    const fr = new VideoFrame(src(), {
+      timestamp: Math.round(i * 1e6 / fps),
+      duration: Math.round(1e6 / fps)
+    });
+    enc.encode(fr, {keyFrame: i % (fps * 2) === 0});
+    fr.close();
+    while(enc.encodeQueueSize > 6) await sleep(4);
+    if(i % 4 === 0){
+      progress(base + span * i / N);
+      setMsg(T('m_video', fileName, i + 1, N));
+      await tick();
+    }
+  }
+  await enc.flush();
+  muxer.finalize();
+  return {blob: new Blob([muxer.target.buffer], {type: 'video/mp4'}), ext: 'mp4'};
+}
+
+/* ---------- MediaRecorder fallback ---------- */
+async function encodeRecorder(fps, dur, base, span){
+  const mime = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm']
+    .find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m));
+  if(!mime) throw new Error(T('e_rec'));
+  const rec = new MediaRecorder(cv.captureStream(fps), {
+    mimeType: mime, videoBitsPerSecond: num('br') * 1e6
+  });
+  const chunks = [];
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  const done = new Promise(r => rec.onstop = r);
+  rec.start();
+  const t0 = performance.now();
+  await new Promise(res => (function step(){
+    const t = (performance.now() - t0) / 1000;
+    if(t >= dur){ res(); return; }
+    frame(t / dur);
+    renderFrame(cam);
+    progress(base + span * t / dur);
+    setMsg(T('m_rec'));
+    requestAnimationFrame(step);
+  })());
+  rec.stop();
+  await done;
+  return {
+    blob: new Blob(chunks, {type: mime.split(';')[0]}),
+    ext: mime.startsWith('video/mp4') ? 'mp4' : 'webm'
+  };
+}
+
+/* ---------- Dosya kaydetme ---------- */
+async function saveAll(files, dirH){
+  if(dirH){
+    for(const f of files){
+      const w = await (await dirH.getFileHandle(f.name, {create: true})).createWritable();
+      await w.write(f.blob);
+      await w.close();
+    }
+    return T('m_dirok', dirH.name);
+  }
+  for(const f of files){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(f.blob);
+    a.download = f.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    await sleep(700);
+  }
+  return T('m_dlok');
+}
+
+/* ---------- IndexedDB klasör tutamacı ---------- */
+const idb = (m, k, v) => new Promise((res, rej) => {
+  const o = indexedDB.open('m3d', 1);
+  o.onupgradeneeded = () => o.result.createObjectStore('h');
+  o.onerror = () => rej(o.error);
+  o.onsuccess = () => {
+    const s = o.result.transaction('h', m === 'get' ? 'readonly' : 'readwrite').objectStore('h');
+    const r = m === 'get' ? s.get(k) : s.put(v, k);
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  };
+});
+async function pickDir(){
+  if(val('sv') !== 'dir') return null;
+  try{
+    const h = await idb('get', 'dir');
+    if(!h) return null;
+    let p = await h.queryPermission({mode: 'readwrite'});
+    if(p !== 'granted') p = await h.requestPermission({mode: 'readwrite'});
+    return p === 'granted' ? h : null;
+  }catch(e){ return null; }
+}
+$('sv').addEventListener('change', () => $('pickDir').style.display = val('sv') === 'dir' ? 'block' : 'none');
+$('pickDir').onclick = async () => {
+  try{
+    const h = await showDirectoryPicker({mode: 'readwrite'});
+    await idb('put', 'dir', h);
+    setMsg(T('m_dirset', h.name));
+  }catch(e){
+    setMsg(T('e_dir') + ': ' + (e.message || e), true);
+  }
+};
+let lastFiles = [];
+$('redl').onclick = () => saveAll(lastFiles, null);
+
+/* ---------- Lightbox ---------- */
+let lbUrl = null;
+function openLb(u, nm, lbl){
+  $('lbi').src = u;
+  $('lbd').href = u;
+  $('lbd').download = nm;
+  $('lbd').textContent = T('dl') + ': ' + lbl;
+  lbUrl = u;
+  $('lb').style.display = 'flex';
+}
+$('lbc').onclick = () => $('lb').style.display = 'none';
+$('lb').onclick = e => { if(e.target === $('lb')) $('lb').style.display = 'none'; };
+$('lbcp').onclick = async () => {
+  try{
+    let b = await (await fetch(lbUrl)).blob();
+    if(b.type !== 'image/png'){
+      const bm = await createImageBitmap(b);
+      const c = document.createElement('canvas');
+      c.width = bm.width; c.height = bm.height;
+      c.getContext('2d').drawImage(bm, 0, 0);
+      b = await new Promise(r => c.toBlob(r, 'image/png'));
+    }
+    await navigator.clipboard.write([new ClipboardItem({'image/png': b})]);
+    setMsg(T('m_copied'));
+  }catch(e){
+    setMsg(String(e.message || e), true);
+  }
+};
+
+/* ---------- Küçük resim + katalog sayfası ---------- */
+function addThumb(blob, nm, label){
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement('button');
+  a.innerHTML = `<img src="${u}" alt="${label}">${label}`;
+  a.onclick = () => openLb(u, nm, label);
+  $('gal').appendChild(a);
+}
+async function makeSheet(blobs){
+  const bm = await Promise.all(blobs.map(b => createImageBitmap(b)));
+  const s = Math.min(1, 900 / bm[0].width);
+  const cw = Math.round(bm[0].width * s);
+  const ch = Math.round(bm[0].height * s);
+  const cols = 3;
+  const rows = Math.ceil(bm.length / 3);
+  const pad = Math.round(cw * .03);
+  const c = document.createElement('canvas');
+  c.width = cols * cw + (cols + 1) * pad;
+  c.height = rows * ch + (rows + 1) * pad;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4f5f6';
+  g.fillRect(0, 0, c.width, c.height);
+  bm.forEach((b, i) => g.drawImage(b,
+    pad + (i % cols) * (cw + pad),
+    pad + Math.floor(i / cols) * (ch + pad),
+    cw, ch
+  ));
+  return new Promise(r => c.toBlob(r, 'image/png'));
+}
+
+/* ---------- GIF kodlayıcı (medyan kesim + LZW) ---------- */
+function gifPalette(px){
+  let boxes = [px];
+  while(boxes.length < 256){
+    let bi = -1, br = 0, ch = 0;
+    boxes.forEach((b, i) => {
+      if(b.length < 2) return;
+      for(let c = 0; c < 3; c++){
+        let mn = 255, mx = 0;
+        for(const p of b){ if(p[c] < mn) mn = p[c]; if(p[c] > mx) mx = p[c]; }
+        if(mx - mn > br){ br = mx - mn; bi = i; ch = c; }
+      }
+    });
+    if(bi < 0) break;
+    const b = boxes[bi].sort((x, y) => x[ch] - y[ch]);
+    const m = b.length >> 1;
+    boxes.splice(bi, 1, b.slice(0, m), b.slice(m));
+  }
+  return boxes.map(b => {
+    let r = 0, g = 0, bl = 0;
+    for(const p of b){ r += p[0]; g += p[1]; bl += p[2]; }
+    const n = b.length || 1;
+    return [r / n | 0, g / n | 0, bl / n | 0];
+  });
+}
+function lzw(idx){
+  const out = [], clear = 256, eoi = 257;
+  let size = 9, next = 258, dict = new Map(), cur = 0, bits = 0;
+  const emit = c => {
+    cur |= c << bits;
+    bits += size;
+    while(bits >= 8){ out.push(cur & 255); cur >>>= 8; bits -= 8; }
+  };
+  emit(clear);
+  let w = idx[0];
+  for(let i = 1; i < idx.length; i++){
+    const k = idx[i], key = (w << 8) | k, f = dict.get(key);
+    if(f !== undefined){ w = f; continue; }
+    emit(w);
+    if(next < 4096){
+      dict.set(key, next++);
+      if(next > (1 << size) && size < 12) size++;
+    } else {
+      emit(clear); dict.clear(); size = 9; next = 258;
+    }
+    w = k;
+  }
+  emit(w); emit(eoi);
+  if(bits > 0) out.push(cur & 255);
+  return out;
+}
+async function makeGif(dur){
+  const qv = val('gifq') || 'mid';
+  const fps = qv === 'low' ? 10 : qv === 'high' ? 20 : 15;
+  const cap = qv === 'low' ? 90 : qv === 'high' ? 240 : 150;
+  const gw  = qv === 'low' ? 480 : qv === 'high' ? 720 : 640;
+  const N = Math.min(cap, Math.round(dur * fps));
+  const gh = Math.round(gw * H / W) & ~1;
+  const gc = document.createElement('canvas');
+  gc.width = gw; gc.height = gh;
+  const gx = gc.getContext('2d', {willReadFrequently: true});
+  const grab = i => {
+    frame(i / N);
+    renderFrame(cam);
+    gx.drawImage(src(), 0, 0, gw, gh);
+    return gx.getImageData(0, 0, gw, gh).data;
+  };
+  const samp = [];
+  for(const i of [0, Math.floor(N / 3), Math.floor(2 * N / 3)]){
+    const d = grab(i);
+    for(let k = 0; k < d.length; k += 32) samp.push([d[k], d[k+1], d[k+2]]);
+  }
+  const pal = gifPalette(samp);
+  const lut = new Int16Array(32768).fill(-1);
+  const near = (r, g, b) => {
+    const key = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+    let v = lut[key];
+    if(v >= 0) return v;
+    let bd = 1e9;
+    for(let i = 0; i < pal.length; i++){
+      const dr = pal[i][0] - r, dg = pal[i][1] - g, db = pal[i][2] - b;
+      const d = dr * dr + dg * dg + db * db;
+      if(d < bd){ bd = d; v = i; }
+    }
+    return lut[key] = v;
+  };
+  const bytes = [];
+  const w16 = v => bytes.push(v & 255, v >> 8);
+  [...'GIF89a'].forEach(c => bytes.push(c.charCodeAt(0)));
+  w16(gw); w16(gh);
+  bytes.push(0xF7, 0, 0);
+  for(let i = 0; i < 256; i++){
+    const p = pal[i] || [0, 0, 0];
+    bytes.push(p[0], p[1], p[2]);
+  }
+  bytes.push(0x21, 0xFF, 11, ...[...'NETSCAPE2.0'].map(c => c.charCodeAt(0)), 3, 1, 0, 0, 0);
+  for(let i = 0; i < N; i++){
+    const d = grab(i);
+    const idx = new Uint8Array(gw * gh);
+    for(let k = 0, j = 0; k < d.length; k += 4, j++) idx[j] = near(d[k], d[k+1], d[k+2]);
+    bytes.push(0x21, 0xF9, 4, 0);
+    w16(Math.round(100 / fps));
+    bytes.push(0, 0, 0x2C);
+    w16(0); w16(0); w16(gw); w16(gh);
+    bytes.push(0, 8);
+    const c = lzw(idx);
+    for(let k = 0; k < c.length; k += 255){
+      const n = Math.min(255, c.length - k);
+      bytes.push(n);
+      for(let j = 0; j < n; j++) bytes.push(c[k + j]);
+    }
+    bytes.push(0);
+    if(i % 3 === 0){
+      setMsg(T('m_gif', fileName, i + 1, N));
+      await tick();
+    }
+  }
+  bytes.push(0x3B);
+  return new Blob([new Uint8Array(bytes)], {type: 'image/gif'});
+}
+
+/* ---------- Ana işlem ---------- */
+async function run(doVideo, doImgs, dirH, keepBusy){
+  if(!mesh || busy) return false;
+  busy = true;
+  ['all','onlyV','onlyI','batch'].forEach(i => $(i).disabled = true);
+  $('res').style.display = 'none';
+  $('gal').style.display = 'none';
+  $('gal').innerHTML = '';
+  $('bar').style.display = 'block';
+  progress(0);
+  const files = [];
+  let ok = true, vurl = null;
+  try{
+    const fmt = val('fmt');
+    const ext = fmt === 'jpeg' ? 'jpg' : fmt;
+    const fps = parseInt(val('fps'));
+    const dur = num('dur');
+    sizeFromUI();
+    const views = $('iso').checked ? [...VIEWS, ISO] : VIEWS;
+    const share = doVideo ? .25 : 1;
+
+    if(doImgs){
+      drawBG(fmt === 'jpeg');
+      for(let i = 0; i < views.length; i++){
+        const v = views[i];
+        setMsg(T('m_view', fileName, T(v[4])));
+        const blob = await renderView(v, 'image/' + fmt);
+        const nm = `${fileName}_${v[0]}.${ext}`;
+        files.push({name: nm, blob});
+        addThumb(blob, nm, T(v[4]));
+        progress((i + 1) / views.length * share);
+        await tick();
+      }
+      if($('sheet').checked){
+        const sb = await makeSheet(files.map(f => f.blob));
+        files.push({name: `${fileName}_sheet.png`, blob: sb});
+        addThumb(sb, `${fileName}_sheet.png`, '▦');
+      }
+      $('gal').style.display = 'grid';
+    }
+
+    if(doVideo){
+      drawBG(true);
+      const base = doImgs ? share : 0;
+      const out = (window.VideoEncoder && window.VideoFrame && window.Mp4Muxer)
+        ? await encodeWebCodecs(fps, Math.round(dur * fps), base, 1 - base)
+        : await encodeRecorder(fps, dur, base, 1 - base);
+      files.unshift({name: `${fileName}.${out.ext}`, blob: out.blob});
+      vurl = URL.createObjectURL(out.blob);
+      $('vid').src = vurl;
+      $('dl').href = vurl;
+      $('dl').download = `${fileName}.${out.ext}`;
+      $('dl').textContent = T('dl') + ': ' + fileName + '.' + out.ext;
+      if($('gif').checked){
+        drawBG(true);
+        const gb = await makeGif(dur);
+        files.push({name: `${fileName}.gif`, blob: gb});
+      }
+    }
+
+    lastFiles = files;
+    $('redl').style.display = 'block';
+    $('gal').scrollIntoView({block: 'nearest'});
+    setMsg(T('m_save'));
+    const where = await saveAll(files, dirH);
+    $('vid').style.display = doVideo ? 'block' : 'none';
+    $('dl').style.display = doVideo ? 'inline-flex' : 'none';
+    $('res').style.display = doVideo ? 'flex' : 'none';
+    if(doVideo) $('vid').play().catch(() => {});
+    progress(1);
+    setMsg(T('m_done', fileName, files.length, where));
+  }catch(e){
+    ok = false;
+    setMsg(e.message || String(e), true);
+    console.error(e);
+  }
+  busy = false;
+  ['all','onlyV','onlyI'].forEach(i => $(i).disabled = false);
+  $('batch').disabled = false;
+  sizeFromUI();
+  applyLook();
+  setTimeout(() => $('bar').style.display = 'none', 800);
+  return ok;
+}
+
+/* ---------- Butonlar ---------- */
+$('all').onclick   = async () => run(true,  true,  await pickDir());
+$('onlyV').onclick = async () => run(true,  false, await pickDir());
+$('onlyI').onclick = async () => run(false, true,  await pickDir());
+$('batch').onclick = async () => {
+  const dir = await pickDir();
+  const cur = +val('models') || 0;
+  for(let i = 0; i < models.length; i++){
+    setModel(i);
+    if(!(await run(true, true, dir))) break;
+  }
+  setModel(cur);
+};
+/* ---------- Preset sahne anahtarları (applyLight için) ---------- */
+const PRESETS_SCENES_KEYS = ['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12','p13','p14','p15'];
+
+/* ---------- Sahne ön ayarları (fotoğraf presetleri için) ---------- */
+const PRESETS = {
+  p1:  {az: 50, w: .1,  s: 1,    vs: 10, bl: 1},
+  p2:  {az: 60, w: 0,   s: 1.05, vs: 8,  bl: 1.5},
+  p3:  {az: 55, w: .05, s: 1,    vs: 12, bl: 2},
+  p4:  {az: 25, w: .1,  s: .95,  vs: 8,  bl: 2.5},
+  p5:  {az: -50, w: .1, s: 1,    vs: 10, bl: 1},
+  p6:  {az: 55, w: .7,  s: 1,    vs: 10, bl: 1},
+  p7:  {az: 50, w: -.6, s: 1,    vs: 10, bl: 1},
+  p8:  {az: 40, w: .5,  s: .7,   vs: 10, bl: 1},
+  p9:  {az: 50, w: 0,   s: 1,    vs: 10, bl: 1},
+  p10: {az: 50, w: 0,   s: 1.1,  vs: 10, bl: 1.5},
+  p11: {az: 30, w: 0,   s: 1.15, vs: 8,  bl: .5},
+  p12: {az: 20, w: .3,  s: .85,  vs: 12, bl: 2},
+  p13: {az: 40, w: .2,  s: 1.1,  vs: 8,  bl: 1},
+  p14: {az: -20, w: -.5, s: .75, vs: 12, bl: 1.5},
+  p15: {az: 45, w: -.3, s: 1.05, vs: 10, bl: 1}
+};
+
+/* ---------- Fotoğraf analizi (renk/ışık ölçümü) ---------- */
+function analyze(img){
+  const c = document.createElement('canvas');
+  c.width = 32; c.height = 40;
+  const g = c.getContext('2d', {willReadFrequently: true});
+  g.drawImage(img, 0, 0, 32, 40);
+  const d = g.getImageData(0, 0, 32, 40).data;
+  let L = 0, R = 0, nl = 0, nr = 0, rr = 0, gg = 0, bb = 0, lum = 0, top = 0, bot = 0;
+  for(let y = 0; y < 22; y++)
+    for(let x = 0; x < 32; x++){
+      const i = (y * 32 + x) * 4;
+      const v = .3 * d[i] + .59 * d[i+1] + .11 * d[i+2];
+      if(x < 16){ L += v; nl++; } else { R += v; nr++; }
+    }
+  for(let y = 0; y < 40; y++)
+    for(let x = 0; x < 32; x++){
+      const i = (y * 32 + x) * 4;
+      const v = .3 * d[i] + .59 * d[i+1] + .11 * d[i+2];
+      rr += d[i]; gg += d[i+1]; bb += d[i+2]; lum += v;
+      if(y < 20) top += v; else bot += v;
+    }
+  const n = d.length / 4;
+  const diff = (R / nr - L / nl) / 255;
+  const avgR = rr / n / 255, avgG = gg / n / 255, avgB = bb / n / 255, avgL = lum / n / 255;
+  return {
+    la: Math.max(-80, Math.min(80, diff * 260)),
+    lw: Math.max(-100, Math.min(100, (avgR - avgB) * 360)),
+    ls: Math.max(.65, Math.min(1.35, .62 + avgL * .78)),
+    vs: 10,
+    blur: 1,
+    avgR, avgG, avgB, avgL,
+    topL: top / (32 * 20 * 255),
+    botL: bot / (32 * 20 * 255)
+  };
+}
+
+/* ---------- Sahne varsayılanları ---------- */
+function sceneDefaults(){
+  const t = val('bg');
+  const p = PRESETS[t];
+  let d;
+  if(p) d = {la: p.az, lw: p.w * 100, ls: p.s, vs: p.vs, blur: p.bl};
+  else if(t === 'photo' && photos[selPhoto]) d = analyze(photos[selPhoto].img);
+  else d = {la: 35, lw: 0, ls: 1, vs: 0, blur: num('blur')};
+  photoMatch = (p || (t === 'photo' && photos[selPhoto])) ? d : null;
+  $('la').value = d.la;
+  $('lw').value = d.lw;
+  $('ls').value = d.ls;
+  $('vs').value = d.vs;
+  $('blur').value = d.blur;
+  $('ts').value = 0;
+  $('sa').value = photoMatch ? .34 : .28;
+  if(PRESETS[t]) $('ortho').checked = false;
+  if(ENV3D.includes(t) && num('el') > 14) $('el').value = 10;
+  applyLook();
+  labels();
+  saveSet();
+}
+
+/* ---------- Otomatik düzleme (lay flat) ---------- */
+function layFlat(){
+  if(!mesh) return;
+  const p = mesh.geometry.attributes.position.array;
+  const bk = new Map();
+  for(let i = 0; i < p.length; i += 9){
+    const ux = p[i+3] - p[i],   uy = p[i+4] - p[i+1], uz = p[i+5] - p[i+2];
+    const wx = p[i+6] - p[i],   wy = p[i+7] - p[i+1], wz = p[i+8] - p[i+2];
+    let nx = uy * wz - uz * wy;
+    let ny = uz * wx - ux * wz;
+    let nz = ux * wy - uy * wx;
+    const a = Math.hypot(nx, ny, nz);
+    if(a < 1e-12) continue;
+    nx /= a; ny /= a; nz /= a;
+    const key = Math.round(nx * 6) + ',' + Math.round(ny * 6) + ',' + Math.round(nz * 6);
+    const e = bk.get(key) || {a: 0, x: 0, y: 0, z: 0};
+    e.a += a; e.x += nx * a; e.y += ny * a; e.z += nz * a;
+    bk.set(key, e);
+  }
+  let best = null;
+  bk.forEach(e => { if(!best || e.a > best.a) best = e; });
+  if(!best) return;
+  const n = new THREE.Vector3(best.x, best.y, best.z).normalize();
+  const down = val('up') === 'z' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0);
+  const q = new THREE.Quaternion().setFromUnitVectors(n, down);
+  const e = new THREE.Euler().setFromQuaternion(q, 'XYZ');
+  const r = 180 / Math.PI;
+  $('rx').value = (e.x * r).toFixed(1);
+  $('ry').value = (e.y * r).toFixed(1);
+  $('rz').value = (e.z * r).toFixed(1);
+  applyTransform();
+}
+
+/* ---------- Arka planı fırınlama (3D ortam için) ---------- */
+function bake(c){
+  const k = [
+    ...c.projectionMatrix.elements,
+    c.position.x, c.position.y, c.position.z,
+    c.up.x, c.up.y, c.up.z,
+    W, H, num('blur'),
+    envKind, envG.rotation.y, envG.position.y
+  ].join('|');
+  if(k !== bakeKey){
+    const vis = [root.visible, floor.visible, envG.visible];
+    root.visible = false;
+    floor.visible = false;
+    envG.visible = true;
+    scene.background = envBg;
+    renderer.render(scene, c);
+    const tc = document.createElement('canvas');
+    tc.width = W; tc.height = H;
+    const g = tc.getContext('2d');
+    const b = num('blur') * H / 1080;
+    g.filter = `blur(${b}px)`;
+    g.drawImage(cv, -b * 2, -b * 2, W + b * 4, H + b * 4);
+    if(bgTex) bgTex.dispose();
+    bgTex = new THREE.CanvasTexture(tc);
+    [root.visible, floor.visible, envG.visible] = vis;
+    bakeKey = k;
+  }
+  scene.background = bgTex;
+}
+
+/* ---------- Kare çizimi ---------- */
+function renderFrame(c){
+  if(envKind){
+    const baked = envShow && num('blur') > 0;
+    if(baked) bake(c);
+    else scene.background = envBg;
+    envG.visible = envShow && !baked;
+    floor.visible = $('sh').checked && !viewHide && (baked || !envShow);
+    contactShadow.visible = false;
+  } else {
+    floor.visible = $('sh').checked && !viewHide;
+    contactShadow.visible = !!(
+      (PRESETS_SCENES_KEYS.includes(val('bg')) || val('bg') === 'photo') &&
+      $('sh').checked && mesh && !viewHide
+    );
+  }
+  root.visible = true;
+  renderer.render(scene, c);
+}
+
+/* ---------- Dil uygulama ---------- */
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+  document.title = T('title');
+  document.querySelectorAll('[data-i]').forEach(e => {
+    e.textContent = T(e.dataset.i) + (e.dataset.s || '');
+  });
+  document.querySelectorAll('[data-g]').forEach(e => { e.label = T(e.dataset.g); });
+  $('drop').innerHTML = `<b>${T('drop1')}</b><span>${T('drop2')}</span>`;
+  $('pau').textContent = T(paused ? 'play' : 'pause');
+  labels();
+  refreshInfo();
+  if(!mesh) setMsg(T('m_start'));
+}
+
+/* ---------- Dil seçici ---------- */
+$('lang').onchange = () => {
+  LANG = val('lang');
+  try{ localStorage.setItem('m3dlang', LANG); }catch(e){}
+  applyLang();
+};
+
+/* ---------- Işık / renk girdileri ---------- */
+['la','lw','ls','sa','ct','ts','vs'].forEach(i => $(i).addEventListener('input', applyLook));
+$('bg').addEventListener('change', sceneDefaults);
+$('autoH').onclick = sceneDefaults;
+$('flat').onclick = layFlat;
+
+/* ---------- Butonlar ---------- */
+$('fsb').onclick = () => {
+  if(document.fullscreenElement) document.exitFullscreen();
+  else if($('stage').requestFullscreen) $('stage').requestFullscreen();
+};
+$('pau').onclick = () => {
+  paused = !paused;
+  $('pau').textContent = T(paused ? 'play' : 'pause');
+};
+document.querySelectorAll('[data-qv]').forEach(b => b.onclick = () => {
+  const [a, e] = b.dataset.qv.split(',').map(Number);
+  offset = a * Math.PI / 180;
+  $('el').value = e;
+  paused = true;
+  $('pau').textContent = T('play');
+  labels();
+  saveSet();
+});
+
+/* ---------- Malzeme değişince uygula ---------- */
+$('mat').addEventListener('change', applyLook);
+
+/* ---------- Başlatma ---------- */
+LANG = detectLang();
+$('lang').value = LANG;
+
+let firstRun = true;
+try{ firstRun = !localStorage.getItem('m3dset3'); }catch(e){}
+loadSet();
+applyLang();
+sizeFromUI();
+labels();
+
+if(firstRun){
+  sceneDefaults();
+} else {
+  applyLook();
+}
+
+/* Pause butonu başlangıç */
+$('pau').textContent = T('pause');
+
+/* Ana döngüyü başlat */
+requestAnimationFrame(loop);
+
+/* İlk açılışta uyarı */
+window.addEventListener('load', () => {
+  if(!mesh) setMsg(T('m_start'));
+});
+
+/* Klavye kısayolları (bonus) */
+document.addEventListener('keydown', e => {
+  if(e.target.matches('input, select, textarea')) return;
+  if(e.code === 'Space'){ e.preventDefault(); $('pau').click(); }
+  if(e.code === 'KeyF'){ e.preventDefault(); $('fsb').click(); }
+  if(e.code === 'KeyR'){ e.preventDefault(); $('trReset').click(); }
+});
+
+/* ---------- SON ---------- */
+</script>
+</body>
+</html>
