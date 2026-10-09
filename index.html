@@ -169,10 +169,9 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
     </div>
     <div id="sw" class="swatches"></div>
     <div class="row">
-      <label><span data-i="upax"></span><select id="up"><option value="z">Z (STL, 3MF)</option><option value="y">Y (OBJ)</option></select></label>
+      <label><span data-i="upax"></span><select id="up"><option value="auto" data-i="up_auto"></option><option value="z" data-i="up_z"></option><option value="y" data-i="up_y"></option></select></label>
       <label><span data-i="dir"></span><select id="dir"><option value="1" data-i="ccw"></option><option value="-1" data-i="cw"></option></select></label>
     </div>
-    <label class="rng"><span data-i="fdm"></span><span id="vFd">40</span><input id="fd" type="range" min="0" max="100" step="1" value="40"></label>
     <label class="chk"><input id="wf" type="checkbox"><span data-i="wire"></span></label>
   </fieldset>
 <fieldset>
@@ -311,10 +310,12 @@ m3=Parlak|Glossy|Glänzend|Brillant|Brillante|Глянцевый|لامع
 m4=Kil|Clay|Ton|Argile|Arcilla|Глина|طين
 m5=Metal|Metal|Metall|Métal|Metal|Металл|معدن
 m6=Fırçalı metal|Brushed metal|Gebürstetes Metall|Métal brossé|Metal cepillado|Шлифованный металл|معدن مصقول
-fdm=Katman çizgisi gücü (FDM, yalnızca Plastik)|Layer line strength (FDM, plastic only)
 t_scene=Sahne|Scene
 t_res=Sonuç|Results
 res_hint=Oluşturulan video ve görüntüler burada görünür.|Rendered video and images appear here.
+up_auto=Otomatik (dosya türüne göre)|Auto (by file type)
+up_z=Z yukarı (STL, 3MF, CAD)|Z up (STL, 3MF, CAD)
+up_y=Y yukarı (OBJ, Blender, oyun)|Y up (OBJ, Blender, games)
 th_light=Açık|Light|Hell|Clair|Claro|Светлая|فاتح
 th_dark=Koyu|Dark|Dunkel|Sombre|Oscuro|Тёмная|داكن
 th_ocean=Okyanus|Ocean|Ozean|Océan|Océano|Океан|محيط
@@ -439,17 +440,8 @@ const fillB = new THREE.DirectionalLight(0xffffff, 0); fillB.position.set(0, -5,
 const aoTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), r = g.createRadialGradient(128, 128, 0, 128, 128, 128); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(.25, 'rgba(0,0,0,.4)'); r.addColorStop(.5, 'rgba(0,0,0,.18)'); r.addColorStop(.75, 'rgba(0,0,0,.05)'); r.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
 const ao = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map: aoTex, transparent: true, depthWrite: false, toneMapped: false}));
 ao.rotation.x = -Math.PI / 2; ao.renderOrder = 2; scene.add(ao);
-const MATS = {plastik: [.46, 0], mat: [.85, 0], parlak: [.16, 0], kil: [.95, 0], metal: [.26, 1], firca: [.5, 1]};
+const MATS = {plastik: [.4, 0], mat: [.85, 0], parlak: [.16, 0], kil: [.95, 0], metal: [.26, 1], firca: [.5, 1]};
 
-const fdmU = {uLayer: {value: .01}, uFloor: {value: 0}, uFdm: {value: 0}};
-mat.extensions = {derivatives: true};
-mat.onBeforeCompile = sh => {
-  Object.assign(sh.uniforms, fdmU);
-  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos; uniform float uLayer, uFloor, uFdm;')
-    .replace('#include <color_fragment>', '#include <color_fragment>\nfloat fdmT = (vWPos.y - uFloor) / uLayer, fdmF = fract(fdmT), fdmP = sin(fdmF * 3.14159265);\nfloat fdmW = 1.0 - smoothstep(0.3, 0.7, fwidth(fdmT)); diffuseColor.rgb *= 1.0 - uFdm * 0.1 * fdmW * (1.0 - fdmP);')
-    .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nvec3 fdmUp = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);\nfloat fdmV = 1.0 - abs(dot(normal, fdmUp));\nnormal = normalize(normal + fdmUp * cos(fdmF * 3.14159265) * uFdm * 0.5 * fdmW * fdmV);');
-};
 let phase = 0, lastT = 0, paused = false, mesh = null, models = [], fileName = 'model', dims = '', offset = 0, busy = false, W = 1920, H = 1080, bgTex = null, normK = 1;
 const photos = []; let selPhoto = -1;
 const val = id => $(id).value, num = id => parseFloat(val(id));
@@ -458,7 +450,7 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg', 'fd'];
+const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg'];
 const isChk = i => $(i).type === 'checkbox';
 function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset6', JSON.stringify(o)); }catch(e){} }
 function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset6') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
@@ -619,7 +611,7 @@ function drawBG(solid){
   if(bgTex) bgTex.dispose();
   bgTex = new THREE.CanvasTexture(out); bgTex.encoding = THREE.sRGBEncoding; scene.background = bgTex; renderer.setClearColor(0x000000, 1);
 }
-function sizeFromUI(){ [W, H] = val('res').split('x').map(Number); renderer.setSize(W, H, false); cam.aspect = W / H; applyView(); drawBG(); }
+function sizeFromUI(){ [W, H] = val('res').split('x').map(Number); renderer.setSize(W, H, false); cam.aspect = W / H; applyView(); drawBG(); if(mesh) fitFloor(); }
 function applyView(){ const v = n0('vs') / 100; if(v){ cam.setViewOffset(W, H, 0, -v * H, W, H); ocam.setViewOffset(W, H, 0, -v * H, W, H); } else { cam.clearViewOffset(); ocam.clearViewOffset(); } }
 
 /* ---------- kamera ve görünüm ---------- */
@@ -634,11 +626,12 @@ function fitFloor(){
   for(let i = 0; i < p.length; i += 3){ const y = m[1] * p[i] + m[5] * p[i+1] + m[9] * p[i+2]; if(y < mn) mn = y; if(y > mx) mx = y; }
   const lim = mn + (mx - mn) * .12; let rb = 0, ra = 0;
   for(let i = 0; i < p.length; i += 3){ const x = p[i], y0 = p[i+1], z = p[i+2], y = m[1] * x + m[5] * y0 + m[9] * z, wx = m[0] * x + m[4] * y0 + m[8] * z, wz = m[2] * x + m[6] * y0 + m[10] * z, r = Math.sqrt(wx * wx + wz * wz); if(r > ra) ra = r; if(y < lim && r > rb) rb = r; }
-  floor.position.y = mn + m[13] - 0.002; fdmU.uFloor.value = mn + m[13]; fdmU.uLayer.value = (mx - mn) / Math.max(60, Math.min(160, (mx - mn) / (normK * Math.max(.01, num('sc'))) / .2)); envG.position.y = floor.position.y;
+  floor.position.y = mn + m[13] - 0.002; envG.position.y = floor.position.y;
   const R = Math.max(rb * 1.5, ra * .6, .35); ao.scale.set(R * 2.9, R * 2.9, 1); ao.position.set(m[12], floor.position.y + .003, m[14]);
 }
+const upAxis = () => { const v = val('up'); return v === 'auto' ? (curM && curM.ext === 'obj' ? 'y' : 'z') : v; };
 function applyTransform(){
-  if(!mesh) return; const d = Math.PI / 180, z = val('up') === 'z', k = normK;
+  if(!mesh) return; const d = Math.PI / 180, z = upAxis() === 'z', k = normK;
   upG.rotation.x = z ? -Math.PI / 2 : 0;
   user.rotation.set(n0('rx') * d, n0('ry') * d, n0('rz') * d, 'XYZ'); user.scale.setScalar(num('sc'));
   root.position.set(n0('px') * k, (z ? n0('pz') : n0('py')) * k, (z ? -n0('py') : n0('pz')) * k);
@@ -652,7 +645,7 @@ function applyLight(){
   key.color.copy(base); key.intensity = 1.2 * st; key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
   hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .5); hemi.intensity = .35 * st; floor.material.opacity = num('sa'); ao.material.opacity = Math.min(1, num('sa') * 1.5);
 }
-function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; fdmU.uFdm.value = val('mat') === 'plastik' ? num('fd') / 100 : 0; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
+function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
@@ -774,7 +767,7 @@ function setModel(i){
   if(mesh){ user.remove(mesh); mesh.geometry.dispose(); }
   mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k; edgeLines = null; updateEdges();
   ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1;
-  $('up').value = m.ext === 'obj' ? 'y' : 'z'; orient();
+  curM = m; $('up').value = 'auto'; orient();
   fileName = m.name; dims = `${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm`; curM = m; if(!m.st) m.st = stats(m.pos);
   refreshInfo();
   $('stage').classList.add('has'); ['all', 'onlyV', 'onlyI', 'batch'].forEach(x => $(x).disabled = false);
@@ -837,10 +830,10 @@ cv.addEventListener('dblclick', () => { setZoom(1); offset = 0; });
 ['rx', 'ry', 'rz', 'px', 'py', 'pz', 'sc'].forEach(i => $(i).addEventListener('input', applyTransform));
 [['bx', 'rx'], ['by', 'ry'], ['bz', 'rz']].forEach(([b, f]) => $(b).onclick = () => { $(f).value = ((n0(f) + 90 + 180) % 360) - 180; applyTransform(); });
 $('trReset').onclick = () => { ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1; applyTransform(); };
-function labels(){ $('vFd').textContent = val('fd'); $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
+function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
 ['dur', 'br', 'el', 'zm', 'blur'].forEach(i => $(i).addEventListener('input', labels));
 ['cm', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
-$('fd').addEventListener('input', () => { applyLook(); labels(); }); $('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
+$('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
 document.querySelector('aside').addEventListener('input', saveSet);
 
 function loop(now){
@@ -1050,7 +1043,7 @@ function layFlat(){
     const key = Math.round(nx * 6) + ',' + Math.round(ny * 6) + ',' + Math.round(nz * 6), e = bk.get(key) || {a: 0, x: 0, y: 0, z: 0}; e.a += a; e.x += nx * a; e.y += ny * a; e.z += nz * a; bk.set(key, e);
   }
   let best = null; bk.forEach(e => { if(!best || e.a > best.a) best = e; }); if(!best) return;
-  const n = new THREE.Vector3(best.x, best.y, best.z).normalize(), down = val('up') === 'z' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0);
+  const n = new THREE.Vector3(best.x, best.y, best.z).normalize(), down = upAxis() === 'z' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0);
   const q = new THREE.Quaternion().setFromUnitVectors(n, down), e = new THREE.Euler().setFromQuaternion(q, 'XYZ'), r = 180 / Math.PI;
   $('rx').value = (e.x * r).toFixed(1); $('ry').value = (e.y * r).toFixed(1); $('rz').value = (e.z * r).toFixed(1); applyTransform();
 }
