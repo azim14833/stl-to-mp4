@@ -85,16 +85,20 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 }
 @media(max-width:400px){.xyz{grid-template-columns:minmax(0,1fr)}.qv{grid-template-columns:repeat(3,minmax(0,1fr))}.row{grid-template-columns:minmax(0,1fr)}#gal{grid-template-columns:repeat(2,minmax(0,1fr))}.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-     html, body {
+html {
   height: auto !important;
-  min-height: 100vh !important;
   overflow-y: auto !important;
 }
 
-#stage, main {
-  position: relative !important;
+body {
+  min-height: 100vh !important;
   height: auto !important;
-  margin-bottom: 40px !important;
+}
+
+#stage {
+  height: 60vh !important;
+  max-height: 600px !important;
+  position: relative !important;
 }
 </style>
 </head>
