@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<meta name="google-adsense-account" content="ca-pub-5140289630713717">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5140289630713717" crossorigin="anonymous"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D Model → MP4 + Görünümler</title>
@@ -11,10 +13,11 @@
 [data-theme=ocean]{--ink:#e0f6ff;--mute:#8fb4c4;--bg:#04101a;--panel:#0a1c2a;--card:#0f2a3b;--line:#1c4157;--field:#08161f;--hover:#153a50;--accent:#22d3ee;--accent-d:#0fb5d1;--on-accent:#04222b;--stage:#071722;--dropbg:rgba(15,42,59,.6);--font:"Space Grotesk",system-ui,sans-serif;--fh:"Space Grotesk",system-ui,sans-serif;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,20,30,.45);color-scheme:dark}
 [data-theme=sunset]{--ink:#3a2418;--mute:#86624f;--bg:#f0dcc9;--panel:#fbf3ea;--card:#fffaf4;--line:#efdccb;--field:#fff;--hover:#f7e8d8;--accent:#e8622c;--accent-d:#c94c1a;--on-accent:#fff;--stage:#e6cdb6;--dropbg:rgba(255,250,244,.6);--font:"Manrope",system-ui,sans-serif;--fh:"Manrope",system-ui,sans-serif;--sh:0 1px 2px rgba(90,40,10,.06),0 8px 24px rgba(90,40,10,.1);color-scheme:light}
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{font:14px/1.5 var(--font),"Noto Sans","Noto Sans Arabic",Arial,sans-serif;color:var(--ink);background:var(--bg);padding:12px;gap:12px;display:grid;grid-template-columns:minmax(0,1fr) clamp(340px,29vw,420px);grid-template-rows:minmax(0,1fr);-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+html,body{margin:0;min-height:100%}
+body{font:14px/1.5 var(--font),"Noto Sans","Noto Sans Arabic",Arial,sans-serif;color:var(--ink);background:var(--bg);padding:12px;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+.app{display:grid;grid-template-columns:minmax(0,1fr) clamp(400px,36vw,520px);gap:12px;height:calc(100vh - 24px);height:calc(100dvh - 24px);min-height:560px}
 #stage{position:relative;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0;min-width:0;border-radius:22px;background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--stage) 70%,#fff 30%),var(--stage));box-shadow:var(--sh),inset 0 0 0 1px var(--line)}
-#cv{width:100%;height:100%;object-fit:contain;display:block;touch-action:none;cursor:grab;border-radius:14px}
+#cv{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;display:block;touch-action:none;cursor:grab;border-radius:14px}
 #cv:active{cursor:grabbing}
 #cv.tr{background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
 #stage:not(.has){cursor:pointer}
@@ -46,10 +49,11 @@ label input[type=range]{grid-column:1/-1;width:100%;margin:2px 0;accent-color:va
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .qv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.qv button{min-height:32px;padding:5px 4px;font-size:12px}
 .chk{grid-template-columns:auto minmax(0,1fr);justify-content:start;gap:8px}.chk input{width:16px;height:16px;accent-color:var(--accent)}
-select,input[type=text],input[type=number]{width:100%;min-width:0;height:38px;border:1px solid var(--line);border-radius:10px;background-color:var(--field);color:var(--ink);font:inherit;padding:0 10px}
+select,input[type=text],input[type=password],input[type=number]{width:100%;min-width:0;height:38px;border:1px solid var(--line);border-radius:10px;background-color:var(--field);color:var(--ink);font:inherit;padding:0 10px}
 select{appearance:none;-webkit-appearance:none;padding-inline-end:30px;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat}
 [dir=rtl] select{background-position:12px 50%,17px 50%}
 select option,select optgroup{background:var(--card);color:var(--ink);font:inherit}
+textarea{width:100%;min-height:240px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink);font:13px/1.55 var(--font);padding:10px;resize:vertical}
 input[type=color]{width:100%;min-width:0;height:38px;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--field);cursor:pointer}
 select:hover,input:hover{border-color:var(--mute)}
 button,.btn{font:inherit;font-weight:600;min-height:38px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;white-space:normal;overflow-wrap:anywhere;line-height:1.25;transition:background .15s,border-color .15s,box-shadow .15s,transform .05s}
@@ -74,17 +78,33 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 .lbb{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 [data-th=light]{--tc:#fff}[data-th=dark]{--tc:#1a2029}[data-th=ocean]{--tc:#22d3ee}[data-th=sunset]{--tc:#e8622c}
 @media(max-width:860px){
-  html,body{height:auto}
-  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto}
+  .app{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
   #stage{height:56vh;min-height:300px}
   aside{overflow:visible}
-  select,input[type=text],input[type=number]{font-size:16px}
+  aside>.pane{overflow:visible;flex:none}
+  .foot{position:sticky;bottom:0;background:var(--panel);padding-bottom:6px;z-index:5}
+  select,input[type=text],input[type=password],input[type=number]{font-size:16px}
 }
-@media(max-width:400px){.xyz{grid-template-columns:minmax(0,1fr)}.qv{grid-template-columns:repeat(3,minmax(0,1fr))}.row{grid-template-columns:minmax(0,1fr)}#gal{grid-template-columns:repeat(2,minmax(0,1fr))}.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.tabbar{grid-template-columns:repeat(3,minmax(0,1fr))}.xyz{grid-template-columns:minmax(0,1fr)}.qv{grid-template-columns:repeat(3,minmax(0,1fr))}.row{grid-template-columns:minmax(0,1fr)}#gal{grid-template-columns:repeat(2,minmax(0,1fr))}.themes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.seo{max-width:1000px;margin:28px auto 16px;display:grid;gap:16px;color:var(--ink)}
+.seo .box{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--sh)}
+.seo .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.seo h2{font:700 24px/1.25 var(--fh);margin:0 0 8px}.seo h3{font:700 17px var(--fh);margin:0 0 10px;color:var(--accent)}.seo h4{margin:14px 0 4px;font-size:15px}
+.seo p,.seo li{color:var(--mute);margin:0 0 6px}.seo ol,.seo ul{margin:0;padding-inline-start:20px}.seo a{color:var(--accent)}
+.seo footer{text-align:center;color:var(--mute);font-size:13px;padding:8px}
+aside{overflow:hidden;gap:10px}
+aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:2px 4px 2px 0;scrollbar-gutter:stable}
+.tab{display:none;flex-direction:column;gap:12px}.tab.on{display:flex}
+.tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--hover);padding:4px;border-radius:12px}
+.tabbar button{min-height:32px;padding:4px 2px;font-size:12px;border:0;background:transparent;border-radius:9px;box-shadow:none}
+.tabbar button.on{background:var(--card);color:var(--accent);box-shadow:var(--sh)}
+.foot{flex:none;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.toprow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}
 </style>
 </head>
 <body>
+<div class="app">
 <main id="stage">
   <canvas id="cv" width="1280" height="720"></canvas>
   <div id="drop" role="button" tabindex="0"><b>Modeli buraya bırak</b><span>STL, 3MF veya OBJ (birden fazla olabilir). Arka plan için bir resim de bırakabilirsin.</span></div>
@@ -96,14 +116,14 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
     <select id="lang" aria-label="Language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
   </div>
   <div class="themes" id="themes"><button data-th="light" data-i="th_light"></button><button data-th="dark" data-i="th_dark"></button><button data-th="ocean" data-i="th_ocean"></button><button data-th="sunset" data-i="th_sunset"></button></div>
-  <button id="open" class="primary" data-i="open"></button>
+  <div class="toprow"><button id="open" class="primary" data-i="open"></button><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
   <input id="file" type="file" accept=".stl,.3mf,.obj" multiple hidden>
   <select id="models" style="display:none"></select>
   <div id="info" class="sub"></div>
   <div id="stats" class="sub"></div>
-  <div class="two"><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
-
-  <fieldset>
+  <div class="tabbar" role="tablist"><button data-tab="scene" class="on" data-i="t_scene"></button><button data-tab="model" data-i="g_model"></button><button data-tab="cam" data-i="g_cam"></button><button data-tab="out" data-i="g_out"></button><button data-tab="res" data-i="t_res"></button></div>
+  <div class="pane">
+<div class="tab on" data-tab="scene"><fieldset>
     <legend data-i="g_bg"></legend>
     <label><span data-i="scene"></span><select id="bg">
       <optgroup data-g="grp_3d">
@@ -128,8 +148,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
     <input id="photo" type="file" accept="image/*" multiple hidden>
     <label class="chk"><input id="sh" type="checkbox" checked><span data-i="shadow"></span></label>
   </fieldset>
-
-  <fieldset>
+<fieldset>
     <legend data-i="g_harm"></legend>
     <label><span data-i="h_az"></span><span id="vLa">0°</span><input id="la" type="range" min="-90" max="90" step="1" value="35"></label>
     <label><span data-i="h_warm"></span><span id="vLw">0</span><input id="lw" type="range" min="-100" max="100" step="1" value="0"></label>
@@ -141,9 +160,8 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
       <label><span data-i="h_tints"></span><input id="ts" type="range" min="0" max="60" step="1" value="0"></label>
     </div>
     <button id="autoH" class="small" data-i="h_auto"></button>
-  </fieldset>
-
-  <fieldset>
+  </fieldset></div>
+<div class="tab" data-tab="model"><fieldset>
     <legend data-i="g_model"></legend>
     <div class="row">
       <label><span data-i="mat"></span><select id="mat"><option value="plastik" data-i="m1"></option><option value="mat" data-i="m2"></option><option value="parlak" data-i="m3"></option><option value="kil" data-i="m4"></option><option value="metal" data-i="m5"></option><option value="firca" data-i="m6"></option></select></label>
@@ -154,10 +172,10 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
       <label><span data-i="upax"></span><select id="up"><option value="z">Z (STL, 3MF)</option><option value="y">Y (OBJ)</option></select></label>
       <label><span data-i="dir"></span><select id="dir"><option value="1" data-i="ccw"></option><option value="-1" data-i="cw"></option></select></label>
     </div>
+    <label class="rng"><span data-i="fdm"></span><span id="vFd">40</span><input id="fd" type="range" min="0" max="100" step="1" value="40"></label>
     <label class="chk"><input id="wf" type="checkbox"><span data-i="wire"></span></label>
   </fieldset>
-
-  <fieldset>
+<fieldset>
     <legend data-i="g_tr"></legend>
     <div class="xyz">
       <label><span data-i="rot" data-s=" X°"></span><input id="rx" type="number" step="15" value="0"></label>
@@ -172,9 +190,8 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
     </div>
     <label><span data-i="scale"></span><span id="vSc">1.00</span><input id="sc" type="range" min="0.2" max="3" step="0.01" value="1"></label>
     <div class="two"><button id="trReset" class="small" data-i="reset"></button><button id="flat" class="small" data-i="flat"></button></div>
-  </fieldset>
-
-  <fieldset>
+  </fieldset></div>
+<div class="tab" data-tab="cam"><fieldset>
     <legend data-i="g_cam"></legend>
     <label><span data-i="el"></span><span id="vEl">22°</span><input id="el" type="range" min="-85" max="85" step="1" value="22"></label>
     <label><span data-i="zoom"></span><span id="vZm">1.00</span><input id="zm" type="range" min="0.3" max="4" step="0.01" value="1"></label>
@@ -185,17 +202,15 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
     <label class="chk"><input id="ortho" type="checkbox" checked><span data-i="ortho"></span></label>
     <label class="chk"><input id="iso" type="checkbox"><span data-i="iso"></span></label>
   </fieldset>
-
-  <fieldset>
+<fieldset>
     <legend data-i="g_tools"></legend>
     <label class="chk"><input id="edg" type="checkbox"><span data-i="edg"></span></label>
     <button id="snap" class="small" data-i="snap"></button>
     <div class="two"><button id="cfgx" class="small" data-i="cfgx"></button><button id="cfgi" class="small" data-i="cfgi"></button></div>
     <button id="cfgr" class="small" data-i="cfgr"></button>
     <input id="cfgf" type="file" accept=".json,application/json" hidden>
-  </fieldset>
-
-  <fieldset>
+  </fieldset></div>
+<div class="tab" data-tab="out"><fieldset>
     <legend data-i="g_out"></legend>
     <div class="row">
       <label><span data-i="resol"></span><select id="res">
@@ -216,17 +231,21 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
     <label class="chk"><input id="sheet" type="checkbox"><span data-i="sheet"></span></label>
     <label><span data-i="save"></span><select id="sv"><option value="dl" data-i="sv1"></option><option value="dir" data-i="sv2"></option></select></label>
     <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
-  </fieldset>
-
+  </fieldset></div>
+<div class="tab" data-tab="res"><p class="sub" data-i="res_hint"></p>
+  <div id="res"><video id="vid" controls loop></video><a id="dl" class="btn primary"></a></div>
+  <div id="gal"></div>
+  <button id="redl" style="display:none" data-i="redl"></button></div>
+</div>
+  <div class="foot">
   <button id="all" class="primary big" disabled data-i="go"></button>
   <div class="two"><button id="onlyV" disabled data-i="onlyv"></button><button id="onlyI" disabled data-i="onlyi"></button></div>
   <button id="batch" style="display:none" disabled data-i="batch"></button>
   <div id="bar"><i></i></div>
   <div id="msg"></div>
-  <div id="res"><video id="vid" controls loop></video><a id="dl" class="btn primary"></a></div>
-  <div id="gal"></div>
-  <button id="redl" style="display:none" data-i="redl"></button>
+  </div>
 </aside>
+</div>
 <div id="lb"><img id="lbi" alt=""><div class="lbb"><a id="lbd" class="btn primary"></a><button id="lbcp" data-i="copy"></button><button id="lbc" data-i="close"></button></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -292,6 +311,10 @@ m3=Parlak|Glossy|Glänzend|Brillant|Brillante|Глянцевый|لامع
 m4=Kil|Clay|Ton|Argile|Arcilla|Глина|طين
 m5=Metal|Metal|Metall|Métal|Metal|Металл|معدن
 m6=Fırçalı metal|Brushed metal|Gebürstetes Metall|Métal brossé|Metal cepillado|Шлифованный металл|معدن مصقول
+fdm=Katman çizgisi gücü (FDM, yalnızca Plastik)|Layer line strength (FDM, plastic only)
+t_scene=Sahne|Scene
+t_res=Sonuç|Results
+res_hint=Oluşturulan video ve görüntüler burada görünür.|Rendered video and images appear here.
 th_light=Açık|Light|Hell|Clair|Claro|Светлая|فاتح
 th_dark=Koyu|Dark|Dunkel|Sombre|Oscuro|Тёмная|داكن
 th_ocean=Okyanus|Ocean|Ozean|Océan|Océano|Океан|محيط
@@ -416,8 +439,17 @@ const fillB = new THREE.DirectionalLight(0xffffff, 0); fillB.position.set(0, -5,
 const aoTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), r = g.createRadialGradient(128, 128, 0, 128, 128, 128); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(.25, 'rgba(0,0,0,.4)'); r.addColorStop(.5, 'rgba(0,0,0,.18)'); r.addColorStop(.75, 'rgba(0,0,0,.05)'); r.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
 const ao = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map: aoTex, transparent: true, depthWrite: false, toneMapped: false}));
 ao.rotation.x = -Math.PI / 2; ao.renderOrder = 2; scene.add(ao);
-const MATS = {plastik: [.42, 0], mat: [.85, 0], parlak: [.16, 0], kil: [.95, 0], metal: [.26, 1], firca: [.5, 1]};
+const MATS = {plastik: [.46, 0], mat: [.85, 0], parlak: [.16, 0], kil: [.95, 0], metal: [.26, 1], firca: [.5, 1]};
 
+const fdmU = {uLayer: {value: .01}, uFloor: {value: 0}, uFdm: {value: 0}};
+mat.extensions = {derivatives: true};
+mat.onBeforeCompile = sh => {
+  Object.assign(sh.uniforms, fdmU);
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos; uniform float uLayer, uFloor, uFdm;')
+    .replace('#include <color_fragment>', '#include <color_fragment>\nfloat fdmT = (vWPos.y - uFloor) / uLayer, fdmF = fract(fdmT), fdmP = sin(fdmF * 3.14159265);\nfloat fdmW = 1.0 - smoothstep(0.3, 0.7, fwidth(fdmT)); diffuseColor.rgb *= 1.0 - uFdm * 0.1 * fdmW * (1.0 - fdmP);')
+    .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nvec3 fdmUp = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);\nfloat fdmV = 1.0 - abs(dot(normal, fdmUp));\nnormal = normalize(normal + fdmUp * cos(fdmF * 3.14159265) * uFdm * 0.5 * fdmW * fdmV);');
+};
 let phase = 0, lastT = 0, paused = false, mesh = null, models = [], fileName = 'model', dims = '', offset = 0, busy = false, W = 1920, H = 1080, bgTex = null, normK = 1;
 const photos = []; let selPhoto = -1;
 const val = id => $(id).value, num = id => parseFloat(val(id));
@@ -426,10 +458,10 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg'];
+const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg', 'fd'];
 const isChk = i => $(i).type === 'checkbox';
-function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset5', JSON.stringify(o)); }catch(e){} }
-function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset5') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
+function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset6', JSON.stringify(o)); }catch(e){} }
+function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset6') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
 
 /* ---------- 3D ortamlar ---------- */
 const envG = new THREE.Group(); scene.add(envG); let envKind = null; const ENV3D = ['ref', 'refwin', 'refshelf', 'refwarm', 'refcool', 'refnight', 'checker', 'marble', 'loft', 'garden', 'cove', 'dark']; const envBg = lin(0xc4cacf); let bakeKey = '', envShow = true, viewHide = false;
@@ -602,7 +634,7 @@ function fitFloor(){
   for(let i = 0; i < p.length; i += 3){ const y = m[1] * p[i] + m[5] * p[i+1] + m[9] * p[i+2]; if(y < mn) mn = y; if(y > mx) mx = y; }
   const lim = mn + (mx - mn) * .12; let rb = 0, ra = 0;
   for(let i = 0; i < p.length; i += 3){ const x = p[i], y0 = p[i+1], z = p[i+2], y = m[1] * x + m[5] * y0 + m[9] * z, wx = m[0] * x + m[4] * y0 + m[8] * z, wz = m[2] * x + m[6] * y0 + m[10] * z, r = Math.sqrt(wx * wx + wz * wz); if(r > ra) ra = r; if(y < lim && r > rb) rb = r; }
-  floor.position.y = mn + m[13] - 0.002; envG.position.y = floor.position.y;
+  floor.position.y = mn + m[13] - 0.002; fdmU.uFloor.value = mn + m[13]; fdmU.uLayer.value = (mx - mn) / Math.max(60, Math.min(160, (mx - mn) / (normK * Math.max(.01, num('sc'))) / .2)); envG.position.y = floor.position.y;
   const R = Math.max(rb * 1.5, ra * .6, .35); ao.scale.set(R * 2.9, R * 2.9, 1); ao.position.set(m[12], floor.position.y + .003, m[14]);
 }
 function applyTransform(){
@@ -620,7 +652,7 @@ function applyLight(){
   key.color.copy(base); key.intensity = 1.2 * st; key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
   hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .5); hemi.intensity = .35 * st; floor.material.opacity = num('sa'); ao.material.opacity = Math.min(1, num('sa') * 1.5);
 }
-function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
+function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; fdmU.uFdm.value = val('mat') === 'plastik' ? num('fd') / 100 : 0; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
@@ -712,11 +744,33 @@ async function parse3MF(buf){
 /*PARSE_END*/
 
 /* ---------- modeller ---------- */
+function smoothNormals(g){
+  const p = g.attributes.position.array, n = p.length / 3, ids = new Int32Array(n), sum = new Float32Array(n * 3), map = new Map(), Q = 30000; let u = 0;
+  for(let t = 0; t < n; t += 3){
+    const o = t * 3, ux = p[o+3] - p[o], uy = p[o+4] - p[o+1], uz = p[o+5] - p[o+2], wx = p[o+6] - p[o], wy = p[o+7] - p[o+1], wz = p[o+8] - p[o+2];
+    const fx = uy * wz - uz * wy, fy = uz * wx - ux * wz, fz = ux * wy - uy * wx;
+    for(let k = 0; k < 3; k++){
+      const q = o + k * 3, key = ((Math.round(p[q] * Q) + 32768) * 65536 + (Math.round(p[q+1] * Q) + 32768)) * 65536 + (Math.round(p[q+2] * Q) + 32768);
+      let id = map.get(key); if(id === undefined){ id = u++; map.set(key, id); } ids[t + k] = id; sum[id*3] += fx; sum[id*3+1] += fy; sum[id*3+2] += fz;
+    }
+  }
+  const nm = new Float32Array(p.length);
+  for(let t = 0; t < n; t += 3){
+    const o = t * 3, ux = p[o+3] - p[o], uy = p[o+4] - p[o+1], uz = p[o+5] - p[o+2], wx = p[o+6] - p[o], wy = p[o+7] - p[o+1], wz = p[o+8] - p[o+2];
+    let fx = uy * wz - uz * wy, fy = uz * wx - ux * wz, fz = ux * wy - uy * wx; const fl = Math.hypot(fx, fy, fz) || 1; fx /= fl; fy /= fl; fz /= fl;
+    for(let k = 0; k < 3; k++){
+      const id = ids[t + k], sx = sum[id*3], sy = sum[id*3+1], sz = sum[id*3+2], sl = Math.hypot(sx, sy, sz); let x = fx, y = fy, z = fz;
+      if(sl > 0 && (sx * fx + sy * fy + sz * fz) / sl > .7){ x = sx / sl; y = sy / sl; z = sz / sl; }
+      const q = o + k * 3; nm[q] = x; nm[q+1] = y; nm[q+2] = z;
+    }
+  }
+  g.setAttribute('normal', new THREE.BufferAttribute(nm, 3));
+}
 function setModel(i){
   const m = models[i]; if(!m) return;
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(m.pos.slice(), 3));
   g.computeBoundingBox(); const c = new THREE.Vector3(), sz = new THREE.Vector3(); g.boundingBox.getCenter(c); g.boundingBox.getSize(sz); g.translate(-c.x, -c.y, -c.z);
-  g.computeBoundingSphere(); const k = 1 / g.boundingSphere.radius; g.scale(k, k, k); g.computeBoundingBox(); g.computeVertexNormals();
+  g.computeBoundingSphere(); const k = 1 / g.boundingSphere.radius; g.scale(k, k, k); g.computeBoundingBox(); smoothNormals(g);
   if(mesh){ user.remove(mesh); mesh.geometry.dispose(); }
   mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k; edgeLines = null; updateEdges();
   ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1;
@@ -783,10 +837,10 @@ cv.addEventListener('dblclick', () => { setZoom(1); offset = 0; });
 ['rx', 'ry', 'rz', 'px', 'py', 'pz', 'sc'].forEach(i => $(i).addEventListener('input', applyTransform));
 [['bx', 'rx'], ['by', 'ry'], ['bz', 'rz']].forEach(([b, f]) => $(b).onclick = () => { $(f).value = ((n0(f) + 90 + 180) % 360) - 180; applyTransform(); });
 $('trReset').onclick = () => { ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1; applyTransform(); };
-function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
+function labels(){ $('vFd').textContent = val('fd'); $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
 ['dur', 'br', 'el', 'zm', 'blur'].forEach(i => $(i).addEventListener('input', labels));
 ['cm', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
-$('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
+$('fd').addEventListener('input', () => { applyLook(); labels(); }); $('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
 document.querySelector('aside').addEventListener('input', saveSet);
 
 function loop(now){
@@ -888,7 +942,7 @@ async function run(doVideo, doImgs, dirH, autoSave){
     lastFiles = files; lastImages = files.filter(f => /\.(png|jpe?g|webp)$/i.test(f.name)); $('redl').style.display = 'block'; $('gal').scrollIntoView({block: 'nearest'}); let where = ''; if(autoSave){ setMsg(T('m_save')); where = await saveAll(files, dirH); }
     $('vid').style.display = doVideo ? 'block' : 'none'; $('dl').style.display = doVideo ? 'inline-flex' : 'none'; $('res').style.display = doVideo ? 'flex' : 'none';
     if(doVideo) $('vid').play().catch(() => {});
-    progress(1); setMsg(autoSave ? T('m_done', fileName, files.length, where) : T('m_gen', fileName, files.length));
+    showTab('res'); progress(1); setMsg(autoSave ? T('m_done', fileName, files.length, where) : T('m_gen', fileName, files.length));
   }catch(e){ ok = false; setMsg(e.message || String(e), true); console.error(e); }
   busy = false; ['all', 'onlyV', 'onlyI'].forEach(i => $(i).disabled = false); $('batch').disabled = false;
   sizeFromUI(); applyLook(); setTimeout(() => $('bar').style.display = 'none', 800);
@@ -1089,7 +1143,7 @@ async function snapshot(){
   if(!mesh || busy) return; renderFrame(cam);
   const fmt = val('fmt'), ext = fmt === 'jpeg' ? 'jpg' : fmt, blob = await blobOf('image/' + fmt), nm = `${fileName}_snap${++snapN}.${ext}`;
   lastFiles.push({name: nm, blob}); lastImages.push({name: nm, blob}); addThumb(blob, nm, '📷 ' + snapN);
-  $('gal').style.display = 'grid'; $('redl').style.display = 'block'; $('gal').scrollIntoView({block: 'nearest'});
+  $('gal').style.display = 'grid'; $('redl').style.display = 'block'; showTab('res'); $('gal').scrollIntoView({block: 'nearest'});
 }
 $('snap').onclick = snapshot;
 document.addEventListener('keydown', e => {
@@ -1108,7 +1162,7 @@ document.addEventListener('keydown', e => {
 $('cfgx').onclick = () => { const o = {lang: LANG}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 1)], {type: 'application/json'})); a.download = 'stl-to-mp4-settings.json'; a.click(); };
 $('cfgi').onclick = () => $('cfgf').click();
 $('cfgf').onchange = async e => { try{ const o = JSON.parse(await e.target.files[0].text()); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); if(o.lang && LANGS.includes(o.lang)){ LANG = o.lang; $('lang').value = LANG; applyLang(); } colorTouched = true; sizeFromUI(); applyLook(); updateEdges(); saveSet(); }catch(err){ setMsg(String(err.message || err), true); } e.target.value = ''; };
-$('cfgr').onclick = () => { try{ localStorage.removeItem('m3dset5'); localStorage.removeItem('m3dlang'); }catch(e){} location.reload(); };
+$('cfgr').onclick = () => { try{ localStorage.removeItem('m3dset6'); localStorage.removeItem('m3dlang'); }catch(e){} location.reload(); };
 
 const SW = ['#ece8e0', '#8c9094', '#26282b', '#e8742a', '#c0392b', '#2f6fb0', '#3f8f5a', '#b98552'], MSW = ['#b8bec4', '#d6a93c', '#b87333', '#c9b037', '#7d868e', '#e9edf0'];
 const addSw = (c, metal) => { const b = document.createElement('button'); b.style.cssText = `background:${metal ? `linear-gradient(135deg,rgba(255,255,255,.65),rgba(0,0,0,.25)),${c}` : c};width:26px;height:26px;padding:0;min-width:0;min-height:0;border:1px solid #8a949b;border-radius:50%`; b.setAttribute('aria-label', c); b.onclick = () => { if(metal && !['metal', 'firca'].includes(val('mat'))) $('mat').value = 'metal'; $('cm').value = c; colorTouched = true; applyLook(); saveSet(); }; $('sw').appendChild(b); };
@@ -1117,12 +1171,33 @@ function setTheme(t){ document.documentElement.dataset.theme = t; try{ localStor
 document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => setTheme(b.dataset.th));
 let th0 = 'light'; try{ th0 = localStorage.getItem('m3dtheme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); }catch(e){} setTheme(th0);
 $('cm').addEventListener('input', () => colorTouched = true);
+function showTab(n){ document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === n)); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === n)); }
+document.querySelectorAll('.tabbar button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 LANG = detectLang(); $('lang').value = LANG;
-let firstRun = true; try{ firstRun = !localStorage.getItem('m3dset5'); }catch(e){}
+let firstRun = true; try{ firstRun = !localStorage.getItem('m3dset6'); }catch(e){}
 colorTouched = !firstRun;
 document.querySelectorAll('label').forEach(l => { if(l.querySelector('input[type=range]')) l.classList.add('rng'); });
 loadSet(); if(!val('bg')) $('bg').value = 'ref'; applyLang(); sizeFromUI(); labels(); if(firstRun) sceneDefaults(); else applyLook(); requestAnimationFrame(loop);
 
 </script>
+<section class="seo">
+  <div class="box"><h2>Free Online STL to MP4 Converter</h2>
+    <p>Convert your 3D models into high-quality MP4 video previews directly in your web browser. <strong>STLtoMP4.com</strong> is a fast, free and private way to showcase 3D prints, CAD models and digital designs without extra software or uploading confidential files to cloud servers.</p></div>
+  <div class="cols">
+    <div class="box"><h3>How to Convert STL to MP4</h3><ol>
+      <li>Drag &amp; drop your <strong>.STL</strong>, <strong>.3MF</strong> or <strong>.OBJ</strong> file into the preview area.</li>
+      <li>Optionally drop a background image, pick a material, colour or scene.</li>
+      <li>Press <strong>Create MP4 + views</strong> to render your showcase video and view images.</li></ol></div>
+    <div class="box"><h3>Why Choose STLtoMP4.com?</h3><ul>
+      <li><strong>100% client-side privacy:</strong> rendering runs in your browser with WebGL; model files are never uploaded.</li>
+      <li><strong>No registration:</strong> free, with no sign-ups or subscriptions.</li>
+      <li><strong>Made for 3D printing:</strong> ideal for Cults3D, Thingiverse, Printables, MakerWorld and social media previews.</li></ul></div>
+  </div>
+  <div class="box"><h3>Frequently Asked Questions</h3>
+    <h4>Is my 3D file uploaded to any server?</h4><p>No. Conversion runs entirely inside your browser, so STL files never leave your device.</p>
+    <h4>Which file formats are supported?</h4><p>STL, 3MF and OBJ. Several files can be loaded and processed in sequence.</p>
+    <h4>Is STLtoMP4 free?</h4><p>Yes, for personal and commercial projects.</p></div>
+  <footer>&copy; 2026 STLtoMP4.com &middot; Free browser-based 3D converter &middot; <a href="/privacy.html">Privacy Policy</a></footer>
+</section>
 </body>
 </html>
