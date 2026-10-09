@@ -7,64 +7,74 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D Model → MP4 + Görünümler</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#17242d;--mute:#5d6d78;--panel:#f6f7f8;--line:#d5dade;--accent:#1f4fd8;--stage:#b9c3cb}
+:root{--ink:#17232d;--mute:#5f6e79;--panel:#f6f7f9;--card:#fff;--line:#dde2e8;--accent:#2354d8;--accent-d:#1a43b3;--stage:#aab5be;--r:12px;--sh:0 1px 2px rgba(18,32,46,.06),0 6px 18px rgba(18,32,46,.07)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--stage);display:grid;grid-template-columns:1fr 350px}
+body{font:14px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic","Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--stage);display:grid;grid-template-columns:minmax(0,1fr) clamp(320px,28vw,400px);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 #stage{position:relative;display:flex;align-items:center;justify-content:center;padding:16px;min-height:0;min-width:0}
-#cv{width:100%;height:100%;object-fit:contain;display:block;touch-action:none;cursor:grab}
+#cv{width:100%;height:100%;object-fit:contain;display:block;touch-action:none;cursor:grab;border-radius:6px}
 #cv:active{cursor:grabbing}
 #cv.tr{background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
-#drop{position:absolute;inset:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed #7d8b95;color:#3a4953;text-align:center;pointer-events:none;background:rgba(246,247,248,.55)}
-#drop b{font-size:20px;font-weight:600}
-#stage.over #drop{border-color:var(--accent);background:rgba(31,79,216,.12)}
+#stage:not(.has){cursor:pointer}
+#drop{position:absolute;inset:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;border:2px dashed #7b8a95;border-radius:var(--r);color:#34444f;text-align:center;pointer-events:none;background:rgba(246,247,249,.62)}
+#drop b{font-size:clamp(17px,2.4vw,22px);font-weight:700}
+#drop span{max-width:46ch;color:var(--mute)}
+#stage.over #drop{border-color:var(--accent);background:rgba(35,84,216,.12)}
 #stage.has #drop{display:none}
-#toast{position:absolute;left:24px;right:24px;top:24px;background:#b3261e;color:#fff;padding:10px 14px;border-radius:4px;display:none;font-weight:500}
-aside{background:var(--panel);border-left:1px solid var(--line);padding:18px;overflow:auto;display:flex;flex-direction:column;gap:14px}
-h1{font-size:18px;font-weight:600;margin:0}
-.sub{color:var(--mute);margin:2px 0 0}
-fieldset{border:0;padding:0;margin:0;display:grid;gap:10px}
-legend{font-weight:600;padding:0;margin-bottom:8px}
-label{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center}
-label>span:last-child{color:var(--mute);font-variant-numeric:tabular-nums}
-label input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
-.row{display:flex;gap:10px}
-.row label{flex:1;grid-template-columns:1fr}
-select,input[type=color]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 6px}
-input[type=color]{padding:2px}
-.chk{grid-template-columns:auto 1fr;justify-content:start;gap:8px}
-button,.btn{font:inherit;font-weight:600;border-radius:4px;border:1px solid var(--ink);background:#fff;color:var(--ink);height:38px;padding:0 14px;cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-button.primary,.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button:disabled{opacity:.45;cursor:not-allowed}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;display:none}
-#bar i{display:block;height:100%;width:0;background:var(--accent)}
-#msg{color:var(--mute);min-height:20px}
-#msg.err{color:#b3261e}
-#res{display:none;gap:8px;flex-direction:column}
-#res video{width:100%;background:#000}
-#gal{display:none;grid-template-columns:repeat(3,1fr);gap:6px}
-#gal button{display:block;font-size:12px;font-weight:500;height:auto;padding:0;border:0;background:none}
-#gal img{width:100%;aspect-ratio:1;object-fit:contain;background:#dfe3e6;border:1px solid var(--line);display:block}
-#photos{display:flex;flex-wrap:wrap;gap:6px}
-#photos img{width:56px;height:40px;object-fit:cover;border:2px solid var(--line);cursor:pointer}
-#photos img.sel{border-color:var(--accent)}
-.xyz{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.xyz label{grid-template-columns:1fr}
-input[type=number]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 6px}
-.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.three button,.small{height:32px}
-#lb{position:fixed;inset:0;background:rgba(10,16,20,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9;padding:20px}
-#lb img{max-width:92vw;max-height:80vh;object-fit:contain;background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
-.lbb{display:flex;gap:10px}
-.hd{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}#lang{width:auto;min-width:92px;flex:none}
+#toast{position:absolute;left:24px;right:24px;top:24px;background:#b3261e;color:#fff;padding:10px 14px;border-radius:8px;display:none;font-weight:500;overflow-wrap:anywhere}
+aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:12px;min-width:0}
 [dir=rtl] aside{border-left:0;border-right:1px solid var(--line)}
-input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;border-radius:4px;padding:0 8px}
-.qv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.qv button{height:30px;padding:0 4px;font-size:12px}
-#stats{font-size:12px}
-.split{display:grid;grid-template-columns:1fr auto;gap:8px}.swatches{display:flex;gap:6px;flex-wrap:wrap}#stage:not(.has){cursor:pointer}
-@media(max-width:860px){body{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto}aside{border-left:0;border-top:1px solid var(--line)}}
+h1{font-size:18px;line-height:1.25;font-weight:700;margin:0;letter-spacing:-.01em;overflow-wrap:anywhere}
+.sub{color:var(--mute);margin:2px 0 0;font-size:13px;overflow-wrap:anywhere}
+.hd{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}.hd>div{min-width:0;flex:1}#lang{width:auto;min-width:96px;max-width:44%;flex:none}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px 14px;margin:0;display:grid;gap:10px;min-width:0;box-shadow:var(--sh)}
+legend{font-weight:700;font-size:13px;letter-spacing:.02em;padding:0 6px;color:var(--ink)}
+label{display:grid;grid-template-columns:minmax(0,1fr);gap:4px 8px;align-items:center;min-width:0}
+label.rng{grid-template-columns:minmax(0,1fr) auto}
+aside>*{flex-shrink:0}
+label>span{min-width:0;overflow-wrap:anywhere}
+label>span:last-of-type:not(:first-child){color:var(--mute);font-variant-numeric:tabular-nums}
+label input[type=range]{grid-column:1/-1;width:100%;margin:2px 0;accent-color:var(--accent)}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row label{grid-template-columns:minmax(0,1fr)}
+.xyz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.xyz label{grid-template-columns:minmax(0,1fr)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.qv button{min-height:32px;padding:5px 4px;font-size:12px}
+.chk{grid-template-columns:auto minmax(0,1fr);justify-content:start;gap:8px}.chk input{width:16px;height:16px;accent-color:var(--accent)}
+select,input[type=text],input[type=number]{width:100%;min-width:0;height:36px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;padding:0 10px}
+input[type=color]{width:100%;min-width:0;height:36px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+select:hover,input:hover{border-color:#c3cbd3}
+button,.btn{font:inherit;font-weight:600;min-height:38px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;white-space:normal;overflow-wrap:anywhere;line-height:1.25;box-shadow:0 1px 1px rgba(18,32,46,.05);transition:background .15s,border-color .15s,box-shadow .15s,transform .05s}
+button:hover:not(:disabled),.btn:hover{background:#f0f3f7;border-color:#c3cbd3}
+button:active:not(:disabled){transform:translateY(1px)}
+button.primary,.btn.primary{background:linear-gradient(180deg,#3a6bef,var(--accent));border-color:var(--accent-d);color:#fff;box-shadow:0 1px 2px rgba(35,84,216,.35)}
+button.primary:hover:not(:disabled),.btn.primary:hover{background:linear-gradient(180deg,#2f63ea,var(--accent-d));border-color:var(--accent-d)}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.small{min-height:34px;padding:6px 10px;font-size:13px}.big{min-height:48px;font-size:15px;width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;display:none}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+#msg{color:var(--mute);min-height:20px;overflow-wrap:anywhere}#msg.err{color:#b3261e}
+#res{display:none;gap:8px;flex-direction:column}#res video{width:100%;background:#000;border-radius:8px}
+#gal{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#gal button{display:block;font-size:12px;font-weight:500;min-height:0;padding:0;border:0;background:none;box-shadow:none;overflow:hidden}
+#gal img{width:100%;aspect-ratio:1;object-fit:contain;background:#dfe3e6;border:1px solid var(--line);border-radius:8px;display:block}
+#photos{display:flex;flex-wrap:wrap;gap:6px}#photos img{width:56px;height:40px;object-fit:cover;border:2px solid var(--line);border-radius:6px;cursor:pointer}#photos img.sel{border-color:var(--accent)}
+#lb{position:fixed;inset:0;background:rgba(10,16,20,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9;padding:20px}
+#lb img{max-width:92vw;max-height:80vh;object-fit:contain;border-radius:8px;background:repeating-conic-gradient(#c9ced2 0 25%,#e6e9ec 0 50%) 0 0/20px 20px}
+.lbb{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+@media(max-width:860px){
+  html,body{height:auto}
+  body{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto}
+  #stage{height:56vh;min-height:300px}
+  aside{border-left:0;border-top:1px solid var(--line);overflow:visible}
+  [dir=rtl] aside{border-right:0}
+  select,input[type=text],input[type=number]{font-size:16px}
+}
+@media(max-width:400px){.xyz{grid-template-columns:minmax(0,1fr)}.qv{grid-template-columns:repeat(3,minmax(0,1fr))}.row{grid-template-columns:minmax(0,1fr)}#gal{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -89,7 +99,7 @@ input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:
     <legend data-i="g_bg"></legend>
     <label><span data-i="scene"></span><select id="bg">
       <optgroup data-g="grp_3d">
-        <option value="ref" data-i="e_ref"></option><option value="office" data-i="b_office"></option><option value="shelf" data-i="b_shelf"></option><option value="marble" data-i="e_marble"></option><option value="loft" data-i="e_loft"></option><option value="garden" data-i="e_garden"></option><option value="workshop" data-i="b_work"></option><option value="desk" data-i="b_desk"></option><option value="cove" data-i="e_cove"></option><option value="dark" data-i="e_dark"></option>
+        <option value="ref" data-i="e_ref"></option><option value="refwin" data-i="e_refwin"></option><option value="refshelf" data-i="e_refshelf"></option><option value="refwarm" data-i="e_refwarm"></option><option value="refcool" data-i="e_refcool"></option><option value="refnight" data-i="e_refnight"></option><option value="checker" data-i="e_checker"></option><option value="marble" data-i="e_marble"></option><option value="loft" data-i="e_loft"></option><option value="garden" data-i="e_garden"></option><option value="cove" data-i="e_cove"></option><option value="dark" data-i="e_dark"></option>
       </optgroup>
       <optgroup data-g="grp_simple">
         <option value="studio" data-i="b_studio"></option><option value="grad" data-i="b_grad"></option><option value="solid" data-i="b_solid"></option><option value="concrete" data-i="b_conc"></option><option value="outdoor" data-i="b_out"></option><option value="transparent" data-i="b_trans"></option>
@@ -148,9 +158,9 @@ input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:
     </div>
     <div class="three"><button id="bx">X +90°</button><button id="by">Y +90°</button><button id="bz">Z +90°</button></div>
     <div class="xyz">
-      <label><span data-i="pos" data-s=" X (mm)"></span><input id="px" type="number" step="0.1" value="0"></label>
-      <label><span data-i="pos" data-s=" Y (mm)"></span><input id="py" type="number" step="0.1" value="0"></label>
-      <label><span data-i="pos" data-s=" Z (mm)"></span><input id="pz" type="number" step="0.1" value="0"></label>
+      <label><span data-i="pos" data-s=" X (mm)"></span><input id="px" type="number" step="10" value="0"></label>
+      <label><span data-i="pos" data-s=" Y (mm)"></span><input id="py" type="number" step="10" value="0"></label>
+      <label><span data-i="pos" data-s=" Z (mm)"></span><input id="pz" type="number" step="10" value="0"></label>
     </div>
     <label><span data-i="scale"></span><span id="vSc">1.00</span><input id="sc" type="range" min="0.2" max="3" step="0.01" value="1"></label>
     <div class="two"><button id="trReset" class="small" data-i="reset"></button><button id="flat" class="small" data-i="flat"></button></div>
@@ -162,9 +172,19 @@ input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:
     <label><span data-i="zoom"></span><span id="vZm">1.00</span><input id="zm" type="range" min="0.3" max="4" step="0.01" value="1"></label>
     <div class="sub" data-i="qv"></div>
     <div class="qv"><button data-qv="0,0" data-i="v_front"></button><button data-qv="180,0" data-i="v_back"></button><button data-qv="-90,0" data-i="v_right"></button><button data-qv="90,0" data-i="v_left"></button><button data-qv="0,85" data-i="v_top"></button><button data-qv="0,-85" data-i="v_bot"></button><button data-qv="45,35" data-i="v_iso"></button></div>
+    <div class="sub" data-i="keys"></div>
     <label class="chk"><input id="bob" type="checkbox"><span data-i="bob"></span></label>
     <label class="chk"><input id="ortho" type="checkbox" checked><span data-i="ortho"></span></label>
     <label class="chk"><input id="iso" type="checkbox"><span data-i="iso"></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend data-i="g_tools"></legend>
+    <label class="chk"><input id="edg" type="checkbox"><span data-i="edg"></span></label>
+    <button id="snap" class="small" data-i="snap"></button>
+    <div class="two"><button id="cfgx" class="small" data-i="cfgx"></button><button id="cfgi" class="small" data-i="cfgi"></button></div>
+    <button id="cfgr" class="small" data-i="cfgr"></button>
+    <input id="cfgf" type="file" accept=".json,application/json" hidden>
   </fieldset>
 
   <fieldset>
@@ -190,7 +210,7 @@ input[type=text]{width:100%;height:32px;border:1px solid var(--line);background:
     <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
   </fieldset>
 
-  <div class="split"><button id="all" class="primary" disabled data-i="go"></button><button id="dlI" disabled data-i="dlimg"></button></div>
+  <button id="all" class="primary big" disabled data-i="go"></button>
   <div class="two"><button id="onlyV" disabled data-i="onlyv"></button><button id="onlyI" disabled data-i="onlyi"></button></div>
   <button id="batch" style="display:none" disabled data-i="batch"></button>
   <div id="bar"><i></i></div>
@@ -317,7 +337,20 @@ e_garden=Bahçe masası|Garden table|Gartentisch|Table de jardin|Mesa de jardín
 e_cove=Beyaz ürün stüdyosu|White product studio|Weißes Produktstudio|Studio produit blanc|Estudio blanco de producto|Белая студия|استوديو منتجات أبيض
 e_dark=Koyu vitrin|Dark showcase|Dunkle Vitrine|Vitrine sombre|Vitrina oscura|Тёмная витрина|واجهة داكنة
 dlimg=Görüntüleri indir|Download images|Bilder herunterladen|Télécharger les images|Descargar imágenes|Скачать изображения|تنزيل الصور
-m_gen={0}: {1} dosya hazır. Kaydetmek için “Görüntüleri indir”e bas.|{0}: {1} files ready. Press “Download images” to save them.|{0}: {1} Dateien bereit. Zum Speichern „Bilder herunterladen“ drücken.|{0} : {1} fichiers prêts. Appuyez sur « Télécharger les images ».|{0}: {1} archivos listos. Pulsa «Descargar imágenes» para guardarlos.|{0}: файлов готово — {1}. Нажмите «Скачать изображения».|{0}: {1} ملفات جاهزة. اضغط «تنزيل الصور» للحفظ.
+m_gen={0}: {1} dosya hazır. Küçük resimlere tıklayarak veya “Tümünü indir” ile kaydedebilirsin.|{0}: {1} files ready. Click a thumbnail or press “Download everything” to save.|{0}: {1} Dateien bereit. Vorschaubild anklicken oder „Alles herunterladen“.|{0} : {1} fichiers prêts. Cliquez sur une vignette ou « Tout télécharger ».|{0}: {1} archivos listos. Pulsa una miniatura o «Descargar todo».|{0}: готово файлов — {1}. Нажмите миниатюру или «Скачать всё».|{0}: {1} ملفات جاهزة. انقر على صورة مصغرة أو «تنزيل الكل».
+g_tools=Araçlar|Tools|Werkzeuge|Outils|Herramientas|Инструменты|أدوات
+snap=Anlık görüntü al|Take snapshot|Schnappschuss|Capture instantanée|Captura instantánea|Снимок|لقطة فورية
+cfgx=Ayarları dışa aktar|Export settings|Einstellungen exportieren|Exporter les réglages|Exportar ajustes|Экспорт настроек|تصدير الإعدادات
+cfgi=Ayarları içe aktar|Import settings|Einstellungen importieren|Importer les réglages|Importar ajustes|Импорт настроек|استيراد الإعدادات
+cfgr=Tüm ayarları sıfırla|Reset all settings|Alle Einstellungen zurücksetzen|Réinitialiser les réglages|Restablecer ajustes|Сбросить все настройки|إعادة ضبط كل الإعدادات
+edg=Kenar çizgilerini göster|Show edge lines|Kantenlinien anzeigen|Afficher les arêtes|Mostrar aristas|Показать рёбра|إظهار خطوط الحواف
+keys=Kısayollar: Boşluk duraklat · R sıfırla · F tam ekran · +/− zoom · oklar döndür · 1–7 hızlı bakış · S anlık görüntü|Shortcuts: Space pause · R reset · F fullscreen · +/− zoom · arrows rotate · 1–7 quick views · S snapshot|Kürzel: Leertaste Pause · R Reset · F Vollbild · +/− Zoom · Pfeile drehen · 1–7 Ansichten · S Schnappschuss|Raccourcis : Espace pause · R réinit. · F plein écran · +/− zoom · flèches rotation · 1–7 vues · S capture|Atajos: Espacio pausa · R reiniciar · F pantalla completa · +/− zoom · flechas girar · 1–7 vistas · S captura|Горячие клавиши: Пробел пауза · R сброс · F экран · +/− масштаб · стрелки вращение · 1–7 виды · S снимок|الاختصارات: مسافة إيقاف · R إعادة · F ملء الشاشة · +/− تكبير · الأسهم تدوير · 1–7 مناظر · S لقطة
+e_refwin=Ofis, pencere ışığı|Office, window light|Büro, Fensterlicht|Bureau, lumière de fenêtre|Oficina, luz de ventana|Офис, свет из окна|مكتب، ضوء النافذة
+e_refshelf=Ofis, kitaplık|Office, bookshelf|Büro, Bücherregal|Bureau, bibliothèque|Oficina, estantería|Офис, книжная полка|مكتب، رف كتب
+e_refwarm=Ofis, gün batımı|Office, sunset|Büro, Sonnenuntergang|Bureau, coucher de soleil|Oficina, atardecer|Офис, закат|مكتب، غروب
+e_refcool=Ofis, serin sabah|Office, cool morning|Büro, kühler Morgen|Bureau, matin frais|Oficina, mañana fría|Офис, прохладное утро|مكتب، صباح بارد
+e_refnight=Ofis, gece lambası|Office, night lamp|Büro, Nachtlampe|Bureau, lampe de nuit|Oficina, lámpara nocturna|Офис, ночник|مكتب، مصباح ليلي
+e_checker=Damalı zemin (Blender tarzı)|Checker floor (Blender style)|Schachbrettboden (Blender-Stil)|Sol en damier (style Blender)|Suelo ajedrezado (estilo Blender)|Шахматный пол (стиль Blender)|أرضية شطرنج (نمط Blender)
 m_start=Bir model aç. Önizlemede sürükleyerek açıyı, tekerlekle yakınlaştırmayı değiştirebilirsin.|Open a model. Drag in the preview to rotate, use the wheel to zoom.|Öffne ein Modell. Ziehen zum Drehen, Mausrad zum Zoomen.|Ouvrez un modèle. Glissez pour tourner, molette pour zoomer.|Abre un modelo. Arrastra para girar y usa la rueda para hacer zoom.|Откройте модель. Перетаскивайте для вращения, колесо — масштаб.|افتح نموذجًا. اسحب للتدوير واستخدم العجلة للتكبير.
 m_ready=Model hazır.|Model ready.|Modell bereit.|Modèle prêt.|Modelo listo.|Модель готова.|النموذج جاهز.
 m_read=Okunuyor: {0}|Reading: {0}|Lese: {0}|Lecture : {0}|Leyendo: {0}|Чтение: {0}|قراءة: {0}
@@ -356,7 +389,7 @@ scene.add(key);
 const rim = new THREE.DirectionalLight(0xffffff, 0.3); rim.position.set(-4, 2, -3); scene.add(rim);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.ShadowMaterial({opacity: 0.28}));
 floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
-const mat = new THREE.MeshStandardMaterial({color: lin(0xd8d3c9), roughness: 0.45, metalness: 0, envMapIntensity: .9});
+const mat = new THREE.MeshStandardMaterial({color: lin(0xd8d3c9), roughness: 0.45, metalness: 0, envMapIntensity: .9, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1});
 /* görüntü tabanlı aydınlatma (IBL): pencere + sıcak dolgu paneli olan sahte bir oda */
 const pm = new THREE.PMREMGenerator(renderer);
 (function(){
@@ -365,6 +398,7 @@ const pm = new THREE.PMREMGenerator(renderer);
   pan(10, 6, 11.5, 5, 0, 0, -Math.PI / 2, 0xffffff, 7); pan(8, 8, 0, 10.8, 0, Math.PI / 2, 0, 0xffffff, 3); pan(8, 4, -11.5, 4, 3, 0, Math.PI / 2, 0xffd6a8, 2.2); pan(10, 3, 0, 3, -11.5, 0, 0, 0xdfe8ff, 1.4);
   scene.environment = pm.fromScene(es, 0.03).texture;
 })();
+const fillB = new THREE.DirectionalLight(0xffffff, 0); fillB.position.set(0, -5, 1.5); scene.add(fillB);
 const aoTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'), r = g.createRadialGradient(128, 128, 0, 128, 128, 128); r.addColorStop(0, 'rgba(0,0,0,.55)'); r.addColorStop(.25, 'rgba(0,0,0,.4)'); r.addColorStop(.5, 'rgba(0,0,0,.18)'); r.addColorStop(.75, 'rgba(0,0,0,.05)'); r.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = r; g.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
 const ao = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map: aoTex, transparent: true, depthWrite: false, toneMapped: false}));
 ao.rotation.x = -Math.PI / 2; ao.renderOrder = 2; scene.add(ao);
@@ -378,24 +412,29 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet'];
+const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg'];
 const isChk = i => $(i).type === 'checkbox';
-function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset4', JSON.stringify(o)); }catch(e){} }
-function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset4') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
+function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset5', JSON.stringify(o)); }catch(e){} }
+function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset5') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
 
 /* ---------- 3D ortamlar ---------- */
-const envG = new THREE.Group(); scene.add(envG); let envKind = null; const ENV3D = ['ref', 'office', 'shelf', 'marble', 'loft', 'garden', 'workshop', 'desk', 'cove', 'dark']; const envBg = lin(0xc4cacf); let bakeKey = '', envShow = true, viewHide = false;
+const envG = new THREE.Group(); scene.add(envG); let envKind = null; const ENV3D = ['ref', 'refwin', 'refshelf', 'refwarm', 'refcool', 'refnight', 'checker', 'marble', 'loft', 'garden', 'cove', 'dark']; const envBg = lin(0xc4cacf); let bakeKey = '', envShow = true, viewHide = false;
 function ctex(w, h, fn, rx = 1, ry = 1){ const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = 8; t.encoding = THREE.sRGBEncoding; return t; }
 const Mt = o => { o = Object.assign({roughness: .85, metalness: 0, envMapIntensity: .55}, o); if(o.color !== undefined) o.color = o.color.isColor ? o.color.clone().convertSRGBToLinear() : lin(o.color); if(o.emissive !== undefined) o.emissive = lin(o.emissive); return new THREE.MeshStandardMaterial(o); };
 const B = (w, h, d) => new THREE.BoxGeometry(w, h, d), Cy = (a, b, h) => new THREE.CylinderGeometry(a, b, h, 28), Sp = r => new THREE.SphereGeometry(r, 22, 16);
 function add(geo, mt, x, y, z, cast = true, ry = 0, rz = 0){ const m = new THREE.Mesh(geo, mt); m.position.set(x, y, z); m.rotation.set(0, ry, rz); m.castShadow = cast; m.receiveShadow = true; envG.add(m); return m; }
 function woodMat(dark){
-  return Mt({roughness: .6, map: ctex(1024, 512, (g, w, h) => {
-    const l = g.createLinearGradient(0, 0, 0, h); const WT = {'false': ['#b5834c', '#94652f'], 'true': ['#6a4529', '#4e311b'], 'oak': ['#d3b283', '#b8905c'], 'weather': ['#9b8b78', '#7a6b59']}, wc = WT[String(dark)]; l.addColorStop(0, wc[0]); l.addColorStop(1, wc[1]); g.fillStyle = l; g.fillRect(0, 0, w, h);
-    const r = rng(dark ? 3 : 5);
-    for(let i = 0; i < 420; i++){ const y = r() * h; g.strokeStyle = `rgba(${r() < .6 ? '50,28,10' : '255,230,190'},${.03 + r() * .09})`; g.lineWidth = .5 + r() * 2.2; g.beginPath(); g.moveTo(0, y); for(let x = 0; x <= w; x += 64) g.lineTo(x, y + Math.sin(x * .01 + i) * 3 + (r() - .5) * 2); g.stroke(); }
-    for(let k = 1; k < 5; k++){ g.fillStyle = 'rgba(30,15,5,.3)'; g.fillRect(0, k * h / 5 - 1, w, 2); }
-  }, 3, 2)});
+  const WT = {'false': ['#b5834c', '#94652f'], 'true': ['#6a4529', '#4e311b'], 'oak': ['#d3b588', '#bf9a66'], 'weather': ['#9b8b78', '#7a6b59']}, wc = WT[String(dark)];
+  const tex = ctex(1024, 512, (g, w, h) => {
+    const r = rng(dark === 'oak' ? 5 : 3), TAU = Math.PI * 2, l = g.createLinearGradient(0, 0, w, 0); l.addColorStop(0, wc[0]); l.addColorStop(.5, wc[1]); l.addColorStop(1, wc[0]); g.fillStyle = l; g.fillRect(0, 0, w, h);
+    const pl = 4, ph = h / pl; for(let b = 0; b < pl; b++){ g.fillStyle = `rgba(${r() < .5 ? '255,235,200' : '70,42,18'},${.05 + r() * .07})`; g.fillRect(0, b * ph, w, ph); }
+    for(let i = 0; i < 8; i++){ const x = r() * w, y = r() * h, rad = 90 + r() * 150, col = r() < .5 ? '255,240,210' : '80,50,20'; for(const dx of [-w, 0, w]) for(const dy of [-h, 0, h]){ const rg = g.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, rad); rg.addColorStop(0, `rgba(${col},.08)`); rg.addColorStop(1, `rgba(${col},0)`); g.fillStyle = rg; g.fillRect(x + dx - rad, y + dy - rad, rad * 2, rad * 2); } }
+    for(let i = 0; i < 700; i++){ const y0 = r() * h, k = 1 + (r() * 3 | 0), ph0 = r() * TAU, amp = 1 + r() * 2.5, col = `rgba(${r() < .6 ? '70,42,18' : '255,236,205'},${.025 + r() * .07})`, lw = .4 + r() * 1.6; g.strokeStyle = col; g.lineWidth = lw;
+      for(const dy of [-h, 0, h]){ g.beginPath(); for(let x = 0; x <= w; x += 16){ const yy = y0 + dy + Math.sin(x / w * TAU * k + ph0) * amp; if(x === 0) g.moveTo(x, yy); else g.lineTo(x, yy); } g.stroke(); } }
+    for(let i = 0; i < 2200; i++){ g.fillStyle = `rgba(60,34,14,${r() * .13})`; g.fillRect(r() * (w - 10), r() * h, 2 + r() * 8, .6); }
+    g.fillStyle = 'rgba(30,15,5,.16)'; for(let b = 0; b < pl; b++) g.fillRect(0, b * ph - 1, w, 2); g.fillRect(0, h - 1, w, 1);
+  }, 3, 2);
+  return Mt({roughness: .55, map: tex, bumpMap: tex, bumpScale: .5, envMapIntensity: .7});
 }
 function wallMat(c1, c2){
   return Mt({roughness: .95, map: ctex(512, 512, (g, w, h) => { const l = g.createLinearGradient(0, 0, 0, h); l.addColorStop(0, c1); l.addColorStop(1, c2); g.fillStyle = l; g.fillRect(0, 0, w, h); const r = rng(9); for(let i = 0; i < 5000; i++){ g.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,255,255'},${r() * .04})`; g.fillRect(r() * w, r() * h, 2, 2); } })});
@@ -442,26 +481,27 @@ function setEnvBase(kind){
 }
 
 
-const NEWENV = ['ref', 'marble', 'loft', 'garden', 'cove', 'dark'], ENVBG = {cove: 0xdfe2e4, dark: 0x050607}; let extraLights = [];
+const NEWENV = ['ref', 'refwin', 'refshelf', 'refwarm', 'refcool', 'refnight', 'checker', 'marble', 'loft', 'garden', 'cove', 'dark'], ENVBG = {cove: 0xdfe2e4, dark: 0x050607, checker: 0xcdd5db};
+const REFV = {ref: [0, 170, 896, 504, ''], refwin: [336, 140, 560, 315, ''], refshelf: [0, 150, 560, 315, ''], refwarm: [0, 170, 896, 504, 'sepia(.35) saturate(1.3) hue-rotate(-12deg) brightness(.97)'], refcool: [0, 170, 896, 504, 'hue-rotate(14deg) saturate(.85) brightness(1.06)'], refnight: [0, 170, 896, 504, 'brightness(.5) contrast(1.2) saturate(.85)']}; let extraLights = [];
 function setEnv(kind){
   if(kind === envKind) return;
   extraLights.forEach(l => scene.remove(l)); extraLights = []; scene.fog = null; envBg.copy(lin(ENVBG[kind] || 0xc4cacf));
   if(NEWENV.includes(kind)){ envKind = kind; envG.traverse(o => { if(o.geometry) o.geometry.dispose(); }); while(envG.children.length) envG.remove(envG.children[0]); buildNew(kind); }
   else setEnvBase(kind);
-  if(kind === 'cove') scene.fog = new THREE.Fog(envBg.clone(), 7, 19); if(kind === 'dark') scene.fog = new THREE.Fog(envBg.clone(), 6, 15);
+  if(kind === 'cove') scene.fog = new THREE.Fog(envBg.clone(), 7, 19); if(kind === 'dark') scene.fog = new THREE.Fog(envBg.clone(), 6, 15); if(kind === 'checker') scene.fog = new THREE.Fog(envBg.clone(), 9, 26);
 }
 function buildNew(kind){
   const r = rng(41), P = (w, h) => new THREE.PlaneGeometry(w, h), dk = Mt({color: '#25292d', roughness: .5}), steel = Mt({color: '#9aa3a9', metalness: .4, roughness: .4});
   const top = (w, d, mt, cz = -.9) => add(B(w, .14, d), mt, 0, -.07, cz, false), bm = (map, tm = true) => new THREE.MeshBasicMaterial({map, toneMapped: !tm ? true : false});
   const pot = (x, z) => { add(Cy(.22, .17, .3), Mt({color: '#b5573a'}), x, .15, z); for(let k = 0; k < 8; k++){ const m = add(Sp(.2), Mt({color: new THREE.Color().setHSL(.3 + r() * .05, .5, .22 + r() * .12)}), x + (r() - .5) * .35, .6 + r() * .45, z + (r() - .5) * .3); m.scale.set(.6, 1.5, .6); m.rotation.z = (r() - .5) * 1.2; } };
-  if(kind === 'ref'){
-    top(10, 4.4, woodMat('oak'));
-    const bt = ctex(896, 504, g => { if(refReady) g.drawImage(refImg, 0, 170, 896, 504, 0, 0, 896, 504); else { g.fillStyle = '#8b8f92'; g.fillRect(0, 0, 896, 504); } });
+  if(kind.startsWith('ref')){
+    top(10, 4.4, woodMat('oak')); const rv = REFV[kind];
+    const bt = ctex(896, 504, g => { if(refReady){ if(rv[4]) g.filter = rv[4]; g.drawImage(refImg, rv[0], rv[1], rv[2], rv[3], 0, 0, 896, 504); } else { g.fillStyle = '#8b8f92'; g.fillRect(0, 0, 896, 504); } });
     add(P(15, 8.44), bm(bt), 0, 3.55, -3.4, false);
-    add(B(1.24, .08, .9), Mt({color: '#e9e3d3'}), -2.0, .04, 1.0, true, .22); add(B(1.3, .035, .96), Mt({color: '#8a6a4f', roughness: .7}), -2.0, .0975, 1.0, true, .22); add(B(.05, .045, .96), dk, -1.55, .1, 1.05, true, .22);
-    const mouse = add(Sp(.2), Mt({color: '#2a2c2e', roughness: .35}), 2.3, .075, -.1, true, .3); mouse.scale.set(.9, .38, 1.5);
+    add(B(1.24, .08, .9), Mt({color: '#e9e3d3'}), -3.1, .04, 1.2, true, .3); add(B(1.3, .035, .96), Mt({color: '#8a6a4f', roughness: .7}), -3.1, .0975, 1.2, true, .3); add(B(.05, .045, .96), dk, -2.7, .1, 1.28, true, .3);
+    const mouse = add(Sp(.2), Mt({color: '#2a2c2e', roughness: .35}), 2.9, .075, .1, true, .3); mouse.scale.set(.9, .38, 1.5);
     const kb = ctex(512, 160, (g, w, h) => { g.fillStyle = '#17191b'; g.fillRect(0, 0, w, h); for(let y = 0; y < 5; y++) for(let x = 0; x < 15; x++){ g.fillStyle = (x === 13 && y === 1) ? '#d9542c' : (r() < .5 ? '#5d6166' : '#8b9096'); g.fillRect(14 + x * 32, 14 + y * 25, 27, 20); } });
-    add(B(2.1, .09, .68), Mt({color: '#17191b'}), -3.0, .045, -1.7, true, .12); add(P(2.05, .64), Mt({map: kb, roughness: .5}), -3.0, .0915, -1.7, false, .12).rotation.x = -Math.PI / 2;
+    add(B(2.1, .09, .68), Mt({color: '#17191b'}), -3.6, .045, -1.9, true, .12); add(P(2.05, .64), Mt({map: kb, roughness: .5}), -3.6, .0915, -1.9, false, .12).rotation.x = -Math.PI / 2;
   }
   if(kind === 'marble'){
     const mm = ctex(1024, 1024, (g, w, h) => { g.fillStyle = '#f1f0ed'; g.fillRect(0, 0, w, h); const q = rng(31); for(let i = 0; i < 28; i++){ let x = q() * w, y = q() * h; g.beginPath(); g.moveTo(x, y); for(let k = 0; k < 14; k++){ x += (q() - .35) * 110; y += (q() - .5) * 90; g.lineTo(x, y); } g.strokeStyle = `rgba(${90 + q() * 40 | 0},${95 + q() * 40 | 0},${105 + q() * 40 | 0},${.06 + q() * .14})`; g.lineWidth = .6 + q() * 2.6; g.stroke(); } }, 2, 1);
@@ -487,6 +527,10 @@ function buildNew(kind){
     const fol = ctex(1024, 512, (g, w, h) => { const l = g.createLinearGradient(0, 0, 0, h); l.addColorStop(0, '#cfe6f5'); l.addColorStop(.5, '#a9cf9a'); l.addColorStop(1, '#496f38'); g.fillStyle = l; g.fillRect(0, 0, w, h); const q = rng(77); g.filter = 'blur(7px)'; for(let i = 0; i < 520; i++){ g.fillStyle = `hsla(${75 + q() * 45},${40 + q() * 30}%,${22 + q() * 30}%,${.35 + q() * .35})`; g.beginPath(); g.arc(q() * w, q() * h, 10 + q() * 46, 0, 7); g.fill(); } g.filter = 'blur(3px)'; for(let i = 0; i < 40; i++){ g.fillStyle = 'rgba(255,250,210,.55)'; g.beginPath(); g.arc(q() * w, q() * h * .7, 4 + q() * 10, 0, 7); g.fill(); } });
     add(P(34, 17), new THREE.MeshBasicMaterial({map: fol, toneMapped: false}), 0, 4.5, -7.5, false); pot(-2.4, -1.3);
     add(Cy(.16, .12, .22), Mt({color: '#f2f2f0', roughness: .3}), 2.2, .11, -.6); add(Cy(.3, .3, .03), Mt({color: '#f2f2f0', roughness: .3}), 2.2, .015, -.6);
+  }
+  if(kind === 'checker'){
+    const ck = ctex(256, 256, (g, w, h) => { g.fillStyle = '#eef0f2'; g.fillRect(0, 0, w, h); g.fillStyle = '#8f98a1'; g.fillRect(0, 0, w / 2, h / 2); g.fillRect(w / 2, h / 2, w / 2, h / 2); }, 16, 12);
+    top(46, 34, Mt({map: ck, roughness: .5, envMapIntensity: .7}), -10);
   }
   if(kind === 'cove'){ top(46, 34, Mt({color: '#f4f4f2', roughness: .75, envMapIntensity: .5}), -10); }
   if(kind === 'dark'){
@@ -562,7 +606,7 @@ function applyLight(){
   key.color.copy(base); key.intensity = 1.2 * st; key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
   hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .5); hemi.intensity = .35 * st; floor.material.opacity = num('sa'); ao.material.opacity = Math.min(1, num('sa') * 1.5);
 }
-function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'flex' : 'none'; labels(); }
+function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
@@ -660,7 +704,7 @@ function setModel(i){
   g.computeBoundingBox(); const c = new THREE.Vector3(), sz = new THREE.Vector3(); g.boundingBox.getCenter(c); g.boundingBox.getSize(sz); g.translate(-c.x, -c.y, -c.z);
   g.computeBoundingSphere(); const k = 1 / g.boundingSphere.radius; g.scale(k, k, k); g.computeBoundingBox(); g.computeVertexNormals();
   if(mesh){ user.remove(mesh); mesh.geometry.dispose(); }
-  mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k;
+  mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k; edgeLines = null; updateEdges();
   ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1;
   $('up').value = m.ext === 'obj' ? 'y' : 'z'; orient();
   fileName = m.name; dims = `${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm`; curM = m; if(!m.st) m.st = stats(m.pos);
@@ -748,11 +792,13 @@ function src(){
 const blobOf = mime => new Promise(r => src().toBlob(r, mime, 0.95));
 const VIEWS = [['on', 'Ön', [0, 0, 1], [0, 1, 0], 'v_front'], ['arka', 'Arka', [0, 0, -1], [0, 1, 0], 'v_back'], ['sag', 'Sağ', [1, 0, 0], [0, 1, 0], 'v_right'], ['sol', 'Sol', [-1, 0, 0], [0, 1, 0], 'v_left'], ['ust', 'Üst', [0, 1, 0], [0, 0, -1], 'v_top'], ['alt', 'Alt', [0, -1, 0], [0, 0, 1], 'v_bot']];
 const ISO = ['izo', 'Iso', [1, .8, 1], [0, 1, 0], 'v_iso'];
+const surfaceScene = () => $('sh').checked && (!!envKind || !!PRESETS[val('bg')] || val('bg') === 'photo');
 async function renderView(v, mime){
   let c = cam; const d = camDist(), n = Math.hypot(...v[2]), dir = v[2].map(x => x / n);
   viewHide = v[0] === 'ust' || v[0] === 'alt'; envShow = v[0] !== 'alt'; envG.rotation.y = Math.hypot(dir[0], dir[2]) > .01 ? Math.atan2(dir[0], dir[2]) : 0;
-  if($('ortho').checked){ const s = 1.25 * num('zm'), hh = s * Math.max(1, H / W); Object.assign(ocam, {left: -hh * W / H, right: hh * W / H, top: hh, bottom: -hh}); ocam.updateProjectionMatrix(); c = ocam; }
-  c.up.set(...v[3]); c.position.set(...dir.map(x => x * (c === ocam ? 5 : d))); c.lookAt(0, 0, 0);
+  if($('ortho').checked && !(surfaceScene() && Math.abs(v[2][1]) < .01)){ const s = 1.25 * num('zm'), hh = s * Math.max(1, H / W); Object.assign(ocam, {left: -hh * W / H, right: hh * W / H, top: hh, bottom: -hh}); ocam.updateProjectionMatrix(); c = ocam; }
+  const lift = surfaceScene() && Math.abs(v[2][1]) < .01 ? 12 * Math.PI / 180 : 0, pv = lift ? [dir[0] * Math.cos(lift), Math.sin(lift), dir[2] * Math.cos(lift)] : dir;
+  c.up.set(...v[3]); c.position.set(...pv.map(x => x * (c === ocam ? 5 : d))); c.lookAt(0, 0, 0);
   pivot.rotation.y = 0; applyView(); renderFrame(c); viewHide = false; envShow = true; envG.rotation.y = 0; cam.up.set(0, 1, 0);
   return blobOf(mime);
 }
@@ -798,13 +844,12 @@ $('sv').addEventListener('change', () => $('pickDir').style.display = val('sv') 
 $('pickDir').onclick = async () => { try{ const h = await showDirectoryPicker({mode: 'readwrite'}); await idb('put', 'dir', h); setMsg(T('m_dirset', h.name)); }catch(e){ setMsg(T('e_dir') + ': ' + (e.message || e), true); } };
 let lastFiles = [], lastImages = [];
 $('redl').onclick = async () => { const d = await pickDir(); await saveAll(lastFiles, d); };
-$('dlI').onclick = async () => { const d = await pickDir(); setMsg(T('m_save')); const w = await saveAll(lastImages, d); setMsg(T('m_done', fileName, lastImages.length, w)); };
 let lbUrl = null; function openLb(u, nm, lbl){ $('lbi').src = u; $('lbd').href = u; $('lbd').download = nm; $('lbd').textContent = T('dl') + ': ' + lbl; lbUrl = u; $('lb').style.display = 'flex'; }
 $('lbc').onclick = () => $('lb').style.display = 'none'; $('lb').onclick = e => { if(e.target === $('lb')) $('lb').style.display = 'none'; };
 
 async function run(doVideo, doImgs, dirH, autoSave){
   if(!mesh || busy) return false;
-  busy = true; ['all', 'onlyV', 'onlyI', 'batch', 'dlI'].forEach(i => $(i).disabled = true);
+  busy = true; ['all', 'onlyV', 'onlyI', 'batch'].forEach(i => $(i).disabled = true);
   $('res').style.display = 'none'; $('gal').style.display = 'none'; $('gal').innerHTML = ''; $('bar').style.display = 'block'; progress(0);
   const files = []; let ok = true, vurl = null;
   try{
@@ -831,7 +876,7 @@ async function run(doVideo, doImgs, dirH, autoSave){
     if(doVideo) $('vid').play().catch(() => {});
     progress(1); setMsg(autoSave ? T('m_done', fileName, files.length, where) : T('m_gen', fileName, files.length));
   }catch(e){ ok = false; setMsg(e.message || String(e), true); console.error(e); }
-  busy = false; ['all', 'onlyV', 'onlyI'].forEach(i => $(i).disabled = false); $('batch').disabled = false; $('dlI').disabled = !lastImages.length;
+  busy = false; ['all', 'onlyV', 'onlyI'].forEach(i => $(i).disabled = false); $('batch').disabled = false;
   sizeFromUI(); applyLook(); setTimeout(() => $('bar').style.display = 'none', 800);
   return ok;
 }
@@ -866,19 +911,17 @@ function applyLang(){
 
 /* ---------- sahne ön ayarları (fotoğraf) ---------- */
 const PRESETS = {
-  p1: {cx: .5, cy: .78, z: 1, f: '', az: 50, w: .1, s: 1, vs: 0, bl: 1},
-  p2: {cx: .85, cy: .55, z: 1.5, f: '', az: 60, w: 0, s: 1.05, vs: 0, bl: 1.5},
-  p3: {cx: .66, cy: .6, z: 1.9, f: '', az: 55, w: .05, s: 1, vs: 0, bl: 2},
-  p4: {cx: .3, cy: .38, z: 1.5, f: '', az: 25, w: .1, s: .95, vs: 0, bl: 2.5},
-  p5: {cx: .5, cy: .78, z: 1, flip: 1, f: '', az: -50, w: .1, s: 1, vs: 0, bl: 1},
-  p6: {cx: .5, cy: .78, z: 1.1, f: 'sepia(.4) saturate(1.35) hue-rotate(-14deg) brightness(.98)', az: 55, w: .7, s: 1, vs: 0, bl: 1},
-  p7: {cx: .5, cy: .78, z: 1.1, f: 'hue-rotate(14deg) saturate(.85) brightness(1.06)', az: 50, w: -.6, s: 1, vs: 0, bl: 1},
-  p8: {cx: .5, cy: .78, z: 1.1, f: 'brightness(.5) contrast(1.2) saturate(.85)', az: 40, w: .5, s: .7, vs: 0, bl: 1},
-  p9: {cx: .5, cy: .78, z: 1, f: 'grayscale(1) contrast(1.1)', az: 50, w: 0, s: 1, vs: 0, bl: 1},
-  p10: {cx: .5, cy: .72, z: 1, f: 'brightness(1.14) contrast(.9) saturate(.8)', az: 50, w: 0, s: 1.1, vs: 0, bl: 1.5}
+  p1: {cx: .74, cy: .84, z: 1.5, f: '', az: 50, w: .1, s: 1, vs: 0, bl: 1}, p2: {cx: .8, cy: .64, z: 1.4, f: '', az: 60, w: 0, s: 1.05, vs: 0, bl: 1.5},
+  p3: {cx: .66, cy: .68, z: 1.8, f: '', az: 55, w: .05, s: 1, vs: 0, bl: 2}, p4: {cx: .42, cy: .66, z: 1.3, f: '', az: 30, w: .1, s: .95, vs: 0, bl: 2.5},
+  p5: {cx: .74, cy: .84, z: 1.5, flip: 1, f: '', az: -50, w: .1, s: 1, vs: 0, bl: 1},
+  p6: {cx: .74, cy: .84, z: 1.5, f: 'sepia(.4) saturate(1.35) hue-rotate(-14deg) brightness(.98)', az: 55, w: .7, s: 1, vs: 0, bl: 1},
+  p7: {cx: .74, cy: .84, z: 1.5, f: 'hue-rotate(14deg) saturate(.85) brightness(1.06)', az: 50, w: -.6, s: 1, vs: 0, bl: 1},
+  p8: {cx: .74, cy: .84, z: 1.5, f: 'brightness(.5) contrast(1.2) saturate(.85)', az: 40, w: .5, s: .7, vs: 0, bl: 1},
+  p9: {cx: .74, cy: .84, z: 1.5, f: 'grayscale(1) contrast(1.1)', az: 50, w: 0, s: 1, vs: 0, bl: 1},
+  p10: {cx: .74, cy: .8, z: 1.4, f: 'brightness(1.14) contrast(.9) saturate(.8)', az: 50, w: 0, s: 1.1, vs: 0, bl: 1.5}
 };
 const refImg = new Image(); let refReady = false;
-refImg.onload = () => { refReady = true; if(envKind === 'ref'){ envKind = null; bakeKey = ''; } if(PRESETS[val('bg')] || envKind === null) drawBG(); }; refImg.src = REF;
+refImg.onload = () => { refReady = true; if(envKind && envKind.startsWith('ref')){ envKind = null; bakeKey = ''; } if(PRESETS[val('bg')] || envKind === null) drawBG(); }; refImg.src = REF;
 function drawPreset(g, p){
   if(!refReady){ g.fillStyle = '#9aa0a5'; g.fillRect(0, 0, W, H); return; }
   const iw = refImg.width, ih = refImg.height, ar = W / H, sa = iw / ih; let cw, ch;
@@ -896,9 +939,10 @@ function analyze(img){
   return {la: Math.max(-80, Math.min(80, diff * 260)), lw: Math.max(-100, Math.min(100, (rr - bb) / n / 255 * 400)), ls: Math.max(.6, Math.min(1.4, .5 + lum / n / 255 * 1.1)), vs: 0, blur: 1};
 }
 const ENVD = {
-  ref: {la: 55, lw: 8, ls: 1, bl: 2, el: 12, col: '#cdc6b9'}, office: {la: 35, lw: 5, ls: 1, bl: 3, el: 10, col: '#d6d0c4'}, shelf: {la: 30, lw: 12, ls: 1, bl: 3, el: 10, col: '#cfc6b4'},
-  marble: {la: 40, lw: 0, ls: 1.05, bl: 3, el: 12, col: '#2f4a66'}, loft: {la: 45, lw: -5, ls: 1, bl: 3, el: 10, col: '#d9d4c9'}, garden: {la: 60, lw: 35, ls: 1.15, bl: 4, el: 10, col: '#c9623b'},
-  workshop: {la: 30, lw: 10, ls: 1, bl: 3, el: 10, col: '#d9a441'}, desk: {la: 35, lw: 5, ls: 1, bl: 2, el: 14, col: '#d8d3c8'}, cove: {la: 25, lw: 0, ls: 1.1, bl: 0, el: 16, col: '#e8742a'}, dark: {la: 40, lw: -10, ls: .9, bl: 0, el: 12, col: '#d9d9dc'}
+  ref: {la: 55, lw: 8, ls: 1, bl: 2, el: 12, col: '#cdc6b9'}, refwin: {la: 62, lw: 0, ls: 1.05, bl: 2.5, el: 12, col: '#cdc6b9'}, refshelf: {la: 40, lw: 10, ls: 1, bl: 2.5, el: 12, col: '#c7bfb0'},
+  refwarm: {la: 55, lw: 60, ls: 1, bl: 2, el: 12, col: '#d6cfc2'}, refcool: {la: 50, lw: -45, ls: 1.05, bl: 2, el: 12, col: '#d2cdc2'}, refnight: {la: 40, lw: 55, ls: .6, bl: 2, el: 12, col: '#d9d3c6'},
+  checker: {la: 35, lw: 0, ls: 1.05, bl: 0, el: 18, col: '#e8742a'}, marble: {la: 40, lw: 0, ls: 1.05, bl: 3, el: 12, col: '#2f4a66'}, loft: {la: 45, lw: -5, ls: 1, bl: 3, el: 10, col: '#d9d4c9'},
+  garden: {la: 60, lw: 35, ls: 1.15, bl: 4, el: 10, col: '#c9623b'}, cove: {la: 25, lw: 0, ls: 1.1, bl: 0, el: 16, col: '#e8742a'}, dark: {la: 40, lw: -10, ls: .9, bl: 0, el: 12, col: '#d9d9dc'}
 };
 let colorTouched = false;
 function sceneDefaults(){
@@ -1004,12 +1048,13 @@ function bake(c){
   scene.background = bgTex;
 }
 function renderFrame(c){
+  const under = !!mesh && c.position.y < floor.position.y + .02, sh = $('sh').checked && !viewHide && !under; fillB.intensity = under ? 1.2 * num('ls') : 0;
   if(envKind){
-    const baked = envShow && num('blur') > 0;
+    const show = envShow && !under, baked = show && num('blur') > 0;
     if(baked) bake(c); else scene.background = envBg;
-    envG.visible = envShow && !baked; floor.visible = $('sh').checked && !viewHide && (baked || !envShow);
-  } else floor.visible = $('sh').checked && !viewHide;
-  ao.visible = $('sh').checked && !viewHide; root.visible = true; renderer.render(scene, c);
+    envG.visible = show && !baked; floor.visible = sh && (baked || !show);
+  } else floor.visible = sh;
+  ao.visible = sh; root.visible = true; renderer.render(scene, c);
 }
 $('lbcp').onclick = async () => { try{ let b = await (await fetch(lbUrl)).blob(); if(b.type !== 'image/png'){ const bm = await createImageBitmap(b), c = document.createElement('canvas'); c.width = bm.width; c.height = bm.height; c.getContext('2d').drawImage(bm, 0, 0); b = await new Promise(r => c.toBlob(r, 'image/png')); } await navigator.clipboard.write([new ClipboardItem({'image/png': b})]); setMsg(T('m_copied')); }catch(e){ setMsg(String(e.message || e), true); } };
 $('lang').onchange = () => { LANG = val('lang'); try{ localStorage.setItem('m3dlang', LANG); }catch(e){} applyLang(); };
@@ -1018,15 +1063,48 @@ $('bg').addEventListener('change', sceneDefaults); $('autoH').onclick = sceneDef
 $('fsb').onclick = () => { if(document.fullscreenElement) document.exitFullscreen(); else if($('stage').requestFullscreen) $('stage').requestFullscreen(); };
 $('pau').onclick = () => { paused = !paused; $('pau').textContent = T(paused ? 'play' : 'pause'); };
 document.querySelectorAll('[data-qv]').forEach(b => b.onclick = () => { const [a, e] = b.dataset.qv.split(',').map(Number); offset = a * Math.PI / 180; phase = 0; $('el').value = e; paused = true; $('pau').textContent = T('play'); labels(); saveSet(); });
+
+let edgeLines = null, snapN = 0;
+function updateEdges(){
+  if(edgeLines){ if(mesh) mesh.remove(edgeLines); edgeLines.geometry.dispose(); edgeLines = null; }
+  if(!$('edg').checked || !mesh || mesh.geometry.attributes.position.count > 1.5e6) return;
+  edgeLines = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, 28), new THREE.LineBasicMaterial({color: lin('#14181c'), transparent: true, opacity: .55})); mesh.add(edgeLines);
+}
+$('edg').addEventListener('change', updateEdges);
+async function snapshot(){
+  if(!mesh || busy) return; renderFrame(cam);
+  const fmt = val('fmt'), ext = fmt === 'jpeg' ? 'jpg' : fmt, blob = await blobOf('image/' + fmt), nm = `${fileName}_snap${++snapN}.${ext}`;
+  lastFiles.push({name: nm, blob}); lastImages.push({name: nm, blob}); addThumb(blob, nm, '📷 ' + snapN);
+  $('gal').style.display = 'grid'; $('redl').style.display = 'block'; $('gal').scrollIntoView({block: 'nearest'});
+}
+$('snap').onclick = snapshot;
+document.addEventListener('keydown', e => {
+  const tg = e.target.tagName; if(['INPUT', 'SELECT', 'TEXTAREA'].includes(tg) || e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key; if(k === ' ' && tg === 'BUTTON') return; let used = true;
+  if(k === ' ') $('pau').click();
+  else if(k === 'r' || k === 'R'){ setZoom(1); offset = 0; phase = 0; $('el').value = ENVD[val('bg')] ? ENVD[val('bg')].el : 22; }
+  else if(k === 'f' || k === 'F') $('fsb').click();
+  else if(k === '+' || k === '=') setZoom(num('zm') / 1.1); else if(k === '-') setZoom(num('zm') * 1.1);
+  else if(k === 'ArrowLeft') offset -= .12; else if(k === 'ArrowRight') offset += .12;
+  else if(k === 'ArrowUp') $('el').value = Math.min(85, num('el') + 3); else if(k === 'ArrowDown') $('el').value = Math.max(-85, num('el') - 3);
+  else if(/^[1-7]$/.test(k)) document.querySelectorAll('[data-qv]')[+k - 1].click();
+  else if(k === 's' || k === 'S') snapshot(); else used = false;
+  if(used){ e.preventDefault(); labels(); }
+});
+$('cfgx').onclick = () => { const o = {lang: LANG}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 1)], {type: 'application/json'})); a.download = 'stl-to-mp4-settings.json'; a.click(); };
+$('cfgi').onclick = () => $('cfgf').click();
+$('cfgf').onchange = async e => { try{ const o = JSON.parse(await e.target.files[0].text()); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); if(o.lang && LANGS.includes(o.lang)){ LANG = o.lang; $('lang').value = LANG; applyLang(); } colorTouched = true; sizeFromUI(); applyLook(); updateEdges(); saveSet(); }catch(err){ setMsg(String(err.message || err), true); } e.target.value = ''; };
+$('cfgr').onclick = () => { try{ localStorage.removeItem('m3dset5'); localStorage.removeItem('m3dlang'); }catch(e){} location.reload(); };
+
 const SW = ['#ece8e0', '#8c9094', '#26282b', '#e8742a', '#c0392b', '#2f6fb0', '#3f8f5a', '#b98552'];
 SW.forEach(c => { const b = document.createElement('button'); b.style.cssText = `background:${c};width:26px;height:26px;padding:0;min-width:0;border:1px solid #8a949b;border-radius:50%`; b.setAttribute('aria-label', c); b.onclick = () => { $('cm').value = c; colorTouched = true; applyLook(); saveSet(); }; $('sw').appendChild(b); });
 $('cm').addEventListener('input', () => colorTouched = true);
 LANG = detectLang(); $('lang').value = LANG;
-let firstRun = true; try{ firstRun = !localStorage.getItem('m3dset4'); }catch(e){}
+let firstRun = true; try{ firstRun = !localStorage.getItem('m3dset5'); }catch(e){}
 colorTouched = !firstRun;
-loadSet(); applyLang(); sizeFromUI(); labels(); if(firstRun) sceneDefaults(); else applyLook(); requestAnimationFrame(loop);
+document.querySelectorAll('label').forEach(l => { if(l.querySelector('input[type=range]')) l.classList.add('rng'); });
+loadSet(); if(!val('bg')) $('bg').value = 'ref'; applyLang(); sizeFromUI(); labels(); if(firstRun) sceneDefaults(); else applyLook(); requestAnimationFrame(loop);
 
 </script>
 </body>
 </html>
-
