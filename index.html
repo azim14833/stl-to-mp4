@@ -645,7 +645,7 @@ function applyLight(){
   key.color.copy(base); key.intensity = 1.2 * st; key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
   hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .5); hemi.intensity = .35 * st; floor.material.opacity = num('sa'); ao.material.opacity = Math.min(1, num('sa') * 1.5);
 }
-function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
+function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
