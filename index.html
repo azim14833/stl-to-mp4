@@ -4,6 +4,13 @@
 <meta name="google-adsense-account" content="ca-pub-5140289630713717">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5140289630713717" crossorigin="anonymous"></script>
 <meta charset="utf-8">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3b5bfd">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="STL→MP4">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D Model → MP4 + Görünümler</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -124,6 +131,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
     <select id="lang" aria-label="Language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
   </div>
   <div class="themes" id="themes"><button data-th="light" data-i="th_light"></button><button data-th="dark" data-i="th_dark"></button><button data-th="ocean" data-i="th_ocean"></button><button data-th="sunset" data-i="th_sunset"></button></div>
+  <button id="install" class="small" style="display:none" data-i="install"></button>
   <div class="toprow"><button id="open" class="primary" data-i="open"></button><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
   <input id="file" type="file" accept=".stl,.3mf,.obj" multiple hidden>
   <select id="models" style="display:none"></select>
@@ -324,6 +332,7 @@ res_hint=Oluşturulan video ve görüntüler burada görünür.|Rendered video a
 up_auto=Otomatik (dosya türüne göre)|Auto (by file type)
 up_z=Z yukarı (STL, 3MF, CAD)|Z up (STL, 3MF, CAD)
 up_y=Y yukarı (OBJ, Blender, oyun)|Y up (OBJ, Blender, games)
+install=Uygulamayı telefona yükle|Install the app
 th_light=Açık|Light|Hell|Clair|Claro|Светлая|فاتح
 th_dark=Koyu|Dark|Dunkel|Sombre|Oscuro|Тёмная|داكن
 th_ocean=Okyanus|Ocean|Ozean|Océan|Océano|Океан|محيط
@@ -1172,6 +1181,11 @@ function setTheme(t){ document.documentElement.dataset.theme = t; try{ localStor
 document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => setTheme(b.dataset.th));
 let th0 = 'light'; try{ th0 = localStorage.getItem('m3dtheme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); }catch(e){} setTheme(th0);
 $('cm').addEventListener('input', () => colorTouched = true);
+let instEv = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instEv = e; $('install').style.display = 'block'; });
+window.addEventListener('appinstalled', () => { instEv = null; $('install').style.display = 'none'; });
+$('install').onclick = async () => { if(!instEv) return; instEv.prompt(); try{ await instEv.userChoice; }catch(e){} instEv = null; $('install').style.display = 'none'; };
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
 function showTab(n){ document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === n)); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === n)); }
 document.querySelectorAll('.tabbar button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 LANG = detectLang(); $('lang').value = LANG;
