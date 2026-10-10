@@ -108,13 +108,24 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
 .tabbar button.on{background:var(--card);color:var(--accent);box-shadow:var(--sh)}
 .foot{flex:none;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
 .toprow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px}
+#stage:fullscreen{display:flex;height:100%;padding:0}#stage:fullscreen #cv{height:100%;max-height:none}
 @media(max-width:860px){
   body{padding:8px}
-  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;height:auto;min-height:0}
-  #stage{height:48vh;min-height:260px;padding:8px}
-  aside{overflow:visible;height:auto;padding:12px}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;height:auto;min-height:0;gap:10px}
+  #stage{display:block;height:auto;min-height:0;padding:6px;border-radius:18px}
+  #cv{display:block;width:100%;height:auto;max-height:58vh;object-fit:contain;border-radius:12px}
+  #drop{inset:6px;padding:10px;gap:4px;border-radius:12px}
+  #drop b{font-size:16px}#drop span{font-size:12px;line-height:1.35}
+  aside{overflow:visible;height:auto;padding:12px;border-radius:18px}
   aside>.pane{flex:none;overflow:visible;padding:0}
-  .foot{position:sticky;bottom:0;z-index:5;background:var(--panel);padding:8px 0 calc(8px + env(safe-area-inset-bottom));margin:0 -4px}
+  h1{font-size:17px}.sub{font-size:12px}
+  .themes{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  .themes button{min-height:30px;padding:3px 2px;font-size:11px;gap:4px}
+  .themes button::before{width:10px;height:10px}
+  .foot{position:sticky;bottom:0;z-index:5;background:var(--panel);gap:6px;padding:8px 0 calc(8px + env(safe-area-inset-bottom));margin:0 -4px;box-shadow:0 -6px 12px -8px rgba(0,0,0,.25)}
+  .foot .big{min-height:44px;font-size:15px;border-radius:12px}
+  .foot .two button,.foot #batch{min-height:34px;font-size:13px;padding:4px 8px}
+  #msg{font-size:12px;line-height:1.3;min-height:0;max-height:2.7em;overflow:auto}
 }
 </style>
 </head>
@@ -187,6 +198,10 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
     <div class="row">
       <label><span data-i="upax"></span><select id="up"><option value="auto" data-i="up_auto"></option><option value="z" data-i="up_z"></option><option value="y" data-i="up_y"></option></select></label>
       <label><span data-i="dir"></span><select id="dir"><option value="1" data-i="ccw"></option><option value="-1" data-i="cw"></option></select></label>
+    </div>
+    <div class="row">
+      <label><span data-i="unit"></span><select id="unit"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option><option value="25.4">inç / in</option></select></label>
+      <label><span data-i="realmm"></span><input id="realmm" type="number" min="0" step="1" placeholder="0"></label>
     </div>
     <label class="chk"><input id="wf" type="checkbox"><span data-i="wire"></span></label>
   </fieldset>
@@ -333,6 +348,9 @@ up_auto=Otomatik (dosya türüne göre)|Auto (by file type)
 up_z=Z yukarı (STL, 3MF, CAD)|Z up (STL, 3MF, CAD)
 up_y=Y yukarı (OBJ, Blender, oyun)|Y up (OBJ, Blender, games)
 install=Uygulamayı telefona yükle|Install the app
+unit=Dosya birimi|File unit
+realmm=Gerçek en uzun kenar (mm)|Real longest edge (mm)
+m_hint=⚠ Boyut çok küçük görünüyor: dosya birimini seç veya gerçek boyu mm olarak yaz.|⚠ Size looks tiny: pick the file unit or enter the real size in mm.
 th_light=Açık|Light|Hell|Clair|Claro|Светлая|فاتح
 th_dark=Koyu|Dark|Dunkel|Sombre|Oscuro|Тёмная|داكن
 th_ocean=Okyanus|Ocean|Ozean|Océan|Océano|Океан|محيط
@@ -467,7 +485,7 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg'];
+const SET = ['bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'iso', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg', 'unit'];
 const isChk = i => $(i).type === 'checkbox';
 function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset6', JSON.stringify(o)); }catch(e){} }
 function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset6') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
@@ -652,7 +670,7 @@ function applyTransform(){
   upG.rotation.x = z ? -Math.PI / 2 : 0;
   user.rotation.set(n0('rx') * d, n0('ry') * d, n0('rz') * d, 'XYZ'); user.scale.setScalar(num('sc'));
   root.position.set(n0('px') * k, (z ? n0('pz') : n0('py')) * k, (z ? -n0('py') : n0('pz')) * k);
-  $('vSc').textContent = num('sc').toFixed(2); fitFloor();
+  $('vSc').textContent = num('sc').toFixed(2); fitFloor(); updDims();
 }
 const orient = applyTransform;
 function applyLight(){
@@ -785,7 +803,7 @@ function setModel(i){
   mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k; edgeLines = null; updateEdges();
   ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1;
   curM = m; $('up').value = 'auto'; orient();
-  fileName = m.name; dims = `${sz.x.toFixed(1)} × ${sz.y.toFixed(1)} × ${sz.z.toFixed(1)} mm`; curM = m; if(!m.st) m.st = stats(m.pos);
+  fileName = m.name; m.sz = [sz.x, sz.y, sz.z]; $('realmm').value = ''; curM = m; if(!m.st) m.st = stats(m.pos); updDims();
   refreshInfo();
   $('stage').classList.add('has'); ['all', 'onlyV', 'onlyI', 'batch'].forEach(x => $(x).disabled = false);
   $('models').value = i; setMsg(T('m_ready'));
@@ -850,7 +868,7 @@ $('trReset').onclick = () => { ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i =>
 function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
 ['dur', 'br', 'el', 'zm', 'blur'].forEach(i => $(i).addEventListener('input', labels));
 ['cm', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
-$('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
+['unit', 'realmm'].forEach(i => $(i).addEventListener('input', updDims)); $('up').onchange = applyTransform; $('res').onchange = sizeFromUI;
 document.querySelector('aside').addEventListener('input', saveSet);
 
 function loop(now){
@@ -1047,10 +1065,13 @@ function stats(pos){
   return {v: Math.abs(v) / 1000, a: a / 100};
 }
 let curM = null;
+const mmK = () => { const r = num('realmm'), raw = curM && curM.sz ? Math.max(...curM.sz) : 0; return (r > 0 && raw > 0 ? r / raw : (+val('unit') || 1)) * (num('sc') || 1); };
+function updDims(){ if(!curM || !curM.sz || !curM.st) return; const k = mmK(); dims = curM.sz.map(x => (x * k).toFixed(1)).join(' × ') + ' mm'; refreshInfo(); }
 function refreshInfo(){
   if(!curM) { $('info').textContent = ''; $('stats').textContent = ''; return; }
   $('info').textContent = T('m_info', curM.name, (curM.pos.length / 9).toLocaleString(LANG), dims);
-  $('stats').textContent = T('m_stats', curM.st.v.toFixed(2), curM.st.a.toFixed(1), (curM.st.v * 1.24).toFixed(1));
+  const k = mmK(), v = curM.st.v * k ** 3, a = curM.st.a * k ** 2, dg = v < 1 ? 3 : 2;
+  $('stats').textContent = T('m_stats', v.toFixed(dg), a.toFixed(a < 1 ? 2 : 1), (v * 1.24).toFixed(v < 1 ? 2 : 1)) + (v < 0.01 ? ' ' + T('m_hint') : '');
 }
 function layFlat(){
   if(!mesh) return; const p = mesh.geometry.attributes.position.array, bk = new Map();
