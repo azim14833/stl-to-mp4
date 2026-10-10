@@ -84,7 +84,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 #bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;display:none}
 #bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
 #msg{color:var(--mute);min-height:20px;overflow-wrap:anywhere}#msg.err{color:#e5484d}
-#res{display:none;gap:8px;flex-direction:column}#res video{width:100%;background:#000;border-radius:12px}
+#resBox{display:none;gap:8px;flex-direction:column}#resBox video{width:100%;background:#000;border-radius:12px}
 #gal{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #gal button{display:block;font-size:12px;font-weight:500;min-height:0;padding:0;border:0;background:none;box-shadow:none;overflow:hidden;color:var(--mute)}
 #gal img{width:100%;aspect-ratio:1;object-fit:contain;background:var(--hover);border:1px solid var(--line);border-radius:10px;display:block}
@@ -136,8 +136,8 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
   .foot .two button,.foot #batch{min-height:34px;font-size:13px;padding:4px 8px}
   #msg{font-size:12px;line-height:1.3;min-height:0;max-height:2.7em;overflow:auto}
 }
-@media(pointer:coarse){#cv{touch-action:pan-y}}
 #toast{cursor:pointer}
+#gal .vbtn{grid-column:1/-1;padding:8px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:13px;min-height:34px;border-radius:10px;text-align:left;font-weight:600}
 .seo h4{margin:12px 0 2px}.seo nav a{color:var(--accent)}.seo footer p{margin:6px 0 0}
 </style>
 </head>
@@ -157,7 +157,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
   <div class="themes" id="themes"><button data-th="light" data-i="th_light"></button><button data-th="dark" data-i="th_dark"></button><button data-th="ocean" data-i="th_ocean"></button><button data-th="sunset" data-i="th_sunset"></button></div>
   <button id="install" class="small" style="display:none" data-i="install"></button>
   <div class="toprow"><button id="open" class="primary" data-i="open"></button><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
-  <input id="file" type="file" accept=".stl,.3mf,.obj" multiple hidden>
+  <input id="file" type="file" accept=".stl,.3mf,.obj,.mtl" multiple hidden>
   <select id="models" style="display:none"></select>
   <div id="info" class="sub"></div>
   <div id="stats" class="sub"></div>
@@ -208,6 +208,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
       <label><span data-i="col"></span><input id="cm" type="color" value="#d8d3c9"></label>
     </div>
     <div id="sw" class="swatches"></div>
+    <label class="chk" id="fcrow" style="display:none"><input id="fc" type="checkbox" checked><span data-i="fcol"></span></label>
     <div class="row">
       <label><span data-i="upax"></span><select id="up"><option value="auto" data-i="up_auto"></option><option value="z" data-i="up_z"></option><option value="y" data-i="up_y"></option></select></label>
       <label><span data-i="dir"></span><select id="dir"><option value="1" data-i="ccw"></option><option value="-1" data-i="cw"></option></select></label>
@@ -277,12 +278,13 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
     <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
   </fieldset></div>
 <div class="tab" data-tab="res"><p class="sub" data-i="res_hint"></p>
-  <div id="res"><video id="vid" controls loop></video><a id="dl" class="btn primary"></a></div>
+  <div id="resBox"><video id="vid" controls playsinline loop></video><a id="dl" class="btn primary"></a></div>
   <div id="gal"></div>
-  <button id="redl" style="display:none" data-i="redl"></button></div>
+  <button id="clearRes" class="small" data-i="clearres"></button></div>
 </div>
   <div class="foot">
   <button id="all" class="primary big" disabled data-i="go"></button>
+  <button id="redl" class="small" disabled data-i="redl"></button>
   <div class="two"><button id="onlyV" disabled data-i="onlyv"></button><button id="onlyI" disabled data-i="onlyi"></button></div>
   <button id="batch" style="display:none" disabled data-i="batch"></button>
   <div id="bar"><i></i></div>
@@ -370,6 +372,9 @@ metadesc=STL, 3MF ve OBJ 3D modellerini tarayıcıda MP4 döner video ve görün
 m_vscale=(Cihaz bu boyutta H.264 videoyu desteklemiyor; video {0} olarak üretildi, resimler tam çözünürlükte.)|(This device cannot encode H.264 at that size; the video was made at {0}, images are full resolution.)
 e_ctx=Grafik belleği doldu. Çözünürlüğü düşür veya sayfayı yenile.|Graphics memory ran out. Lower the resolution or reload the page.
 vreset=Görünümü ortala / sıfırla|Center / reset view
+fcol=Dosyadaki renkleri kullan|Use colors from the file
+clearres=Sonuçları temizle|Clear results
+m_retry=Video oynatılamadı, uyumlu modda yeniden kodlanıyor…|The video did not play, re-encoding in compatible mode…
 th_light=Açık|Light|Hell|Clair|Claro|Светлая|فاتح
 th_dark=Koyu|Dark|Dunkel|Sombre|Oscuro|Тёмная|داكن
 th_ocean=Okyanus|Ocean|Ozean|Océan|Océano|Океан|محيط
@@ -497,7 +502,7 @@ const ao = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMate
 ao.rotation.x = -Math.PI / 2; ao.renderOrder = 2; scene.add(ao);
 const MATS = {plastik: [.4, 0], mat: [.85, 0], parlak: [.16, 0], kil: [.95, 0], metal: [.26, 1], firca: [.5, 1]};
 
-let videoNote = '', phase = 0, lastT = 0, paused = false, mesh = null, models = [], fileName = 'model', dims = '', offset = 0, busy = false, W = 1920, H = 1080, bgTex = null, normK = 1;
+let runCount = 0, videoNote = '', phase = 0, lastT = 0, paused = false, mesh = null, models = [], fileName = 'model', dims = '', offset = 0, busy = false, W = 1920, H = 1080, bgTex = null, normK = 1;
 const photos = []; let selPhoto = -1;
 const val = id => $(id).value, num = id => parseFloat(val(id));
 const tick = () => new Promise(r => setTimeout(r, 0)), sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -669,7 +674,7 @@ function drawBG(solid){
 function sizeFromUI(full){
   let [ow, oh] = val('res').split('x').map(Number), k;
   if(full === true){ const gl = renderer.getContext(), mx = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) || 4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096); k = Math.min(1, mx / Math.max(ow, oh)); }
-  else k = Math.min(1, (COARSE ? 720 : 1280) / Math.max(ow, oh));
+  else k = Math.min(1, (COARSE ? 640 : 1280) / Math.max(ow, oh));
   W = Math.round(ow * k); H = Math.round(oh * k); renderer.setSize(W, H, false); cam.aspect = W / H; applyView(); drawBG(); if(mesh) fitFloor();
 }
 function applyView(){ const v = n0('vs') / 100; if(v){ cam.setViewOffset(W, H, 0, -v * H, W, H); ocam.setViewOffset(W, H, 0, -v * H, W, H); } else { cam.clearViewOffset(); ocam.clearViewOffset(); } }
@@ -705,7 +710,8 @@ function applyLight(){
   key.color.copy(base); key.intensity = 1.2 * st; key.position.set(Math.sin(az) * 5, 5, 4 * Math.cos(az) + .5);
   hemi.color.copy(base).lerp(new THREE.Color(1, 1, 1), .5); hemi.intensity = .35 * st; floor.material.opacity = num('sa'); ao.material.opacity = Math.min(1, num('sa') * 1.5);
 }
-function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; mat.color.copy(lin(val('cm'))); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
+function useFileColors(){ const vc = !!(curM && curM.col && $('fc').checked); if(mat.vertexColors !== vc){ mat.vertexColors = vc; mat.needsUpdate = true; } mat.color.copy(vc ? new THREE.Color(1, 1, 1) : lin(val('cm'))); }
+function applyLook(){ const m = MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = m[1] ? 1.6 : .9; useFileColors(); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked && (!COARSE || busy); $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
@@ -713,27 +719,38 @@ function parseSTL(buf){
   if(buf.byteLength >= 84){
     const n = dv.getUint32(80, true);
     if(84 + n * 50 === buf.byteLength || (!head.startsWith('solid') && 84 + n * 50 < buf.byteLength)){
-      const p = new Float32Array(n * 9); let o = 84;
-      for(let i = 0; i < n; i++){ o += 12; for(let j = 0; j < 9; j++){ p[i*9+j] = dv.getFloat32(o, true); o += 4; } o += 2; }
-      return p;
+      const p = new Float32Array(n * 9), at = new Uint16Array(n); let o = 84, big = 0;
+      for(let i = 0; i < n; i++){ o += 12; for(let j = 0; j < 9; j++){ p[i*9+j] = dv.getFloat32(o, true); o += 4; } const a = dv.getUint16(o, true); at[i] = a; if((a & 0x8000) && (a & 0x7fff)) big++; o += 2; }
+      const u = new Uint8Array(buf, 0, 80), hs = String.fromCharCode(...u), ci = hs.indexOf('COLOR='), rgb = a => [(a & 31) / 31, ((a >> 5) & 31) / 31, ((a >> 10) & 31) / 31];
+      const fill = f => { const col = new Float32Array(n * 9); for(let i = 0; i < n; i++){ const c = f(at[i]); for(let v = 0; v < 3; v++){ col[i*9+v*3] = c[0]; col[i*9+v*3+1] = c[1]; col[i*9+v*3+2] = c[2]; } } return col; };
+      let col = null;
+      if(ci >= 0 && ci + 9 <= 80){ const d = [u[ci+6] / 255, u[ci+7] / 255, u[ci+8] / 255]; col = fill(a => (a & 0x8000) === 0 ? rgb(a) : d); }
+      else if(big > n * .5) col = fill(a => (a & 0x8000) ? rgb(a) : [.8, .8, .8]);
+      return {pos: p, col};
     }
   }
   const txt = new TextDecoder().decode(buf), re = /vertex\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)\s+([-+0-9.eE]+)/g, a = []; let m;
   while((m = re.exec(txt))) a.push(+m[1], +m[2], +m[3]);
   if(!a.length || a.length % 9) throw new Error(T('e_stl'));
-  return new Float32Array(a);
+  return {pos: new Float32Array(a), col: null};
 }
-function parseOBJ(buf){
-  const V = [], out = [];
+function parseMTL(txt){
+  const m = {}; let cur = null;
+  for(const ln of txt.split(/\r?\n/)){ const t = ln.trim(); if(/^newmtl\s/i.test(t)) cur = t.slice(7).trim(); else if(cur && /^Kd\s/i.test(t)){ const q = t.split(/\s+/); m[cur] = [+q[1], +q[2], +q[3]]; } }
+  return m;
+}
+function parseOBJ(buf, mtl){
+  const V = [], VC = [], out = [], oc = []; let cur = null, anyC = false;
   for(const ln of new TextDecoder().decode(buf).split(/\r?\n/)){
-    if(ln.startsWith('v ')){ const p = ln.trim().split(/\s+/); V.push([+p[1], +p[2], +p[3]]); }
+    if(ln.startsWith('v ')){ const p = ln.trim().split(/\s+/); V.push([+p[1], +p[2], +p[3]]); if(p.length >= 7){ let c = [+p[4], +p[5], +p[6]]; if(c.some(x => x > 1)) c = c.map(x => x / 255); VC.push(c); } else VC.push(null); }
+    else if(ln.startsWith('usemtl ')) cur = ln.slice(7).trim();
     else if(ln.startsWith('f ')){
-      const ix = ln.trim().split(/\s+/).slice(1).map(t => { const k = parseInt(t); return k < 0 ? V.length + k : k - 1; });
-      for(let i = 1; i < ix.length - 1; i++) for(const k of [ix[0], ix[i], ix[i+1]]) out.push(...V[k]);
+      const ix = ln.trim().split(/\s+/).slice(1).map(t => { const k = parseInt(t); return k < 0 ? V.length + k : k - 1; }), kd = mtl && cur ? mtl[cur] : null;
+      for(let i = 1; i < ix.length - 1; i++) for(const k of [ix[0], ix[i], ix[i+1]]){ out.push(...V[k]); const c = VC[k] || kd; if(c){ anyC = true; oc.push(c[0], c[1], c[2]); } else oc.push(.8, .8, .8); }
     }
   }
   if(!out.length) throw new Error(T('e_obj'));
-  return Float32Array.from(out);
+  return {pos: Float32Array.from(out), col: anyC ? Float32Array.from(oc) : null};
 }
 async function unzip(buf){
   const u8 = new Uint8Array(buf), dv = new DataView(buf); let e = u8.length - 22;
@@ -771,18 +788,20 @@ async function parse3MF(buf){
         const m = o.getElementsByTagName('mesh')[0], ob = {};
         if(m){
           ob.v = []; for(const v of m.getElementsByTagName('vertex')) ob.v.push([+v.getAttribute('x'), +v.getAttribute('y'), +v.getAttribute('z')]);
-          ob.t = []; for(const t of m.getElementsByTagName('triangle')) ob.t.push([+t.getAttribute('v1'), +t.getAttribute('v2'), +t.getAttribute('v3')]);
+          ob.t = []; for(const t of m.getElementsByTagName('triangle')) ob.t.push([+t.getAttribute('v1'), +t.getAttribute('v2'), +t.getAttribute('v3'), t.getAttribute('pid'), t.getAttribute('p1'), t.getAttribute('p2'), t.getAttribute('p3')]);
         } else ob.c = [...o.getElementsByTagName('component')].map(c => ({id: c.getAttribute('objectid'), path: attr(c, 'path'), tf: c.getAttribute('transform')}));
-        objs[o.getAttribute('id')] = ob;
+        ob.pid = o.getAttribute('pid'); ob.pi = o.getAttribute('pindex'); objs[o.getAttribute('id')] = ob;
       }
-      docs[n] = {xml, objs, name: n};
+      const groups = {}, hx = h => { h = (h || '').replace('#', ''); return h.length >= 6 ? [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255] : null; };
+      for(const nm of ['basematerials', 'colorgroup']) for(const g of xml.getElementsByTagNameNS('*', nm)) groups[g.getAttribute('id')] = [...g.children].map(c => hx(c.getAttribute('displaycolor') || c.getAttribute('color')));
+      docs[n] = {xml, objs, name: n, groups};
     }
     return docs[n];
   };
-  const out = [];
+  const out = [], outc = []; let anyC = false;
   const emit = async (path, id, mats, depth) => {
     const d = await load(path); const o = d && d.objs[id]; if(!o || depth > 8) return;
-    if(o.t){ for(const t of o.t) for(const k of t){ let p = o.v[k]; if(!p) continue; for(const mt of mats) p = ap(mt, p); out.push(p[0], p[1], p[2]); } }
+    if(o.t){ const grp = d.groups; for(const t of o.t){ const pid = t[3] ?? o.pid, g = pid != null ? grp[pid] : null; for(let q = 0; q < 3; q++){ let p = o.v[t[q]]; if(!p) continue; for(const mt of mats) p = ap(mt, p); out.push(p[0], p[1], p[2]); const pj = q === 0 ? (t[4] ?? o.pi) : (t[4 + q] ?? t[4] ?? o.pi), c = g && pj != null ? g[+pj] : null; if(c){ anyC = true; outc.push(c[0], c[1], c[2]); } else outc.push(.8, .8, .8); } } }
     else for(const c of o.c) await emit(c.path || path, c.id, [tfm(c.tf), ...mats], depth + 1);
   };
   const root = names.find(k => /^3d\/3dmodel\.model$/i.test(k)) || names.find(k => /\.model$/i.test(k));
@@ -792,7 +811,7 @@ async function parse3MF(buf){
   if(!out.length) for(const id of Object.keys(rd.objs)) await emit(root, id, [], 0);
   if(!out.length) for(const n of names.filter(k => /\.model$/i.test(k))){ const d = await load(n); for(const id of Object.keys(d.objs)) await emit(n, id, [], 0); }
   if(!out.length) throw new Error(T('e_3mf') + ' (no triangles)');
-  return Float32Array.from(out);
+  return {pos: Float32Array.from(out), col: anyC ? Float32Array.from(outc) : null};
 }
 /*PARSE_END*/
 
@@ -822,13 +841,15 @@ function smoothNormals(g){
 function setModel(i){
   const m = models[i]; if(!m) return;
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(m.pos.slice(), 3));
+  if(m.col){ if(!m.colLin) m.colLin = m.col.map(c => c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4)); g.setAttribute('color', new THREE.BufferAttribute(m.colLin.slice(), 3)); }
+  $('fcrow').style.display = m.col ? '' : 'none'; if(m.col) $('fc').checked = true;
   g.computeBoundingBox(); const c = new THREE.Vector3(), sz = new THREE.Vector3(); g.boundingBox.getCenter(c); g.boundingBox.getSize(sz); g.translate(-c.x, -c.y, -c.z);
   g.computeBoundingSphere(); const k = 1 / g.boundingSphere.radius; g.scale(k, k, k); g.computeBoundingBox(); (g.attributes.position.count > (COARSE ? 1.2e6 : 3e6) ? g.computeVertexNormals() : smoothNormals(g));
   if(mesh){ user.remove(mesh); mesh.geometry.dispose(); }
   mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; user.add(mesh); normK = k; edgeLines = null; updateEdges();
   ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1;
   curM = m; $('up').value = 'auto'; orient();
-  fileName = m.name; m.sz = [sz.x, sz.y, sz.z]; $('realmm').value = ''; curM = m; if(!m.st) m.st = stats(m.pos); updDims();
+  fileName = m.name; m.sz = [sz.x, sz.y, sz.z]; $('realmm').value = ''; curM = m; if(!m.st) m.st = stats(m.pos); updDims(); useFileColors();
   refreshInfo();
   $('stage').classList.add('has'); ['all', 'onlyV', 'onlyI', 'batch'].forEach(x => $(x).disabled = false);
   $('models').value = i; setMsg(T('m_ready'));
@@ -846,12 +867,13 @@ async function loadFiles(list){
   const fs = [...list], imgs = fs.filter(f => f.type.startsWith('image/')); imgs.forEach(addPhoto);
   const ms = fs.filter(f => /\.(stl|3mf|obj)$/i.test(f.name));
   if(!ms.length){ if(!imgs.length) setMsg(T('m_unsup'), true); return; }
+  const mtl = {}; for(const f of fs.filter(f => /\.mtl$/i.test(f.name))) Object.assign(mtl, parseMTL(await f.text()));
   const fresh = [];
   for(const f of ms){
     try{
       setMsg(T('m_read', f.name)); await tick();
       const buf = await f.arrayBuffer(), ext = f.name.split('.').pop().toLowerCase();
-      fresh.push({name: f.name.replace(/\.[^.]+$/, ''), ext, pos: ext === '3mf' ? await parse3MF(buf) : ext === 'obj' ? parseOBJ(buf) : parseSTL(buf)});
+      const r = ext === '3mf' ? await parse3MF(buf) : ext === 'obj' ? parseOBJ(buf, mtl) : parseSTL(buf); fresh.push({name: f.name.replace(/\.[^.]+$/, ''), ext, pos: r.pos, col: r.col});
     }catch(e){ setMsg(`${f.name}: ${e.message || e}`, true); console.error(e); }
   }
   if(!fresh.length) return;
@@ -882,7 +904,7 @@ cv.addEventListener('pointermove', e => {
   if(!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
   if(ptrs.size === 2){ const d = pd(); if(d > 0) setZoom(num('zm') * pinch / d); pinch = d; return; }
   if(!drag) return;
-  offset += (e.clientX - drag.x) * 0.01; $('el').value = Math.max(-20, Math.min(85, num('el') + (e.pointerType === 'touch' ? 0 : e.clientY - drag.y) * 0.3));
+  offset += (e.clientX - drag.x) * 0.01; $('el').value = Math.max(-20, Math.min(85, num('el') + (e.clientY - drag.y) * 0.3));
   drag = {x: e.clientX, y: e.clientY}; labels();
 });
 cv.addEventListener('wheel', e => { e.preventDefault(); setZoom(num('zm') * Math.exp(e.deltaY * 0.0012)); }, {passive: false});
@@ -892,12 +914,12 @@ cv.addEventListener('dblclick', () => { setZoom(1); offset = 0; });
 $('trReset').onclick = () => { ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1; applyTransform(); };
 function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
 ['dur', 'br', 'el', 'zm', 'blur'].forEach(i => $(i).addEventListener('input', labels));
-['cm', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
+['cm', 'fc', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
 ['unit', 'realmm'].forEach(i => $(i).addEventListener('input', updDims)); $('up').onchange = applyTransform; $('res').onchange = () => sizeFromUI();
 document.querySelector('aside').addEventListener('input', saveSet);
 
 function loop(now){
-  if(COARSE && lastT && now - lastT < 32){ requestAnimationFrame(loop); return; }
+  if(COARSE && lastT && now - lastT < 40){ requestAnimationFrame(loop); return; }
   const dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now;
   if(!busy){ if(!paused && !drag) phase = (phase + dt / num('dur')) % 1; if(mesh) frame(phase); renderFrame(cam); }
   requestAnimationFrame(loop);
@@ -924,17 +946,17 @@ async function renderView(v, mime){
   pivot.rotation.y = 0; applyView(); renderFrame(c); viewHide = false; envShow = true; envG.rotation.y = 0; cam.up.set(0, 1, 0);
   return blobOf(mime);
 }
-async function encodeWebCodecs(fps, N, base, span){
+async function encodeWebCodecs(fps, N, base, span, safe){
   const ev = n => (n & ~1) || 2, fit = m => { const k = Math.min(1, m / Math.max(W, H)); return [ev(Math.round(W * k)), ev(Math.round(H * k))]; };
-  const cands = (w, h) => { const lv = w * h > 2088960 ? ['33', '34', '32'] : ['2A', '28', '1F'], o = []; for(const pr of ['6400', '4D00', '4200']) for(const l of lv) o.push('avc1.' + pr + l); return o; };
+  const cands = (w, h) => { const lv = w * h > 2088960 ? ['33', '34', '32'] : ['2A', '28', '1F'], o = []; for(const pr of safe ? ['4D00', '4200'] : ['6400', '4D00', '4200']) for(const l of lv) o.push('avc1.' + pr + l); return o; };
   let pick = null;
-  for(const [w, h] of [[ev(W), ev(H)], fit(1920), fit(1280)]){
-    for(const codec of cands(w, h)){ const cfg = {codec, width: w, height: h, bitrate: num('br') * 1e6, framerate: fps}; try{ if((await VideoEncoder.isConfigSupported(cfg)).supported){ pick = cfg; break; } }catch(e){} }
+  for(const [w, h] of safe ? [fit(1920), fit(1280)] : [[ev(W), ev(H)], fit(1920), fit(1280)]){
+    for(const codec of cands(w, h)){ const cfg = {codec, width: w, height: h, bitrate: num('br') * 1e6, framerate: fps}; if(safe){ cfg.latencyMode = 'realtime'; cfg.avc = {format: 'avc'}; } try{ if((await VideoEncoder.isConfigSupported(cfg)).supported){ pick = cfg; break; } }catch(e){} }
     if(pick) break;
   }
   if(!pick){ const er = new Error(T('e_h264')); er.h264 = true; throw er; }
   const w = pick.width, h = pick.height, scaled = w !== W || h !== H; videoNote = (w !== ev(W) || h !== ev(H)) ? T('m_vscale', w + '×' + h) : '';
-  const muxer = new Mp4Muxer.Muxer({target: new Mp4Muxer.ArrayBufferTarget(), video: {codec: 'avc', width: w, height: h}, fastStart: 'in-memory'});
+  const muxer = new Mp4Muxer.Muxer({target: new Mp4Muxer.ArrayBufferTarget(), video: {codec: 'avc', width: w, height: h, frameRate: fps}, fastStart: 'in-memory'});
   let fail = null; const enc = new VideoEncoder({output: (c, m) => muxer.addVideoChunk(c, m), error: e => fail = e}); enc.configure(pick);
   const sc = document.createElement('canvas'); sc.width = w; sc.height = h; const sg = sc.getContext('2d');
   for(let i = 0; i < N; i++){
@@ -948,6 +970,7 @@ async function encodeWebCodecs(fps, N, base, span){
   await enc.flush(); muxer.finalize();
   return {blob: new Blob([muxer.target.buffer], {type: 'video/mp4'}), ext: 'mp4'};
 }
+const playable = blob => new Promise(res => { const v = document.createElement('video'), u = URL.createObjectURL(blob); let done = false; const fin = ok => { if(done) return; done = true; URL.revokeObjectURL(u); res(ok); }; v.muted = true; v.preload = 'metadata'; v.onloadedmetadata = () => fin(isFinite(v.duration) && v.duration > 0); v.onerror = () => fin(false); setTimeout(() => fin(false), 8000); v.src = u; });
 async function encodeRecorder(fps, dur, base, span){
   const mime = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m));
   if(!mime) throw new Error(T('e_rec'));
@@ -977,32 +1000,33 @@ $('lbc').onclick = () => $('lb').style.display = 'none'; $('lb').onclick = e => 
 
 async function run(doVideo, doImgs, dirH, autoSave){
   if(!mesh || busy) return false;
-  busy = true; ['all', 'onlyV', 'onlyI', 'batch'].forEach(i => $(i).disabled = true);
-  $('res').style.display = 'none'; $('gal').style.display = 'none'; $('gal').innerHTML = ''; $('bar').style.display = 'block'; progress(0);
-  const files = []; let ok = true, vurl = null;
+  busy = true; key.castShadow = $('sh').checked; ['all', 'onlyV', 'onlyI', 'batch'].forEach(i => $(i).disabled = true);
+  $('bar').style.display = 'block'; progress(0);
+  const files = []; let ok = true, vurl = null; const nb = fileName + (runCount ? '_' + (runCount + 1) : ''); runCount++;
   try{
     const fmt = val('fmt'), ext = fmt === 'jpeg' ? 'jpg' : fmt, fps = parseInt(val('fps')), dur = num('dur');
     sizeFromUI(true); videoNote = ''; const views = $('iso').checked ? [...VIEWS, ISO] : VIEWS, share = doVideo ? .25 : 1;
     if(doImgs){
       drawBG(fmt === 'jpeg');
       for(let i = 0; i < views.length; i++){
-        const v = views[i]; setMsg(T('m_view', fileName, T(v[4]))); const blob = await renderView(v, 'image/' + fmt), nm = `${fileName}_${v[0]}.${ext}`; files.push({name: nm, blob});
+        const v = views[i]; setMsg(T('m_view', fileName, T(v[4]))); const blob = await renderView(v, 'image/' + fmt), nm = `${nb}_${v[0]}.${ext}`; files.push({name: nm, blob});
         addThumb(blob, nm, T(v[4]));
         progress((i + 1) / views.length * share); await tick();
       }
-      if($('sheet').checked){ const sb = await makeSheet(files.map(f => f.blob)); files.push({name: `${fileName}_sheet.png`, blob: sb}); addThumb(sb, `${fileName}_sheet.png`, '▦'); } $('gal').style.display = 'grid';
+      if($('sheet').checked){ const sb = await makeSheet(files.map(f => f.blob)); files.push({name: `${nb}_sheet.png`, blob: sb}); addThumb(sb, `${nb}_sheet.png`, '▦'); } $('gal').style.display = 'grid';
     }
     if(doVideo){
       drawBG(true); const base = doImgs ? share : 0;
       let out; const nf = Math.round(dur * fps);
-      if(window.VideoEncoder && window.VideoFrame && window.Mp4Muxer){ try{ out = await encodeWebCodecs(fps, nf, base, 1 - base); }catch(e){ if(!e.h264) throw e; out = await encodeRecorder(fps, dur, base, 1 - base); } }
+      if(window.VideoEncoder && window.VideoFrame && window.Mp4Muxer){ try{ out = await encodeWebCodecs(fps, nf, base, 1 - base, false); if(!(await playable(out.blob))){ setMsg(T('m_retry')); out = await encodeWebCodecs(fps, nf, base, 1 - base, true); } }catch(e){ if(!e.h264) throw e; out = await encodeRecorder(fps, dur, base, 1 - base); } }
       else out = await encodeRecorder(fps, dur, base, 1 - base);
-      files.unshift({name: `${fileName}.${out.ext}`, blob: out.blob}); vurl = URL.createObjectURL(out.blob);
-      $('vid').src = vurl; $('dl').href = vurl; $('dl').download = `${fileName}.${out.ext}`; $('dl').textContent = T('dl') + ': ' + fileName + '.' + out.ext;
-      if($('gif').checked){ drawBG(true); const gb = await makeGif(dur); files.push({name: `${fileName}.gif`, blob: gb}); }
+      files.unshift({name: `${nb}.${out.ext}`, blob: out.blob}); vurl = URL.createObjectURL(out.blob);
+      { const vb = document.createElement('button'); vb.className = 'vbtn'; vb.textContent = '▶ ' + nb + '.' + out.ext; const vu = vurl, vn = nb + '.' + out.ext; vb.onclick = () => { $('vid').src = vu; $('dl').href = vu; $('dl').download = vn; $('dl').textContent = T('dl') + ': ' + vn; $('resBox').style.display = 'flex'; $('vid').play().catch(() => {}); }; $('gal').prepend(vb); }
+      $('vid').src = vurl; $('dl').href = vurl; $('dl').download = `${nb}.${out.ext}`; $('dl').textContent = T('dl') + ': ' + nb + '.' + out.ext;
+      if($('gif').checked){ drawBG(true); const gb = await makeGif(dur); files.push({name: `${nb}.gif`, blob: gb}); }
     }
-    lastFiles = files; lastImages = files.filter(f => /\.(png|jpe?g|webp)$/i.test(f.name)); $('redl').style.display = 'block'; $('gal').scrollIntoView({block: 'nearest'}); let where = ''; if(autoSave){ setMsg(T('m_save')); where = await saveAll(files, dirH); }
-    $('vid').style.display = doVideo ? 'block' : 'none'; $('dl').style.display = doVideo ? 'inline-flex' : 'none'; $('res').style.display = doVideo ? 'flex' : 'none';
+    lastFiles = lastFiles.concat(files); lastImages = lastFiles.filter(f => /\.(png|jpe?g|webp)$/i.test(f.name)); $('redl').disabled = false; $('gal').scrollIntoView({block: 'nearest'}); let where = ''; if(autoSave){ setMsg(T('m_save')); where = await saveAll(files, dirH); }
+    if(doVideo){ $('vid').style.display = 'block'; $('dl').style.display = 'inline-flex'; $('resBox').style.display = 'flex'; } $('gal').style.display = 'grid';
     if(doVideo) $('vid').play().catch(() => {});
     showTab('res'); progress(1); setMsg((autoSave ? T('m_done', fileName, files.length, where) : T('m_gen', fileName, files.length)) + (videoNote ? ' ' + videoNote : ''));
   }catch(e){ ok = false; setMsg(e.message || String(e), true); console.error(e); }
@@ -1183,7 +1207,7 @@ function bake(c){
 function renderFrame(c){
   const under = !!mesh && c.position.y < floor.position.y + .02, sh = $('sh').checked && !viewHide && !under; fillB.intensity = under ? 1.2 * num('ls') : 0;
   if(envKind){
-    const show = envShow && !under, baked = show && num('blur') > 0;
+    const show = envShow && !under, baked = show && num('blur') > 0 && (!COARSE || busy);
     if(baked) bake(c); else scene.background = envBg;
     envG.visible = show && !baked; floor.visible = sh && (baked || !show);
   } else floor.visible = sh;
@@ -1207,12 +1231,12 @@ $('edg').addEventListener('change', updateEdges);
 async function snapshot(){
   if(!mesh || busy) return; busy = true;
   try{
-    sizeFromUI(true); frame(phase); renderFrame(cam);
+    key.castShadow = $('sh').checked; sizeFromUI(true); frame(phase); renderFrame(cam);
     const fmt = val('fmt'), ext = fmt === 'jpeg' ? 'jpg' : fmt, blob = await blobOf('image/' + fmt), nm = `${fileName}_snap${++snapN}.${ext}`;
     lastFiles.push({name: nm, blob}); lastImages.push({name: nm, blob}); addThumb(blob, nm, '📷 ' + snapN);
-    $('gal').style.display = 'grid'; $('redl').style.display = 'block'; showTab('res'); $('gal').scrollIntoView({block: 'nearest'});
+    $('gal').style.display = 'grid'; $('redl').disabled = false; showTab('res'); $('gal').scrollIntoView({block: 'nearest'});
   }catch(e){ setMsg(String(e.message || e), true); }
-  finally{ busy = false; sizeFromUI(); }
+  finally{ busy = false; key.castShadow = $('sh').checked && !COARSE; sizeFromUI(); }
 }
 $('snap').onclick = snapshot;
 document.addEventListener('keydown', e => {
@@ -1234,12 +1258,12 @@ $('cfgf').onchange = async e => { try{ const o = JSON.parse(await e.target.files
 $('cfgr').onclick = () => { try{ localStorage.removeItem('m3dset6'); localStorage.removeItem('m3dlang'); }catch(e){} location.reload(); };
 
 const SW = ['#ece8e0', '#8c9094', '#26282b', '#e8742a', '#c0392b', '#2f6fb0', '#3f8f5a', '#b98552'], MSW = ['#b8bec4', '#d6a93c', '#b87333', '#c9b037', '#7d868e', '#e9edf0'];
-const addSw = (c, metal) => { const b = document.createElement('button'); b.style.cssText = `background:${metal ? `linear-gradient(135deg,rgba(255,255,255,.65),rgba(0,0,0,.25)),${c}` : c};width:26px;height:26px;padding:0;min-width:0;min-height:0;border:1px solid #8a949b;border-radius:50%`; b.setAttribute('aria-label', c); b.onclick = () => { if(metal && !['metal', 'firca'].includes(val('mat'))) $('mat').value = 'metal'; $('cm').value = c; colorTouched = true; applyLook(); saveSet(); }; $('sw').appendChild(b); };
+const addSw = (c, metal) => { const b = document.createElement('button'); b.style.cssText = `background:${metal ? `linear-gradient(135deg,rgba(255,255,255,.65),rgba(0,0,0,.25)),${c}` : c};width:26px;height:26px;padding:0;min-width:0;min-height:0;border:1px solid #8a949b;border-radius:50%`; b.setAttribute('aria-label', c); b.onclick = () => { if(metal && !['metal', 'firca'].includes(val('mat'))) $('mat').value = 'metal'; $('cm').value = c; colorTouched = true; $('fc').checked = false; applyLook(); saveSet(); }; $('sw').appendChild(b); };
 SW.forEach(c => addSw(c, false)); $('sw').appendChild(document.createElement('i')); MSW.forEach(c => addSw(c, true));
 function setTheme(t){ document.documentElement.dataset.theme = t; try{ localStorage.setItem('m3dtheme', t); }catch(e){} document.querySelectorAll('[data-th]').forEach(b => b.classList.toggle('on', b.dataset.th === t)); }
 document.querySelectorAll('[data-th]').forEach(b => b.onclick = () => setTheme(b.dataset.th));
 let th0 = 'light'; try{ th0 = localStorage.getItem('m3dtheme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'); }catch(e){} setTheme(th0);
-$('cm').addEventListener('input', () => colorTouched = true);
+$('cm').addEventListener('input', () => { colorTouched = true; if($('fc').checked){ $('fc').checked = false; applyLook(); } });
 let instEv = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instEv = e; $('install').style.display = 'block'; });
 window.addEventListener('appinstalled', () => { instEv = null; $('install').style.display = 'none'; });
@@ -1247,6 +1271,7 @@ $('install').onclick = async () => { if(!instEv) return; instEv.prompt(); try{ a
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
 cv.addEventListener('webglcontextlost', e => { e.preventDefault(); setMsg(T('e_ctx'), true); });
 cv.addEventListener('webglcontextrestored', () => { setMsg(T('m_ready')); sizeFromUI(); applyLook(); });
+$('clearRes').onclick = () => { lastFiles = []; lastImages = []; $('gal').innerHTML = ''; $('gal').style.display = 'none'; $('resBox').style.display = 'none'; $('vid').removeAttribute('src'); $('redl').disabled = true; };
 $('toast').onclick = () => $('toast').style.display = 'none';
 $('viewReset').onclick = () => { setZoom(1); offset = 0; phase = 0; $('el').value = ENVD[val('bg')] ? ENVD[val('bg')].el : 22; $('vs').value = 0; applyLook(); labels(); saveSet(); };
 function showTab(n){ document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === n)); document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === n)); }
