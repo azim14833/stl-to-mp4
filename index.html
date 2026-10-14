@@ -1078,13 +1078,13 @@ async function run(doVideo, doImgs, dirH, autoSave, setMode){
     if(doImgs){
       drawBG(fmt === 'jpeg');
       const SET9 = [['shaded'], ['wireframe'], ['orthographic', ISO, true], ['front', VIEWS[0]], ['right', VIEWS[2]], ['left', VIEWS[3]], ['back', VIEWS[1]], ['bottom', VIEWS[5]], ['top', VIEWS[4]]];
-      setWire(false);
-      for(let i = 0; i < SET9.length; i++){
-        const [lb, v, fo] = SET9[i]; setMsg(T('m_view', fileName, (i + 1) + '. ' + lb));
+      const SETX = setMode ? SET9.slice(2) : SET9; setWire(false);
+      for(let i = 0; i < SETX.length; i++){
+        const [lb, v, fo] = SETX[i]; setMsg(T('m_view', fileName, (i + 1) + '. ' + lb));
         if(v) await renderView(v, 'image/' + fmt, fo, true); else { setWire(lb === 'wireframe'); frame(0); renderFrame(cam); }
         const r = await fitImg(blobOf, 'image/' + fmt, lim); if(!v) setWire(false);
         const nm = `${nb}_${i + 1}_${lb}.${mimeExt(r.mime)}`; files.push({name: nm, blob: r.blob}); addThumb(r.blob, nm, (i + 1) + '. ' + lb);
-        progress((i + 1) / SET9.length * imgShare); await tick();
+        progress((i + 1) / SETX.length * imgShare); await tick();
       }
       restoreWire();
       if($('sheet').checked){ const sr = await makeSheet(files.map(f => f.blob)), sn = `${nb}_sheet.${mimeExt(sr.mime)}`; files.push({name: sn, blob: sr.blob}); addThumb(sr.blob, sn, '▦'); }
@@ -1093,7 +1093,7 @@ async function run(doVideo, doImgs, dirH, autoSave, setMode){
     if(setMode){
       drawBG(true); forceBob = true;
       for(let vi = 0; vi < 2; vi++){
-        const wire = vi === 1, nm0 = `${nb}_${10 + vi}_${wire ? 'wireframe' : 'shaded'}_video`; setWire(wire); setMsg((10 + vi) + '. ' + (wire ? 'wireframe' : 'shaded') + ' video…');
+        const wire = vi === 1, nm0 = `${nb}_${8 + vi}_${wire ? 'wireframe' : 'shaded'}_video`; setWire(wire); setMsg((8 + vi) + '. ' + (wire ? 'wireframe' : 'shaded') + ' video…');
         const out = await makeVideo(fps, dur, imgShare + vi * vspan, vspan, wire ? 1.4 : 1); const nm = `${nm0}.${out.ext}`; files.push({name: nm, blob: out.blob}); addVid(out.blob, nm, true);
       }
       forceBob = false; restoreWire();
