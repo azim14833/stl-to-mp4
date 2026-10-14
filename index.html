@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#3b5bfd">
-<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"><link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -139,6 +139,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
 #toast{cursor:pointer}
 #gal .vbtn{grid-column:1/-1;padding:8px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:13px;min-height:34px;border-radius:10px;text-align:left;font-weight:600}
 .seo h4{margin:12px 0 2px}.seo nav a{color:var(--accent)}.seo footer p{margin:6px 0 0}
+.logo{width:40px;height:40px;border-radius:10px;flex:none;display:block}
 </style>
 </head>
 <body>
@@ -151,6 +152,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
 </main>
 <aside>
   <div class="hd">
+    <img class="logo" src="icon-192.png" width="40" height="40" alt="STLtoMP4 logosu">
     <div><h1 data-i="title">STL to MP4 converter: 3D model video &amp; views</h1><p class="sub" data-i="sub">Runs in your browser, files are never uploaded.</p></div>
     <select id="lang" aria-label="Language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
   </div>
@@ -429,7 +431,7 @@ sv2=Kayıt klasörü (bir kez seçilir)|Save folder (chosen once)|Speicherordner
 pickdir=Kayıt klasörünü seç|Choose save folder|Speicherordner wählen|Choisir le dossier|Elegir carpeta|Выбрать папку|اختيار المجلد
 go=MP4 + görünümleri oluştur|Create MP4 + views|MP4 + Ansichten erstellen|Créer MP4 + vues|Crear MP4 + vistas|Создать MP4 + виды|إنشاء MP4 + المناظر
 onlyv=Sadece MP4|MP4 only|Nur MP4|MP4 seul|Solo MP4|Только MP4|MP4 فقط
-onlyi=Resim + video setini indir (9 dosya)|Download image + video set (11 files)|Bild- und Videoset laden (11 Dateien)|Télécharger le lot images + vidéos (11 fichiers)|Descargar set de imágenes y vídeos (11 archivos)|Скачать набор: изображения + видео (11 файлов)|تنزيل مجموعة الصور والفيديو (11 ملفًا)
+onlyi=Resim + video setini indir (11 dosya)|Download image + video set (11 files)|Bild- und Videoset laden (11 Dateien)|Télécharger le lot images + vidéos (11 fichiers)|Descargar set de imágenes y vídeos (11 archivos)|Скачать набор: изображения + видео (11 файлов)|تنزيل مجموعة الصور والفيديو (11 ملفًا)
 batch=Tüm modelleri sırayla işle|Process all models in order|Alle Modelle nacheinander|Traiter tous les modèles|Procesar todos los modelos|Обработать все модели|معالجة كل النماذج
 redl=Tümünü indir (MP4 dahil)|Download everything (incl. MP4)|Alles herunterladen (inkl. MP4)|Tout télécharger (MP4 inclus)|Descargar todo (con MP4)|Скачать всё (с MP4)|تنزيل الكل (مع MP4)
 dl=İndir|Download|Herunterladen|Télécharger|Descargar|Скачать|تنزيل
