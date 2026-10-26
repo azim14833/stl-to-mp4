@@ -7,7 +7,7 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Rehberler ve Araçlar -->
+  <!-- Rehberler ve Araç Sayfaları -->
   <url>
     <loc>https://stltomp4.com/guides.html</loc>
     <changefreq>weekly</changefreq>
@@ -69,7 +69,7 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Kurumsal ve Destek Sayfaları -->
+  <!-- Kurumsal Sayfalar -->
   <url>
     <loc>https://stltomp4.com/about.html</loc>
     <changefreq>yearly</changefreq>
