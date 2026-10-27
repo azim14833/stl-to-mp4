@@ -3,6 +3,7 @@
   <!-- Ana Sayfa -->
   <url>
     <loc>https://stltomp4.com/</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -10,61 +11,73 @@
   <!-- Rehberler ve Araç Sayfaları -->
   <url>
     <loc>https://stltomp4.com/guides.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/check-stl-before-printing.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/fix-stl-scale-units-and-orientation.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/reduce-stl-file-size.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/stl-vs-3mf-vs-obj-vs-ply.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/how-to-make-a-3d-print-turntable-video.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/how-to-write-a-3d-model-listing.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/layer-height-infill-and-walls-explained.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/lighting-and-materials-for-3d-renders.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/mp4-vs-gif-vs-webp-for-3d-previews.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/3d-print-preview-image-sizes-and-views.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/estimate-3d-print-weight-and-filament-cost.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -72,21 +85,25 @@
   <!-- Kurumsal Sayfalar -->
   <url>
     <loc>https://stltomp4.com/about.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/contact.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/privacy.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
     <loc>https://stltomp4.com/terms.html</loc>
+    <lastmod>2026-10-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
