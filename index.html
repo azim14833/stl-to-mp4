@@ -112,7 +112,7 @@ button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
 aside{overflow:hidden;gap:10px}
 aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:2px 4px 2px 0;scrollbar-gutter:stable}
 .tab{display:none;flex-direction:column;gap:12px}.tab.on{display:flex}
-.tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--hover);padding:4px;border-radius:12px}
+.tabbar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;background:var(--hover);padding:4px;border-radius:12px}
 .tabbar button{min-height:32px;padding:4px 2px;font-size:12px;border:0;background:transparent;border-radius:9px;box-shadow:none}
 .tabbar button.on{background:var(--card);color:var(--accent);box-shadow:var(--sh)}
 .foot{flex:none;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
@@ -190,7 +190,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
   <select id="models" style="display:none"></select>
   <div id="info" class="sub"></div>
   <div id="stats" class="sub"></div>
-  <div class="tabbar" role="tablist"><button data-tab="scene" class="on" data-i="t_scene"></button><button data-tab="model" data-i="g_model"></button><button data-tab="cam" data-i="g_cam"></button><button data-tab="out" data-i="g_out"></button><button data-tab="res" data-i="t_res"></button></div>
+  <div class="tabbar" role="tablist"><button data-tab="scene" class="on" data-i="t_scene"></button><button data-tab="model" data-i="g_model"></button><button data-tab="cam" data-i="g_cam"></button><button data-tab="out" data-i="g_out"></button><button data-tab="ai" data-i="t_ai"></button><button data-tab="res" data-i="t_res"></button></div>
   <div class="pane">
 <div class="tab on" data-tab="scene"><fieldset><legend data-i="g_looks"></legend><div id="looks" class="chips"></div></fieldset>
 <fieldset><legend data-i="g_print"></legend>
@@ -233,6 +233,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
     <label><span data-i="h_str"></span><span id="vLs">1.00</span><input id="ls" type="range" min="0.3" max="1.8" step="0.05" value="1"></label>
     <label><span data-i="h_sh"></span><span id="vSa">0.28</span><input id="sa" type="range" min="0" max="0.8" step="0.02" value="0.28"></label>
     <label><span data-i="h_vs"></span><span id="vVs">0%</span><input id="vs" type="range" min="-30" max="30" step="1" value="0"></label>
+    <label><span data-i="h_msz"></span><span id="vMsz">100%</span><input id="msz" type="range" min="40" max="150" step="1" value="100"></label>
     <div class="row">
       <label><span data-i="h_tint"></span><input id="ct" type="color" value="#ff9a3c"></label>
       <label><span data-i="h_tints"></span><input id="ts" type="range" min="0" max="60" step="1" value="0"></label>
@@ -331,6 +332,22 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
     <label><span data-i="save"></span><select id="sv"><option value="dl" data-i="sv1"></option><option value="dir" data-i="sv2"></option></select></label>
     <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
   </fieldset></div>
+<div class="tab" data-tab="ai"><fieldset>
+    <legend data-i="g_ai"></legend>
+    <div class="row">
+      <label><span data-i="ai_prov"></span><select id="aip"><option value="gemini">Gemini</option><option value="claude">Claude</option><option value="openai">OpenAI</option></select></label>
+      <label><span data-i="ai_model"></span><input id="aim" type="text" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <label><span data-i="ai_key"></span><input id="aik" type="password" autocomplete="off" data-lpignore="true"></label>
+    <div class="sub" id="aikst"></div>
+    <label><span data-i="ai_note"></span><input id="ain" type="text" placeholder="Eagle / desk sculpture..."></label>
+    <div class="sub" data-i="ai_hint"></div>
+    <button id="aigo" class="primary" data-i="ai_go"></button>
+    <textarea id="aiout" style="display:none" spellcheck="false"></textarea>
+    <button id="aicp" class="small" style="display:none" data-i="ai_copy"></button>
+    <label><span data-i="ai_fname"></span><input id="fname" type="text" autocomplete="off" spellcheck="false"></label>
+    <div class="sub" data-i="ai_fname_hint"></div>
+  </fieldset></div>
 <div class="tab" data-tab="res"><p class="sub" data-i="res_hint"></p>
   <div id="resBox"><video id="vid" controls playsinline loop></video><a id="dl" class="btn primary"></a></div>
   <div id="gal"></div>
@@ -401,6 +418,7 @@ h_az=Işık yönü|Light direction|Lichtrichtung|Direction de la lumière|Direcc
 h_warm=Işık sıcaklığı|Light warmth|Lichtwärme|Chaleur de la lumière|Calidez de la luz|Тёплота света|دفء الضوء
 h_str=Işık gücü|Light strength|Lichtstärke|Intensité|Intensidad|Яркость света|شدة الضوء
 h_sh=Gölge yoğunluğu|Shadow strength|Schattenstärke|Force de l'ombre|Fuerza de sombra|Плотность тени|قوة الظل
+h_msz=Modelin sahnedeki boyutu|Model size in the scene|Modellgröße in der Szene|Taille du modèle dans la scène|Tamaño del modelo en la escena|Размер модели в сцене|حجم النموذج في المشهد
 h_vs=Model dikey konumu|Model vertical position|Vertikale Modellposition|Position verticale|Posición vertical|Вертикальное положение|الموضع العمودي
 h_tint=Ton rengi|Tint colour|Tönung|Teinte|Tinte|Оттенок|لون الصبغة
 h_tints=Ton gücü|Tint strength|Tönungsstärke|Force de la teinte|Fuerza de tinte|Сила оттенка|قوة الصبغة
@@ -430,6 +448,19 @@ vreset=Görünümü ortala / sıfırla|Center / reset view
 fcol=Dosyadaki renkleri kullan|Use colors from the file
 clearres=Sonuçları temizle|Clear results
 m_retry=Video oynatılamadı, uyumlu modda yeniden kodlanıyor…|The video did not play, re-encoding in compatible mode…
+g_ai=Yapay zeka ile Cults3D açıklaması|Cults3D listing with AI
+ai_prov=Sağlayıcı|Provider
+ai_model=Model|Model
+ai_key=API anahtarı|API key
+ai_note=Ek not (isteğe bağlı)|Extra note (optional)
+ai_hint=Anahtar yalnızca bu cihazda saklanır, hata olsa da silinmez; doğrudan sağlayıcıya gönderilir. Model 4 görünümden tanınır.|The key is kept only on this device and is never cleared by errors; it is sent only to the provider. The model is recognised from 4 views.
+ai_go=Açıklamayı yaz|Write the listing
+ai_fname=Dosya adı (AI başlığından; boşsa model adı)|File name (from the AI title; model name if empty)
+ai_fname_hint=İndirilen resim ve MP4 dosyaları bu adla başlar. İstersen değiştirebilirsin.|Downloaded images and MP4s start with this name. You can edit it.
+ai_copy=Kopyala|Copy
+ai_saved=✓ Anahtar bu cihazda kayıtlı (…{0})|✓ Key saved on this device (…{0})
+ai_busy=Sağlayıcı yoğun veya sınıra takıldı. {0} sn sonra yeniden denenecek ({1}/{2})…|Provider busy or rate-limited. Retrying in {0}s ({1}/{2})…
+t_ai=Yapay zeka|AI|KI|IA|IA|ИИ|الذكاء الاصطناعي
 e_ply=Geçersiz veya yüzeyi olmayan PLY dosyası.|Invalid PLY file or no faces found.
 wst_l=Kafes stili|Wireframe style
 wst_o=Dolu yüzey + ince kafes|Solid surface + fine wire
@@ -675,7 +706,7 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['mpid', 'rgh', 'mtl', 'opq', 'texs', 'rig', 'ri', 'exps', 'motion', 'opre', 'logoPos', 'logoSz', 'logoOp', 'dimv', 'pa_mat', 'pa_inf', 'pa_wall', 'pa_price', 'pa_bed', 'bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'tourvid', 'sheet', 'edg', 'unit', 'wstyle', 'maxmb'];
+const SET = ['mpid', 'rgh', 'mtl', 'opq', 'texs', 'rig', 'ri', 'exps', 'motion', 'opre', 'logoPos', 'logoSz', 'logoOp', 'dimv', 'pa_mat', 'pa_inf', 'pa_wall', 'pa_price', 'pa_bed', 'bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'msz', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'tourvid', 'sheet', 'edg', 'unit', 'wstyle', 'maxmb'];
 const isChk = i => $(i).type === 'checkbox';
 function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset6', JSON.stringify(o)); }catch(e){} }
 function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset6') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
@@ -885,8 +916,8 @@ function presetGeom(p){
   const iw = 896, ih = 1200, ar = W / H, sa = iw / ih; let cw, ch;
   if(ar > sa){ cw = iw; ch = iw / ar; } else { ch = ih; cw = ih * ar; } cw /= p.z; ch /= p.z;
   const sx = clampN(p.cx * iw - cw / 2, 0, iw - cw), sy = clampN(p.cy * ih - ch / 2, 0, ih - ch), tt = (.605 * ih - sy) / ch, wide = ar > 1.15;
-  const ty = tt <= .02 ? (wide ? .72 : .76) : clampN(tt + .5 * (1 - tt), .6, .82);
-  return {sx, sy, cw, ch, tx: .5, ty, h: wide ? .46 : (ar > .85 ? .42 : .38)};
+  const ty = tt <= .02 ? (wide ? .72 : .78) : clampN(tt + .62 * (1 - tt), .6, .85);
+  return {sx, sy, cw, ch, tx: .5, ty, h: clampN(300 / ch, .22, wide ? .46 : .34)};
 }
 function sceneAnchor(){
   const t = val('bg'), p = PRESETS[t];
@@ -894,7 +925,7 @@ function sceneAnchor(){
   if(t === 'photo' && photos[selPhoto]){ const wide = W / H > 1.15; return {tx: .5, ty: wide ? .76 : .8, h: wide ? .46 : .4, k: 'photo'}; }
   return null;
 }
-function fitTargets(useA){ const A = useA ? sceneAnchor() : null, ar = W / H; let tw = envKind ? .70 : .80, th = tw; if(A){ tw = ar > 1.15 ? .52 : .60; th = A.h; } return {A, tw, th}; }
+function fitTargets(useA){ const A = useA ? sceneAnchor() : null, ar = W / H, k = clampN((num('msz') || 100) / 100, .3, 1.6); let tw = envKind ? .70 : .80, th = tw; if(A){ tw = ar > 1.15 ? .52 : .60; th = A.h; } return {A, tw: clampN(tw * k, .08, .97), th: clampN(th * k, .08, .97)}; }
 function fitDir(pv, up, useA){
   if(!MET) return 3.4;
   const T = fitTargets(useA); _fc.fov = cam.fov; _fc.aspect = W / H; _fc.clearViewOffset(); _fc.up.set(up[0], up[1], up[2]);
@@ -911,7 +942,7 @@ function fitDir(pv, up, useA){
 }
 function fitDistFor(eDeg){
   if(!MET) return 3.4;
-  const e = clampN(Math.round(eDeg * 2) / 2, -80, 80), A = sceneAnchor(), key = [W, H, e, A ? A.k : '-', envKind ? 1 : 0, MET.s].join('|'), hit = fitCache.get(key); if(hit) return hit;
+  const e = clampN(Math.round(eDeg * 2) / 2, -80, 80), A = sceneAnchor(), key = [W, H, e, A ? A.k : '-', envKind ? 1 : 0, MET.s, num('msz')].join('|'), hit = fitCache.get(key); if(hit) return hit;
   const er = THREE.MathUtils.degToRad(e), d = fitDir([0, Math.sin(er), Math.cos(er)], [0, 1, 0], true);
   if(fitCache.size > 300) fitCache.clear(); fitCache.set(key, d); return d;
 }
@@ -1215,8 +1246,8 @@ cv.addEventListener('dblclick', () => { setZoom(1); offset = 0; });
 ['rx', 'ry', 'rz', 'px', 'py', 'pz', 'sc'].forEach(i => $(i).addEventListener('input', applyTransform));
 [['bx', 'rx'], ['by', 'ry'], ['bz', 'rz']].forEach(([b, f]) => $(b).onclick = () => { $(f).value = ((n0(f) + 90 + 180) % 360) - 180; applyTransform(); });
 $('trReset').onclick = () => { ['rx', 'ry', 'rz', 'px', 'py', 'pz'].forEach(i => $(i).value = 0); $('sc').value = 1; applyTransform(); };
-function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; }
-['dur', 'br', 'el', 'zm', 'blur'].forEach(i => $(i).addEventListener('input', labels));
+function labels(){ $('vDur').textContent = val('dur') + ' ' + T('sec'); $('vBr').textContent = val('br') + ' Mbps'; $('vEl').textContent = Math.round(num('el')) + '°'; $('vZm').textContent = num('zm').toFixed(2); $('vBl').textContent = val('blur'); $('vLa').textContent = Math.round(n0('la')) + '°'; $('vLw').textContent = Math.round(n0('lw')); $('vLs').textContent = num('ls').toFixed(2); $('vSa').textContent = num('sa').toFixed(2); $('vVs').textContent = Math.round(n0('vs')) + '%'; $('vMsz').textContent = Math.round(num('msz') || 100) + '%'; }
+['dur', 'br', 'el', 'zm', 'blur', 'msz'].forEach(i => $(i).addEventListener('input', labels));
 ['cm', 'fc', 'cb', 'cb2', 'wf', 'sh', 'bg', 'mat', 'blur'].forEach(i => $(i).addEventListener('input', applyLook));
 ['unit', 'realmm'].forEach(i => $(i).addEventListener('input', updDims)); $('up').onchange = applyTransform; $('res').onchange = () => sizeFromUI();
 document.querySelector('aside').addEventListener('input', saveSet);
@@ -1616,11 +1647,103 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instEv
 window.addEventListener('appinstalled', () => { instEv = null; $('install').style.display = 'none'; });
 $('install').onclick = async () => { if(!instEv) return; instEv.prompt(); try{ await instEv.userChoice; }catch(e){} instEv = null; $('install').style.display = 'none'; };
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+/* ---------- yapay zeka: Cults3D açıklaması ---------- */
+const AIDEF = {gemini: 'gemini-3.8-flash', claude: 'claude-sonnet-5-5', openai: 'gpt-4o'}, AIFB = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+let aiS = {}, aiPrev = null; try{ aiS = JSON.parse(localStorage.getItem('m3dai') || '{}'); }catch(e){}
+function aiPersist(){ const j = JSON.stringify(aiS); try{ localStorage.setItem('m3dai', j); }catch(e){} try{ idb('put', 'ai', j).catch(() => {}); }catch(e){} }
+function aiBadge(){ const k = $('aik').value.trim(); $('aikst').textContent = k ? T('ai_saved', k.slice(-4)) : ''; }
+function aiLoad(){ const p = $('aip').value, sm = (aiS.m || {})[p]; $('aik').value = (aiS.k || {})[p] || ''; $('aim').value = (sm && sm !== 'gemini-2.5-flash') ? sm : AIDEF[p]; aiBadge(); }
+function aiSave(p, user){ p = p || $('aip').value; aiS.p = $('aip').value; aiS.k = aiS.k || {}; aiS.m = aiS.m || {}; const k = $('aik').value.trim(); if(k || user) aiS.k[p] = k; if($('aim').value.trim()) aiS.m[p] = $('aim').value.trim(); aiS.n = $('ain').value; aiPersist(); }
+$('aip').value = aiS.p || 'gemini'; aiPrev = $('aip').value; aiLoad(); $('ain').value = aiS.n || '';
+try{ const o = localStorage.getItem('m3dai_out'); if(o){ $('aiout').value = o; $('aiout').style.display = 'block'; $('aicp').style.display = 'inline-flex'; } }catch(e){}
+(async () => { try{ const raw = await idb('get', 'ai'); if(raw){ const o = JSON.parse(raw); aiS.k = Object.assign({}, o.k, aiS.k); aiS.m = Object.assign({}, o.m, aiS.m); if(!aiS.p) aiS.p = o.p; if(!aiS.n) aiS.n = o.n; if(!$('aik').value.trim()) aiLoad(); if(!$('ain').value) $('ain').value = aiS.n || ''; } }catch(e){} })();
+$('aip').onchange = () => { aiSave(aiPrev, true); aiPrev = $('aip').value; aiLoad(); aiPersist(); };
+$('aik').addEventListener('input', () => { aiSave(null, true); aiBadge(); try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){} });
+['change', 'blur'].forEach(ev => $('aik').addEventListener(ev, () => { aiSave(null, true); aiBadge(); }));
+['aim', 'ain'].forEach(i => $(i).addEventListener('input', () => aiSave()));
+addEventListener('pagehide', () => aiSave()); document.addEventListener('visibilitychange', () => { if(document.hidden) aiSave(); });
+async function aiViews(){
+  busy = true; key.castShadow = $('sh').checked; const out = [];
+  try{ sizeFromUI(true); for(const v of [VIEWS[0], VIEWS[2], VIEWS[1], ISO]){ const bm = await createImageBitmap(await renderView(v, 'image/png')), k = Math.min(1, 896 / Math.max(bm.width, bm.height)), c = document.createElement('canvas'); c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bm, 0, 0, c.width, c.height); out.push(c.toDataURL('image/jpeg', .82).split(',')[1]); } }
+  finally{ busy = false; key.castShadow = $('sh').checked; sizeFromUI(); }
+  return out;
+}
+async function aiFetch(url, init, ms = 70000){
+  const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms);
+  try{ return await fetch(url, Object.assign({signal: ac.signal}, init)); }
+  catch(e){ if(e.name === 'AbortError'){ const er = new Error('Zaman aşımı: sağlayıcı ' + Math.round(ms / 1000) + ' sn içinde cevap vermedi.'); er.status = 504; throw er; } throw e; }
+  finally{ clearTimeout(t); }
+}
+async function aiCall(prompt, imgs, model){
+  const p = $('aip').value, key = $('aik').value.trim(); let r, j;
+  const bad = async () => { const er = new Error(r.status + ': ' + (await r.text()).slice(0, 400)); er.status = r.status; throw er; };
+  if(p === 'gemini'){
+    const gu = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, gb = JSON.stringify({contents: [{parts: [{text: prompt}, ...imgs.map(d => ({inline_data: {mime_type: 'image/jpeg', data: d}}))]}]});
+    try{ r = await aiFetch(gu, {method: 'POST', headers: {'Content-Type': 'application/json', 'x-goog-api-key': key}, body: gb}); }
+    catch(e1){ if(e1.status) throw e1; r = await aiFetch(gu + '?key=' + encodeURIComponent(key), {method: 'POST', headers: {'Content-Type': 'application/json'}, body: gb}); }
+    if(!r.ok) await bad(); j = await r.json(); const t = (j.candidates?.[0]?.content?.parts || []).map(x => x.text || '').join('');
+    if(!t.trim()){ const er = new Error('Boş yanıt (' + (j.promptFeedback?.blockReason || j.candidates?.[0]?.finishReason || 'bilinmiyor') + ')'); er.status = 502; throw er; } return t;
+  }
+  if(p === 'claude'){
+    r = await aiFetch('https://api.anthropic.com/v1/messages', {method: 'POST', headers: {'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'}, body: JSON.stringify({model, max_tokens: 2000, messages: [{role: 'user', content: [...imgs.map(d => ({type: 'image', source: {type: 'base64', media_type: 'image/jpeg', data: d}})), {type: 'text', text: prompt}]}]})});
+    if(!r.ok) await bad(); j = await r.json(); return (j.content || []).map(x => x.text || '').join('');
+  }
+  r = await aiFetch('https://api.openai.com/v1/chat/completions', {method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key}, body: JSON.stringify({model, messages: [{role: 'user', content: [{type: 'text', text: prompt}, ...imgs.map(d => ({type: 'image_url', image_url: {url: 'data:image/jpeg;base64,' + d}}))]}]})});
+  if(!r.ok) await bad(); j = await r.json(); return j.choices?.[0]?.message?.content || '';
+}
+async function aiRetry(fn, wait){
+  for(let i = 0; ; i++){
+    try{ return await fn(); }
+    catch(e){
+      if(![429, 500, 502, 503, 504, 529].includes(e.status) || i >= wait.length) throw e;
+      let w = wait[i]; const m = /retry(?:Delay"?:?\s*"?| in )\s*([\d.]+)s/i.exec(e.message); if(m) w = Math.min(60, Math.ceil(+m[1]) + 1);
+      for(let s = w; s > 0; s--){ setMsg(T('ai_busy', s, i + 1, wait.length)); await sleep(1000); }
+    }
+  }
+}
+$('aigo').onclick = async () => {
+  if(!mesh || !curM) return setMsg('Önce bir model aç.', true);
+  if(!$('aik').value.trim()) return setMsg('API anahtarını gir.', true);
+  aiSave(null, true); $('aigo').disabled = true;
+  try{
+    setMsg('Görünümler hazırlanıyor…'); const imgs = await aiViews(), note = $('ain').value.trim(), p = $('aip').value, model = $('aim').value.trim() || AIDEF[p];
+    const prompt = `You are an expert 3D-printing marketplace copywriter. The attached images show one 3D model from the front, right, back and an isometric angle. File name: ${curM.name}. Bounding box: ${dims}. Triangles: ${(curM.pos.length / 9).toLocaleString('en')}. ${note ? 'Creator note: ' + note + '.' : ''}
+Identify what the object is, then write a ready-to-paste Cults3D listing in English, in exactly this order:
+1) A title line (max 70 characters, descriptive, search-friendly).
+2) Two short paragraphs: what it is, who it is for, why it looks good on a desk or shelf.
+3) "Features:" with 3-5 lines in the form "Name: explanation", based only on what is visible.
+4) "Recommended 3D Print Settings:" with Material, Layer Height, Infill, Supports (based on the visible overhangs, mention best print orientation and the size above) and Print Speed.
+5) "Tags:" 10-14 comma-separated single words.
+Plain text only, no markdown symbols such as ** or #. Do not claim the model was tested or printed unless the creator note says so. Do not invent dimensions.`;
+    const models = p === 'gemini' ? [model, ...AIFB.filter(m => m !== model)] : [model]; let txt = '', used = model, last = null;
+    for(let i = 0; i < models.length; i++){
+      setMsg('Yapay zeka yazıyor…' + (i ? ' (' + models[i] + ')' : ''));
+      try{ txt = (await aiRetry(() => aiCall(prompt, imgs, models[i]), i ? [3] : [4, 8, 15, 25])).trim(); used = models[i]; last = null; if(txt) break; }
+      catch(e){ last = e; if(![404, 429, 500, 502, 503, 504, 529].includes(e.status)) break; }
+    }
+    if(last) throw last; if(!txt) throw new Error('Boş yanıt döndü.');
+    $('aiout').value = txt; $('aiout').style.display = 'block'; $('aicp').style.display = 'inline-flex'; try{ localStorage.setItem('m3dai_out', txt); }catch(e){} aiAuto = true; $('fname').value = aiTitle(txt); if(!$('cap').checked){ $('cap').checked = true; saveSet(); } refreshInfo();
+    setMsg('Açıklama hazır.' + (used !== model ? ' (model: ' + used + ')' : '')); $('aiout').scrollIntoView({block: 'nearest'});
+  }catch(e){
+    const m = String(e.message || e), lk = {gemini: 'aistudio.google.com/apikey', claude: 'console.anthropic.com', openai: 'platform.openai.com/api-keys'}[$('aip').value]; let h = '';
+    if(e instanceof TypeError) h = 'Ağ hatası: tarayıcı isteği engelledi. Reklam/gizlilik eklentisini bu sayfa için kapat, VPN/güvenlik duvarını kontrol et, https:// ile açıldığından emin ol.';
+    else if([400, 401, 403].includes(e.status)) h = '→ Anahtar veya model reddedildi. ' + lk + ' adresinden anahtarı kontrol et; Model kutusundaki adı doğrula. (Kayıtlı anahtarın silinmedi.)';
+    else if(e.status === 429) h = '→ Kota veya hız sınırı doldu (ücretsiz planlarda dakikalık/günlük sınır var). Biraz bekleyip tekrar dene ya da başka bir sağlayıcı seç.';
+    else if([500, 502, 503, 504, 529].includes(e.status)) h = '→ Sağlayıcı şu an yoğun. Birkaç dakika sonra tekrar dene; anahtarın kayıtlı kaldı.';
+    setMsg(e instanceof TypeError ? h + ' (' + m + ')' : m + (h ? '\n' + h : ''), true);
+  }
+  finally{ $('aigo').disabled = false; }
+};
+let aiAuto = true;
+const aiTitle = t => { const l = String(t).split(/\r?\n/).map(x => x.trim()).find(x => x); return cleanName((l || '').replace(/^[#>*_\s"“]+/, '').replace(/^\d+[).]\s*/, '').replace(/^(title|başlık)\s*[:\-–]\s*/i, '').replace(/["”*_\s]+$/, '')); };
+$('fname').addEventListener('input', () => { aiAuto = false; refreshInfo(); });
+$('aiout').addEventListener('input', () => { if(aiAuto){ $('fname').value = aiTitle($('aiout').value); refreshInfo(); } try{ localStorage.setItem('m3dai_out', $('aiout').value); }catch(e){} });
+$('aicp').onclick = () => navigator.clipboard.writeText($('aiout').value).then(() => setMsg('Kopyalandı.'));
 cv.addEventListener('webglcontextlost', e => { e.preventDefault(); setMsg(T('e_ctx'), true); });
 cv.addEventListener('webglcontextrestored', () => { setMsg(T('m_ready')); sizeFromUI(); applyLook(); });
 $('clearRes').onclick = clearResults;
 $('toast').onclick = () => $('toast').style.display = 'none';
-$('viewReset').onclick = () => { setZoom(1); offset = 0; phase = 0; $('el').value = ENVD[val('bg')] ? ENVD[val('bg')].el : 22; $('vs').value = 0; applyLook(); labels(); saveSet(); };
+$('viewReset').onclick = () => { setZoom(1); offset = 0; phase = 0; $('el').value = ENVD[val('bg')] ? ENVD[val('bg')].el : 22; $('vs').value = 0; $('msz').value = 100; applyLook(); labels(); saveSet(); };
 if('launchQueue' in window) launchQueue.setConsumer(async lp => { const fl = []; for(const h of (lp.files || [])) fl.push(await h.getFile()); if(fl.length) loadFiles(fl); });
 if(/[?&]share=1/.test(location.search) && 'caches' in window) (async () => { try{ const c = await caches.open('m3d-share'), ks = await c.keys(), fl = []; for(const k of ks){ const b = await (await c.match(k)).blob(); fl.push(new File([b], decodeURIComponent(k.url.split('/').pop()))); } history.replaceState(null, '', location.pathname); if(fl.length) await loadFiles(fl); for(const k of ks) await c.delete(k); }catch(e){} })();
 async function resSave(files){ try{ try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){} const t = Date.now(); let i = 0; for(const f of files){ i++; await idbS('r', 'put', t + '_' + String(i).padStart(3, '0') + '_' + f.name, {name: f.name, blob: f.blob, t: t + i}); } const ks = (await idbS('r', 'keys')).sort(); for(const k of ks.slice(0, Math.max(0, ks.length - 80))) await idbS('r', 'del', k); }catch(e){} }
@@ -1845,7 +1968,7 @@ $('shareBtn').onclick = async () => { try{ const fs = lastFiles.slice(0, 8).map(
 
 /* ---- ikonları bağla ---- */
 [['open', 'folder'], ['all', 'play'], ['onlyV', 'film'], ['onlyI', 'image'], ['pau', 'pause'], ['fsb', 'expand'], ['snap', 'camera'], ['redl', 'download'], ['batch', 'layers'], ['shareBtn', 'share'], ['mcBtn', 'check'], ['logoPick', 'image'], ['logoClear', 'trash']].forEach(([id, n]) => icon($(id), n));
-document.querySelectorAll('.tabbar button').forEach((b, i) => icon(b, {scene: 'scene', model: 'cube', cam: 'sliders', out: 'export', res: 'grid'}[b.dataset.tab] || 'grid'));
+document.querySelectorAll('.tabbar button').forEach((b, i) => icon(b, {scene: 'scene', model: 'cube', cam: 'sliders', out: 'export', ai: 'scene', res: 'grid'}[b.dataset.tab] || 'grid'));
 $('pau').addEventListener('click', () => setTimeout(() => icon($('pau'), paused ? 'play' : 'pause'), 0));
 function restoreV8(){ if(val('mpid')) applyPresetById(val('mpid'), true); else applyMatExtras(); buildLooks(); rim.intensity = .6 * num('ri'); renderer.toneMappingExposure = .95 * num('exps'); updPA(); }
 
@@ -1857,16 +1980,16 @@ restoreV8();
 <section lang="en"><div class="box"><h2>Free Online STL to MP4 Converter</h2>
 <p>STLtoMP4.com turns 3D models (STL, 3MF and OBJ) into smooth MP4 turntable videos and clean view images – front, back, left, right, top, bottom and isometric – directly in your browser. It is built for makers who want attractive previews of their 3D prints for Cults3D, Thingiverse, Printables, MakerWorld, Etsy, Instagram, TikTok and YouTube Shorts, without installing software or uploading private files.</p></div>
 <div class="cols"><div class="box"><h3>How to convert STL to MP4</h3><ol><li>Drop your <strong>.STL</strong>, <strong>.3MF</strong>, <strong>.OBJ</strong> or <strong>.PLY</strong> file into the preview area or press <em>Open model</em>.</li><li>Pick a scene, material, colour and camera angle. Plastic, glossy, matte, clay and metal finishes are included.</li><li>Choose resolution, frame rate and video length in the Output tab.</li><li>Press <strong>Create MP4 + views</strong> and download the video and images.</li></ol></div>
-<div class="box"><h3>Features</h3><ul><li>Realistic 3D scenes, photo backdrops and transparent PNG export</li><li>Nine numbered images in a fixed order (wireframe, shaded, orthographic, front, right, left, back, bottom, top) plus optional GIF and contact sheet</li><li>Volume, surface area and PLA weight estimate with unit selection</li><li>Four colour themes, seven interface languages</li><li>Installable app that works offline after the first visit</li><li>100% client-side: your models never leave your device</li></ul></div></div>
+<div class="box"><h3>Features</h3><ul><li>Optional AI listing writer: describes the model from four views, using your own API key</li><li>Camera tour: a second video that shows the model from low, high, side and close-up angles, not only a turntable</li><li>Smart framing: the model is sized to the scene and placed on the table or floor of photo scenes, with a size slider for fine tuning</li><li>Realistic 3D scenes, photo backdrops and transparent PNG export</li><li>Nine numbered images in a fixed order (wireframe, shaded, orthographic, front, right, left, back, bottom, top) plus optional GIF and contact sheet</li><li>Volume, surface area and PLA weight estimate with unit selection</li><li>Four colour themes, seven interface languages</li><li>Installable app that works offline after the first visit</li><li>100% client-side: your models never leave your device</li></ul></div></div>
 <div class="box"><h3>Tips for great 3D print previews</h3><ul><li>Rotate the model so the most detailed side faces the camera, then use Lay flat for a clean base.</li><li>Use a neutral scene and a soft shadow so the model stays the hero of the shot.</li><li>Export 1080×1080 for Instagram, 1080×1920 for Reels, TikTok and Shorts, and 1920×1080 for marketplaces.</li><li>Add a caption with the model name and size to build trust with buyers.</li></ul></div>
 <div class="box"><h3>Frequently asked questions</h3><h4>Is my 3D file uploaded to any server?</h4><p>No. Conversion runs entirely inside your browser with WebGL, so your STL, 3MF and OBJ files never leave your device.</p><h4>Which file formats are supported?</h4><p>STL (binary and ASCII), 3MF, OBJ and PLY, including colored models. You can load several models and process them one after another.</p><h4>What can I export?</h4><p>MP4 turntable videos (up to 4K where your device allows it), view images (front, back, left, right, top, bottom, isometric) as PNG, JPG or WebP, an optional animated GIF and a contact sheet.</p><h4>Why is my model tiny or the volume 0?</h4><p>STL files have no unit. Choose the file unit (mm, cm, m, inch) or type the real longest edge in millimetres in the Model tab and the volume and weight estimate update.</p><h4>Can I install it on my phone?</h4><p>Yes. Open the site in Chrome on Android and tap Install app, or use the browser menu and choose Install app. It then opens full screen and works offline after the first visit.</p><h4>Is STLtoMP4 free?</h4><p>Yes, it is free for personal and commercial use. The site is supported by ads.</p></div></section>
 <section lang="tr"><div class="box"><h2>Ücretsiz Online STL → MP4 Dönüştürücü</h2>
 <p>STLtoMP4.com, 3D modellerini (STL, 3MF ve OBJ) tarayıcında akıcı MP4 döner videolara ve temiz görünüm resimlerine (ön, arka, sol, sağ, üst, alt ve izometrik) çevirir. 3D baskılarını Cults3D, Thingiverse, Printables, MakerWorld, Etsy, Instagram, TikTok ve YouTube Shorts için etkileyici göstermek isteyenler içindir; program kurmak veya özel dosyaları yüklemek gerekmez.</p></div>
 <div class="cols"><div class="box"><h3>STL'yi MP4'e nasıl çevirirsin?</h3><ol><li><strong>.STL</strong>, <strong>.3MF</strong>, <strong>.OBJ</strong> veya <strong>.PLY</strong> dosyanı önizleme alanına bırak ya da <em>Model aç</em> düğmesine bas.</li><li>Sahneyi, malzemeyi, rengi ve kamera açısını seç. Plastik, parlak, mat, kil ve metal seçenekleri var.</li><li>Çıktı sekmesinden çözünürlüğü, FPS'i ve video süresini belirle.</li><li><strong>MP4 + görünümleri oluştur</strong> düğmesine bas, video ve resimleri indir.</li></ol></div>
-<div class="box"><h3>Özellikler</h3><ul><li>Gerçekçi 3B sahneler, fotoğraf arka planları ve şeffaf PNG çıktısı</li><li>Sabit sırayla dokuz numaralı resim (tel kafes, gölgeli, ortografik, ön, sağ, sol, arka, alt, üst), isteğe bağlı GIF ve katalog sayfası</li><li>Birim seçimiyle hacim, yüzey alanı ve PLA ağırlık tahmini</li><li>Dört renk teması, yedi arayüz dili</li><li>İlk ziyaretten sonra çevrimdışı çalışan, kurulabilir uygulama</li><li>%100 tarayıcıda çalışır: modelin cihazından çıkmaz</li></ul></div></div>
+<div class="box"><h3>Özellikler</h3><ul><li>İsteğe bağlı yapay zeka açıklaması: kendi API anahtarınla modeli dört görünümden tanıyıp ilan metni yazar</li><li>Kamera turu: modeli yalnızca dönerken değil, alçak, yüksek, yan ve yakın açılardan gösteren ek video</li><li>Akıllı kadraj: model sahneye göre boyutlanır, fotoğraf sahnelerinde masaya veya zemine oturur; boyut kaydırıcısıyla ince ayar yapılır</li><li>Gerçekçi 3B sahneler, fotoğraf arka planları ve şeffaf PNG çıktısı</li><li>Sabit sırayla dokuz numaralı resim (tel kafes, gölgeli, ortografik, ön, sağ, sol, arka, alt, üst), isteğe bağlı GIF ve katalog sayfası</li><li>Birim seçimiyle hacim, yüzey alanı ve PLA ağırlık tahmini</li><li>Dört renk teması, yedi arayüz dili</li><li>İlk ziyaretten sonra çevrimdışı çalışan, kurulabilir uygulama</li><li>%100 tarayıcıda çalışır: modelin cihazından çıkmaz</li></ul></div></div>
 <div class="box"><h3>Etkileyici baskı önizlemeleri için ipuçları</h3><ul><li>Modelin en detaylı yüzünü kameraya çevir, temiz bir taban için "Düz yüzeye yatır"ı kullan.</li><li>Sade bir sahne ve yumuşak gölge seç; model öne çıksın.</li><li>Instagram için 1080×1080, Reels, TikTok ve Shorts için 1080×1920, pazar yerleri için 1920×1080 dışa aktar.</li><li>Alıcıya güven vermek için model adı ve boyutunu alt yazı olarak ekle.</li></ul></div>
 <div class="box"><h3>Sık sorulan sorular</h3><h4>3D dosyam bir sunucuya yükleniyor mu?</h4><p>Hayır. Dönüştürme tamamen tarayıcında WebGL ile yapılır; STL, 3MF ve OBJ dosyaların cihazından çıkmaz.</p><h4>Hangi dosya biçimleri destekleniyor?</h4><p>STL (ikili ve ASCII), 3MF, OBJ ve PLY; renkli modeller dahil. Birden fazla model yükleyip sırayla işleyebilirsin.</p><h4>Neler dışa aktarabilirim?</h4><p>MP4 döner video (cihazın izin verdiği yerde 4K&#x27;ya kadar), PNG, JPG veya WebP olarak dokuz numaralı resim (tel kafes, gölgeli, ortografik, ön, sağ, sol, arka, alt, üst), isteğe bağlı GIF ve katalog sayfası.</p><h4>Modelim neden çok küçük veya hacim 0 çıkıyor?</h4><p>STL dosyalarında birim yoktur. Model sekmesinden dosya birimini (mm, cm, m, inç) seç veya gerçek en uzun kenarı milimetre olarak yaz; hacim ve ağırlık tahmini güncellenir.</p><h4>Telefonuma uygulama olarak kurabilir miyim?</h4><p>Evet. Siteyi Android Chrome&#x27;da aç, &quot;Uygulamayı yükle&quot; düğmesine bas veya tarayıcı menüsünden &quot;Uygulamayı yükle&quot; seç. Sonra tam ekran açılır ve ilk ziyaretten sonra çevrimdışı çalışır.</p><h4>STLtoMP4 ücretsiz mi?</h4><p>Evet, kişisel ve ticari kullanım için ücretsizdir. Site reklamlarla desteklenir.</p></div></section>
-<section class="guides" lang="en"><div class="box"><h3>Guides for makers</h3><ul><li><a href="stl-vs-3mf-vs-obj-vs-ply.html">STL vs 3MF vs OBJ vs PLY: Which 3D File Format Should You Use?</a> – A practical comparison of STL, 3MF, OBJ and PLY: what each format stores, where it breaks, how large the files get and when to pick each one.</li><li><a href="how-to-make-a-3d-print-turntable-video.html">How to Make a Turntable Video of a 3D Model</a> – Step-by-step guide to a smooth, loopable turntable video of a 3D model: preparation, lighting, camera, duration, resolution, bitrate and file size.</li><li><a href="3d-print-preview-image-sizes-and-views.html">Best Image Sizes and Views for 3D Print Listings and Social Media</a> – Which views, aspect ratios, resolutions and file formats work best for 3D model listings, marketplaces, Instagram, Reels, TikTok and YouTube.</li><li><a href="fix-stl-scale-units-and-orientation.html">Why Your STL Looks Too Small, Too Big or Upside Down</a> – STL files carry no units and no up direction. Learn why models import at the wrong size or rotation, and how to correct scale, axis and base.</li><li><a href="estimate-3d-print-weight-and-filament-cost.html">How to Estimate 3D Print Weight and Filament Cost from an STL</a> – Estimate filament weight and cost from model volume, material density and infill, with worked examples and a table of common densities.</li><li><a href="how-to-write-a-3d-model-listing.html">How to Write a 3D Model Listing That Sells</a> – A practical structure for 3D model listings: titles, opening lines, technical details, images, licence terms and how to improve from buyer questions.</li><li><a href="check-stl-before-printing.html">How to Check an STL File Before You Print or Sell It</a> – A practical pre-print checklist: watertight meshes, flipped normals, wall thickness, overhangs, flat base, clearances and the tools that repair problems.</li><li><a href="reduce-stl-file-size.html">How to Reduce STL File Size Without Losing Visible Detail</a> – Why STL files get huge and how to shrink them: binary export, decimation, triangle budgets, removing hidden geometry, 3MF and zip compression.</li><li><a href="layer-height-infill-and-walls-explained.html">Layer Height, Infill and Walls: What Each Setting Really Does</a> – A plain explanation of the three print settings that matter most: layer height, infill and wall count, with ranges, trade-offs and starting points.</li><li><a href="lighting-and-materials-for-3d-renders.html">Lighting, Colour and Material Choices for 3D Model Renders</a> – How to light and colour 3D model previews so they look like the real print: key and fill light, shadows, matte vs glossy, backgrounds and honest colour.</li><li><a href="mp4-vs-gif-vs-webp-for-3d-previews.html">MP4 vs GIF vs WebP: Which Format for 3D Model Previews?</a> – Compare MP4, GIF and animated WebP for 3D previews: file size, quality, colours, transparency, looping and where each format is accepted.</li><li><a href="camera-angles-for-3d-model-videos.html">Camera Angles for 3D Model Videos: Beyond the Turntable</a> – Eye level, three-quarter, high and low angles, orbit, sweep and fly-over, with a reusable shot list.</li><li><a href="choosing-a-scene-and-background-for-3d-previews.html">Choosing a Scene and Background for 3D Model Previews</a> – Plain, photo and 3D room backgrounds, grounding the object on its surface and sizing for phones.</li><li><a href="how-stltomp4-works.html">How STLtoMP4 Works</a> – Rendering and encoding inside your browser, privacy and limits.</li><li><a href="troubleshooting-stl-to-mp4.html">Troubleshooting STL to MP4</a> – Fixes for black frames, wrong framing, slow exports and files that will not play.</li><li><a href="3d-model-glossary.html">3D Model, Rendering and Video Glossary</a> – Short definitions of common terms.</li><li><a href="stl-dosyasi-nedir.html">STL Dosyası Nedir? (Türkçe)</a> – STL, OBJ ve 3MF farkları ve önizleme videosu rehberi.</li></ul><p><a href="guides.html">All guides / Tüm rehberler</a></p></div></section>
+<section class="guides" lang="en"><div class="box"><h3>Guides for makers</h3><ul><li><a href="stl-vs-3mf-vs-obj-vs-ply.html">STL vs 3MF vs OBJ vs PLY: Which 3D File Format Should You Use?</a> – A practical comparison of STL, 3MF, OBJ and PLY: what each format stores, where it breaks, how large the files get and when to pick each one.</li><li><a href="how-to-make-a-3d-print-turntable-video.html">How to Make a Turntable Video of a 3D Model</a> – Step-by-step guide to a smooth, loopable turntable video of a 3D model: preparation, lighting, camera, duration, resolution, bitrate and file size.</li><li><a href="3d-print-preview-image-sizes-and-views.html">Best Image Sizes and Views for 3D Print Listings and Social Media</a> – Which views, aspect ratios, resolutions and file formats work best for 3D model listings, marketplaces, Instagram, Reels, TikTok and YouTube.</li><li><a href="fix-stl-scale-units-and-orientation.html">Why Your STL Looks Too Small, Too Big or Upside Down</a> – STL files carry no units and no up direction. Learn why models import at the wrong size or rotation, and how to correct scale, axis and base.</li><li><a href="estimate-3d-print-weight-and-filament-cost.html">How to Estimate 3D Print Weight and Filament Cost from an STL</a> – Estimate filament weight and cost from model volume, material density and infill, with worked examples and a table of common densities.</li><li><a href="how-to-write-a-3d-model-listing.html">How to Write a 3D Model Listing That Sells</a> – A practical structure for 3D model listings: titles, opening lines, technical details, images, licence terms and how to improve from buyer questions.</li><li><a href="check-stl-before-printing.html">How to Check an STL File Before You Print or Sell It</a> – A practical pre-print checklist: watertight meshes, flipped normals, wall thickness, overhangs, flat base, clearances and the tools that repair problems.</li><li><a href="reduce-stl-file-size.html">How to Reduce STL File Size Without Losing Visible Detail</a> – Why STL files get huge and how to shrink them: binary export, decimation, triangle budgets, removing hidden geometry, 3MF and zip compression.</li><li><a href="layer-height-infill-and-walls-explained.html">Layer Height, Infill and Walls: What Each Setting Really Does</a> – A plain explanation of the three print settings that matter most: layer height, infill and wall count, with ranges, trade-offs and starting points.</li><li><a href="lighting-and-materials-for-3d-renders.html">Lighting, Colour and Material Choices for 3D Model Renders</a> – How to light and colour 3D model previews so they look like the real print: key and fill light, shadows, matte vs glossy, backgrounds and honest colour.</li><li><a href="mp4-vs-gif-vs-webp-for-3d-previews.html">MP4 vs GIF vs WebP: Which Format for 3D Model Previews?</a> – Compare MP4, GIF and animated WebP for 3D previews: file size, quality, colours, transparency, looping and where each format is accepted.</li><li><a href="camera-angles-for-3d-model-videos.html">Camera Angles for 3D Model Videos: Beyond the Turntable</a> – Eye level, three-quarter, high and low angles, orbit, sweep and fly-over, with a reusable shot list.</li><li><a href="choosing-a-scene-and-background-for-3d-previews.html">Choosing a Scene and Background for 3D Model Previews</a> – Plain, photo and 3D room backgrounds, grounding the object on its surface and sizing for phones.</li><li><a href="how-stltomp4-works.html">How STLtoMP4 Works</a> – Rendering and encoding inside your browser, privacy and limits.</li><li><a href="troubleshooting-stl-to-mp4.html">Troubleshooting STL to MP4</a> – Fixes for black frames, wrong framing, slow exports and files that will not play.</li><li><a href="3d-model-glossary.html">3D Model, Rendering and Video Glossary</a> – Short definitions of common terms.</li><li><a href="stl-dosyasi-nedir.html">STL Dosyası Nedir? (Türkçe)</a> – STL, OBJ ve 3MF farkları ve önizleme videosu rehberi.</li><li><a href="best-3d-print-orientation.html">Best 3D Print Orientation: How to Choose the Right Way Up</a> – Strength, surface, supports and time, with a five-step method.</li><li><a href="common-3d-print-problems-and-fixes.html">Common 3D Print Problems and How to Fix Them</a> – Warping, stringing, weak layers, shifted layers and more, by symptom.</li><li><a href="3d-model-licenses-explained.html">3D Model Licenses Explained</a> – Personal, commercial and Creative Commons terms in plain language.</li><li><a href="how-to-photograph-3d-prints.html">How to Photograph 3D Prints</a> – Light, backgrounds, scale and angles with just a phone.</li><li><a href="faq.html">STLtoMP4 FAQ</a> – Quick answers about privacy, formats, camera tour, scenes and phones.</li></ul><p><a href="guides.html">All guides / Tüm rehberler</a></p></div></section>
 <footer><nav aria-label="Site"><a href="guides.html">Guides / Rehberler</a> · <a href="about.html">About / Hakkında</a> · <a href="privacy.html">Privacy Policy / Gizlilik</a> · <a href="terms.html">Terms / Koşullar</a> · <a href="contact.html">Contact / İletişim</a></nav><p>&copy; 2026 STLtoMP4.com – Free browser-based 3D converter</p></footer>
 </article>
 </body>
