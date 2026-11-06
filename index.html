@@ -167,7 +167,7 @@ button.big{font-size:15.5px;font-weight:700}
 button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:700px){.mgrid{grid-template-columns:repeat(auto-fill,minmax(36px,1fr))}.chip{min-height:34px}}
 @media(prefers-reduced-motion:reduce){#bar i{animation:none}.msw{transition:none}}
-.support-card{max-width:980px;margin:18px auto;padding:16px 18px;border:1px solid rgba(128,128,128,.35);border-radius:14px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.support-card p{margin:4px 0 0;opacity:.85;font-size:.92em}.support-card a.sup-btn{display:inline-block;padding:10px 18px;border-radius:10px;background:#e8643c;color:#fff;font-weight:600;text-decoration:none}.support-card a.sup-btn:hover{filter:brightness(1.08)}</style>
+.sup-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#ff7a3d,#e8433c);color:#fff!important;text-decoration:none;box-shadow:0 6px 18px rgba(232,67,60,.35);transition:transform .15s,box-shadow .15s}.sup-banner:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(232,67,60,.45)}.sup-banner .sup-ic{font-size:26px;line-height:1;flex:none}.sup-banner .sup-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.sup-banner b{font-size:15px;line-height:1.2}.sup-banner small{font-size:12.5px;opacity:.95;line-height:1.3}.sup-banner .sup-go{flex:none;background:#fff;color:#c9382f;font-weight:700;font-size:13px;padding:8px 12px;border-radius:10px;white-space:nowrap}.sup-pill{position:absolute;left:14px;bottom:14px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#ff7a3d,#e8433c);color:#fff!important;font-weight:700;font-size:13px;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.35)}.sup-pill:hover{filter:brightness(1.08)}#stage:fullscreen .sup-pill{display:none}.sup-wide{max-width:980px;margin:18px auto;padding:0 12px}.sup-wide .sup-banner{font-size:15px}</style>
 </head>
 <body>
 <noscript><p style="padding:16px;font-family:sans-serif">STLtoMP4.com converts STL, 3MF and OBJ 3D models into MP4 videos and view images in your browser. Please enable JavaScript to use the converter.</p></noscript>
@@ -175,6 +175,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
 <main id="stage">
   <canvas id="cv" width="1280" height="720"></canvas>
   <div id="drop" role="button" tabindex="0"><b>Modeli buraya bırak</b><span>STL, 3MF, OBJ veya PLY (birden fazla olabilir). Arka plan için bir resim de bırakabilirsin.</span></div>
+  <a class="sup-pill" href="https://cults3d.com/@Artifacta3D" target="_blank" rel="noopener">♥ Cults3D</a>
   <div id="toast"></div>
 </main>
 <aside>
@@ -183,6 +184,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
     <div><h1 data-i="title">STL to MP4 converter: 3D model video &amp; views</h1><p class="sub" data-i="sub">Runs in your browser, files are never uploaded.</p></div>
     <select id="lang" aria-label="Language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
   </div>
+  <a class="sup-banner" href="https://cults3d.com/@Artifacta3D" target="_blank" rel="noopener" aria-label="Cults3D store"><span class="sup-ic">♥</span><span class="sup-tx"><b data-i="sup_t">Siteyi destekle</b><small data-i="sup_s">Ücretsiz araç. Cults3D'deki 3D baskı modellerime göz at.</small></span><span class="sup-go" data-i="sup_b">Mağazaya git</span></a>
   <div class="themes" id="themes"><button data-th="light" data-i="th_light"></button><button data-th="dark" data-i="th_dark"></button><button data-th="ocean" data-i="th_ocean"></button><button data-th="sunset" data-i="th_sunset"></button></div>
   <button id="install" class="small" style="display:none" data-i="install"></button>
   <div class="toprow"><button id="open" class="primary" data-i="open"></button><button id="fsb" class="small" data-i="fs"></button><button id="pau" class="small" data-i="pause"></button></div>
@@ -434,8 +436,9 @@ sc8=Adaçayı stüdyo fonu|Sage studio backdrop|Salbeigrüner Studiohintergrund|
 sc9=Keten ve jaluzi ışığı|Linen and blind light|Leinen mit Jalousielicht|Lin et lumière de store|Lino y luz de persiana|Лён и свет жалюзи|كتان وضوء الستائر
 sc10=Gece vitrini|Night showcase|Nachtvitrine|Vitrine de nuit|Vitrina nocturna|Ночная витрина|واجهة ليلية
 sup_t=Siteyi destekle|Support this site|Diese Seite unterstützen|Soutenir ce site|Apoya este sitio
+sup_s=Ücretsiz araç. Cults3D'deki 3D baskı modellerime göz at.|Free tool. Browse my 3D printable models on Cults3D.|Kostenloses Tool. Stöbere in meinen 3D-Druck-Modellen auf Cults3D.|Outil gratuit. Découvrez mes modèles imprimables en 3D sur Cults3D.|Herramienta gratuita. Mira mis modelos imprimibles en 3D en Cults3D.|Бесплатный инструмент. Загляните в мои 3D-модели на Cults3D.|أداة مجانية. تصفح نماذجي للطباعة ثلاثية الأبعاد على Cults3D.
 sup_p=Dönüştürücü ücretsiz. Destek olmak istersen Cults3D mağazamdaki 3D baskı modellerine göz atabilirsin.|The converter is free. To support it, you can browse my 3D printable models on Cults3D.|Der Konverter ist kostenlos. Zur Unterstützung kannst du meine 3D-Druck-Modelle auf Cults3D ansehen.|Le convertisseur est gratuit. Pour le soutenir, découvrez mes modèles imprimables en 3D sur Cults3D.|El conversor es gratuito. Para apoyarlo, puedes ver mis modelos imprimibles en 3D en Cults3D.
-sup_b=Mağazaya git (Cults3D)|Visit the store (Cults3D)|Zum Shop (Cults3D)|Voir la boutique (Cults3D)|Ir a la tienda (Cults3D)
+sup_b=Mağazaya git|Visit store|Zum Shop|Voir la boutique|Ir a la tienda|В магазин|المتجر
 e_ply=Geçersiz veya yüzeyi olmayan PLY dosyası.|Invalid PLY file or no faces found.
 wst_l=Kafes stili|Wireframe style
 wst_o=Dolu yüzey + ince kafes|Solid surface + fine wire
@@ -1893,7 +1896,7 @@ loadSet(); if(firstRun && COARSE && !$('opre').value) $('res').value = '1080x135
 restoreV8();
 
 </script>
-<aside class="support-card" aria-label="Support"><div><strong data-i="sup_t"></strong><p data-i="sup_p"></p></div><a class="sup-btn" href="https://cults3d.com/@Artifacta3D" target="_blank" rel="noopener" data-i="sup_b"></a></aside>
+<div class="sup-wide"><a class="sup-banner" href="https://cults3d.com/@Artifacta3D" target="_blank" rel="noopener"><span class="sup-ic">♥</span><span class="sup-tx"><b>Siteyi destekle / Support this site</b><small>Araç ücretsiz. Cults3D'deki Artifacta3D mağazamdan 3D baskı modelleri alabilirsin. · The tool is free. You can shop my 3D printable models on Cults3D.</small></span><span class="sup-go">Cults3D →</span></a></div>
 <article class="seo">
 <section lang="en"><div class="box"><h2>Free Online STL to MP4 Converter</h2>
 <p>STLtoMP4.com turns 3D models (STL, 3MF and OBJ) into smooth MP4 turntable videos and clean view images – front, back, left, right, top, bottom and isometric – directly in your browser. It is built for makers who want attractive previews of their 3D prints for Cults3D, Thingiverse, Printables, MakerWorld, Etsy, Instagram, TikTok and YouTube Shorts, without installing software or uploading private files.</p></div>
