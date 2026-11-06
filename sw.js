@@ -1,4 +1,4 @@
-const V = 'm3d-v6', CORE = ['./', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const V = 'm3d-v7', CORE = ['./', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 const CDN = ['cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== V && x !== 'm3d-share').map(x => caches.delete(x)))).then(() => self.clients.claim())));

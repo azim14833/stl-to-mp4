@@ -122,7 +122,7 @@ aside>.pane{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:
   body{padding:8px}
   .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;height:auto;min-height:0;gap:10px}
   #stage{display:block;height:auto;min-height:0;padding:6px;border-radius:18px}
-  #cv{display:block;width:100%;height:auto;max-height:58vh;object-fit:contain;border-radius:12px}
+  #cv{display:block;width:100%;height:auto;max-height:74vh;object-fit:contain;border-radius:12px}
   #drop{inset:6px;padding:10px;gap:4px;border-radius:12px}
   #drop b{font-size:16px}#drop span{font-size:12px;line-height:1.35}
   aside{overflow:visible;height:auto;padding:12px;border-radius:18px}
@@ -282,7 +282,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
     <label><span data-i="scale"></span><span id="vSc">1.00</span><input id="sc" type="range" min="0.2" max="3" step="0.01" value="1"></label>
     <div class="two"><button id="trReset" class="small" data-i="reset"></button><button id="flat" class="small" data-i="flat"></button></div>
   </fieldset></div>
-<div class="tab" data-tab="cam"><fieldset><legend data-i="g_motion"></legend><label><span data-i="motion"></span><select id="motion"><option value="orbit" data-i="mo_orbit"></option><option value="ease" data-i="mo_ease"></option><option value="pend" data-i="mo_pend"></option><option value="spiral" data-i="mo_spiral"></option><option value="dolly" data-i="mo_dolly"></option><option value="cine" data-i="mo_cine"></option></select></label></fieldset><fieldset>
+<div class="tab" data-tab="cam"><fieldset><legend data-i="g_motion"></legend><label><span data-i="motion"></span><select id="motion"><option value="orbit" data-i="mo_orbit"></option><option value="ease" data-i="mo_ease"></option><option value="pend" data-i="mo_pend"></option><option value="spiral" data-i="mo_spiral"></option><option value="dolly" data-i="mo_dolly"></option><option value="cine" data-i="mo_cine"></option><option value="tour" data-i="mo_tour"></option><option value="sweep" data-i="mo_sweep"></option><option value="flyover" data-i="mo_fly"></option></select></label></fieldset><fieldset>
     <legend data-i="g_cam"></legend>
     <label><span data-i="el"></span><span id="vEl">22°</span><input id="el" type="range" min="-85" max="85" step="1" value="22"></label>
     <label><span data-i="zoom"></span><span id="vZm">1.00</span><input id="zm" type="range" min="0.3" max="4" step="0.01" value="1"></label>
@@ -326,6 +326,7 @@ button:focus-visible,.chip:focus-visible,.msw:focus-visible{outline:2px solid va
     <label class="chk"><input id="cap" type="checkbox"><span data-i="cap"></span></label>
     <label><span data-i="capt"></span><input id="capt" type="text" value=""></label>
     <label class="chk"><input id="gif" type="checkbox"><span data-i="gif"></span></label>
+    <label class="chk"><input id="tourvid" type="checkbox" checked><span data-i="tourvid"></span></label>
     <label class="chk"><input id="sheet" type="checkbox"><span data-i="sheet"></span></label>
     <label><span data-i="save"></span><select id="sv"><option value="dl" data-i="sv1"></option><option value="dir" data-i="sv2"></option></select></label>
     <button id="pickDir" class="small" style="display:none" data-i="pickdir"></button>
@@ -569,6 +570,11 @@ mo_pend=Sarkaç|Pendulum
 mo_spiral=Yükselen spiral|Rising spiral
 mo_dolly=Yaklaşarak dönüş|Dolly-in orbit
 mo_cine=Sinematik süpürme|Cinematic sweep
+mo_tour=Kamera turu (çoklu açı)|Camera tour (multi-angle)|Kamerafahrt (mehrere Winkel)|Tour de caméra (multi-angles)|Recorrido de cámara (varios ángulos)|Облёт камеры (разные ракурсы)|جولة الكاميرا (زوايا متعددة)
+mo_sweep=Yatay kamera süpürmesi|Horizontal camera sweep|Horizontaler Kameraschwenk|Balayage horizontal de la caméra|Barrido horizontal de cámara|Горизонтальный проезд камеры|مسح أفقي للكاميرا
+mo_fly=Üstten alçağa süzülüş|High-to-low flyover|Flug von oben nach unten|Survol de haut en bas|Sobrevuelo de arriba abajo|Пролёт сверху вниз|تحليق من الأعلى للأسفل
+tourvid=Ek video: farklı kamera açılarıyla gezinti (en az 10 sn)|Extra video: camera tour from different angles (10 s or more)|Zusatzvideo: Kamerafahrt aus verschiedenen Winkeln (ab 10 s)|Vidéo en plus : tour de caméra sous plusieurs angles (10 s min.)|Vídeo extra: recorrido de cámara desde varios ángulos (mín. 10 s)|Доп. видео: облёт камеры с разных ракурсов (от 10 с)|فيديو إضافي: جولة كاميرا من زوايا مختلفة (10 ثوانٍ فأكثر)
+m_tour=kamera turu videosu|camera tour video|Kamerafahrt-Video|vidéo tour de caméra|vídeo de recorrido de cámara|видео облёта камеры|فيديو جولة الكاميرا
 g_social=Çıktı ön ayarı|Output preset
 op_custom=Özel|Custom
 op_yt=YouTube 16:9|YouTube 16:9
@@ -669,7 +675,7 @@ const progress = p => { $('bar').firstElementChild.style.width = (Math.min(1, p)
 function setMsg(t, err){ $('msg').textContent = t; $('msg').className = err ? 'err' : ''; const o = $('toast'); if(err){ o.textContent = t; o.style.display = 'block'; } else o.style.display = 'none'; }
 
 /* ---------- ayarları hatırla ---------- */
-const SET = ['mpid', 'rgh', 'mtl', 'opq', 'texs', 'rig', 'ri', 'exps', 'motion', 'opre', 'logoPos', 'logoSz', 'logoOp', 'dimv', 'pa_mat', 'pa_inf', 'pa_wall', 'pa_price', 'pa_bed', 'bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'sheet', 'edg', 'unit', 'wstyle', 'maxmb'];
+const SET = ['mpid', 'rgh', 'mtl', 'opq', 'texs', 'rig', 'ri', 'exps', 'motion', 'opre', 'logoPos', 'logoSz', 'logoOp', 'dimv', 'pa_mat', 'pa_inf', 'pa_wall', 'pa_price', 'pa_bed', 'bg', 'cb', 'cb2', 'blur', 'sh', 'cm', 'mat', 'dir', 'el', 'zm', 'wf', 'ortho', 'res', 'fmt', 'fps', 'turns', 'dur', 'br', 'bob', 'cap', 'sv', 'la', 'lw', 'ls', 'sa', 'vs', 'ct', 'ts', 'capt', 'gif', 'tourvid', 'sheet', 'edg', 'unit', 'wstyle', 'maxmb'];
 const isChk = i => $(i).type === 'checkbox';
 function saveSet(){ try{ const o = {}; SET.forEach(i => o[i] = isChk(i) ? $(i).checked : $(i).value); localStorage.setItem('m3dset6', JSON.stringify(o)); }catch(e){} }
 function loadSet(){ try{ const o = JSON.parse(localStorage.getItem('m3dset6') || '{}'); SET.forEach(i => { if(i in o){ if(isChk(i)) $(i).checked = o[i]; else $(i).value = o[i]; } }); }catch(e){} }
@@ -853,13 +859,105 @@ function sizeFromUI(full){
   else k = Math.min(1, (COARSE ? 640 : 1280) / Math.max(ow, oh));
   W = Math.round(ow * k); H = Math.round(oh * k); renderer.setSize(W, H, false); cam.aspect = W / H; applyView(); drawBG(); if(mesh) fitFloor();
 }
-function applyView(){ const v = n0('vs') / 100; if(v){ cam.setViewOffset(W, H, 0, -v * H, W, H); ocam.setViewOffset(W, H, 0, -v * H, W, H); } else { cam.clearViewOffset(); ocam.clearViewOffset(); } }
+
+/* ---------- akıllı kadraj (v9): model sahneye oturur, telefonda da büyük açılır ---------- */
+let zoomMul = 1, camAz = 0, forceTour = false, MET = null, RIM = [], metStamp = 0;
+const _fc = new THREE.PerspectiveCamera(35, 1, .1, 400), _fv = new THREE.Vector3(), fitCache = new Map();
+const clampN = (x, a, b) => Math.max(a, Math.min(b, x)), CAMM = ['tour', 'sweep', 'flyover'], isCamMotion = m => CAMM.includes(m);
+const dd = () => { const d = num('dur') || 6; return isCamMotion(val('motion')) ? Math.max(d, 10) : d; };
+function refreshMet(){
+  if(!mesh){ MET = null; RIM = []; fitCache.clear(); return; }
+  root.updateMatrixWorld(true);
+  const p = mesh.geometry.attributes.position.array, m = mesh.matrixWorld.elements, st = Math.max(1, Math.floor(p.length / 3 / 120000)) * 3;
+  let mn = Infinity, mx = -Infinity, ra = 0;
+  for(let i = 0; i < p.length; i += st){ const x = p[i], y0 = p[i+1], z = p[i+2], y = m[1] * x + m[5] * y0 + m[9] * z, wx = m[0] * x + m[4] * y0 + m[8] * z, wz = m[2] * x + m[6] * y0 + m[10] * z, r = wx * wx + wz * wz; if(y < mn) mn = y; if(y > mx) mx = y; if(r > ra) ra = r; }
+  MET = {r: Math.max(Math.sqrt(ra), .05), y0: mn + m[13], y1: mx + m[13], cx: m[12], cz: m[14], s: ++metStamp};
+  RIM = []; const n = 28; for(let i = 0; i < n; i++){ const a = i / n * Math.PI * 2, x = Math.cos(a) * MET.r + MET.cx, z = Math.sin(a) * MET.r + MET.cz; RIM.push([x, MET.y0, z], [x, MET.y1, z]); }
+  fitCache.clear();
+}
+function ndcBox(c){
+  const el = c.projectionMatrix.elements, kx = el[0], ky = el[5]; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, ok = true;
+  for(const q of RIM){ _fv.set(q[0], q[1], q[2]).applyMatrix4(c.matrixWorldInverse); const w = -_fv.z; if(w < .08){ ok = false; break; } const x = _fv.x * kx / w, y = _fv.y * ky / w; if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y; }
+  return {x0, x1, y0, y1, ok};
+}
+function ndcPt(c, x, y, z){ const el = c.projectionMatrix.elements; _fv.set(x, y, z).applyMatrix4(c.matrixWorldInverse); const w = Math.max(.08, -_fv.z); return [_fv.x * el[0] / w, _fv.y * el[5] / w]; }
+function presetGeom(p){
+  const iw = 896, ih = 1200, ar = W / H, sa = iw / ih; let cw, ch;
+  if(ar > sa){ cw = iw; ch = iw / ar; } else { ch = ih; cw = ih * ar; } cw /= p.z; ch /= p.z;
+  const sx = clampN(p.cx * iw - cw / 2, 0, iw - cw), sy = clampN(p.cy * ih - ch / 2, 0, ih - ch), tt = (.605 * ih - sy) / ch, wide = ar > 1.15;
+  const ty = tt <= .02 ? (wide ? .72 : .76) : clampN(tt + .5 * (1 - tt), .6, .82);
+  return {sx, sy, cw, ch, tx: .5, ty, h: wide ? .46 : (ar > .85 ? .42 : .38)};
+}
+function sceneAnchor(){
+  const t = val('bg'), p = PRESETS[t];
+  if(p){ const g = presetGeom(p); return {tx: g.tx, ty: g.ty, h: g.h, k: t + '|' + g.ty.toFixed(3)}; }
+  if(t === 'photo' && photos[selPhoto]){ const wide = W / H > 1.15; return {tx: .5, ty: wide ? .76 : .8, h: wide ? .46 : .4, k: 'photo'}; }
+  return null;
+}
+function fitTargets(useA){ const A = useA ? sceneAnchor() : null, ar = W / H; let tw = envKind ? .70 : .80, th = tw; if(A){ tw = ar > 1.15 ? .52 : .60; th = A.h; } return {A, tw, th}; }
+function fitDir(pv, up, useA){
+  if(!MET) return 3.4;
+  const T = fitTargets(useA); _fc.fov = cam.fov; _fc.aspect = W / H; _fc.clearViewOffset(); _fc.up.set(up[0], up[1], up[2]);
+  const place = d => { _fc.position.set(pv[0] * d, pv[1] * d, pv[2] * d); _fc.lookAt(0, 0, 0); _fc.updateMatrixWorld(true); };
+  let lo = .7, hi = 90;
+  for(let i = 0; i < 24; i++){ const d = (lo + hi) / 2; place(d); const b = ndcBox(_fc), f = b.ok ? Math.max((b.x1 - b.x0) / 2 / T.tw, (b.y1 - b.y0) / 2 / T.th) : 9; if(f > 1) lo = d; else hi = d; }
+  let d = hi;
+  if(T.A) for(let k = 0; k < 8; k++){
+    place(d); const b = ndcBox(_fc), p = ndcPt(_fc, MET.cx, MET.y0, MET.cz), sx = T.A.tx * W - (p[0] + 1) / 2 * W, sy = T.A.ty * H - (1 - p[1]) / 2 * H;
+    const L = (b.x0 + 1) / 2 * W + sx, R = (b.x1 + 1) / 2 * W + sx, Tp = (1 - b.y1) / 2 * H + sy, Bt = (1 - b.y0) / 2 * H + sy;
+    if(L >= .03 * W && R <= .97 * W && Tp >= .03 * H && Bt <= .985 * H) break; d *= 1.07;
+  }
+  return d;
+}
+function fitDistFor(eDeg){
+  if(!MET) return 3.4;
+  const e = clampN(Math.round(eDeg * 2) / 2, -80, 80), A = sceneAnchor(), key = [W, H, e, A ? A.k : '-', envKind ? 1 : 0, MET.s].join('|'), hit = fitCache.get(key); if(hit) return hit;
+  const er = THREE.MathUtils.degToRad(e), d = fitDir([0, Math.sin(er), Math.cos(er)], [0, 1, 0], true);
+  if(fitCache.size > 300) fitCache.clear(); fitCache.set(key, d); return d;
+}
+function autoShift(c, useA = true){
+  if(!MET) return {sx: 0, sy: 0};
+  c.clearViewOffset(); c.updateMatrixWorld(true);
+  const A = useA ? sceneAnchor() : null;
+  if(A){ const p = ndcPt(c, MET.cx, MET.y0, MET.cz); return {sx: A.tx * W - (p[0] + 1) / 2 * W, sy: A.ty * H - (1 - p[1]) / 2 * H}; }
+  const b = ndcBox(c); if(!b.ok) return {sx: 0, sy: 0};
+  return {sx: -(b.x0 + b.x1) / 2 * W / 2, sy: (b.y0 + b.y1) / 2 * H / 2};
+}
+function applyViewFor(c, useA){ const v = n0('vs') / 100, s = autoShift(c, useA); if(v || s.sx || s.sy) c.setViewOffset(W, H, -s.sx, -s.sy - v * H, W, H); else c.clearViewOffset(); }
+function applyView(){ applyViewFor(cam, true); const v = n0('vs') / 100; if(v) ocam.setViewOffset(W, H, 0, -v * H, W, H); else ocam.clearViewOffset(); }
+function orthoFit(c, fill){
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for(const q of RIM){ _fv.set(q[0], q[1], q[2]).applyMatrix4(c.matrixWorldInverse); if(_fv.x < x0) x0 = _fv.x; if(_fv.x > x1) x1 = _fv.x; if(_fv.y < y0) y0 = _fv.y; if(_fv.y > y1) y1 = _fv.y; }
+  if(!RIM.length){ x0 = y0 = -1; x1 = y1 = 1; }
+  const ar = W / H, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, hh = Math.max((y1 - y0) / 2, (x1 - x0) / 2 / ar) / fill * num('zm');
+  c.left = cx - hh * ar; c.right = cx + hh * ar; c.top = cy + hh; c.bottom = cy - hh; c.updateProjectionMatrix();
+}
+
+/* ---------- kamera ---------- */
+function camDist(e){ return fitDistFor(e) * num('zm') * zoomMul; }
+function placeCamera(extra = 0){
+  const e0 = num('el') + extra, e = THREE.MathUtils.degToRad(e0), a = THREE.MathUtils.degToRad(camAz), d = camDist(e0);
+  cam.up.set(0, 1, 0); cam.position.set(Math.sin(a) * Math.cos(e) * d, Math.sin(e) * d, Math.cos(a) * Math.cos(e) * d); cam.lookAt(0, 0, 0); applyView();
+}
+/* kamera turu: [kameranın nesne etrafındaki açısı°, ek yükseklik°, yakınlık çarpanı] */
+const TOUR = [[0, 0, 1], [55, -9, .95], [120, 16, .9], [190, 32, 1], [255, 6, .8], [305, -4, .9], [360, 0, 1]];
+function camMotion(t){
+  const mo = forceTour ? 'tour' : val('motion');
+  if(!isCamMotion(mo)){ const o = motionAt(t); return {spin: o.a * num('dir'), az: 0, e: o.e, z: o.z}; }
+  const TAU = Math.PI * 2; let A, e, z;
+  if(mo === 'tour'){ const n = TOUR.length - 1, s = t * n, i = Math.min(n - 1, Math.floor(s)), u = s - i, k = u < .2 ? 0 : sstep((u - .2) / .8), a = TOUR[i], b = TOUR[i + 1]; A = a[0] + (b[0] - a[0]) * k; e = a[1] + (b[1] - a[1]) * k; z = a[2] + (b[2] - a[2]) * k; }
+  else if(mo === 'sweep'){ const c = 1 - Math.cos(TAU * t); A = 58 * Math.sin(TAU * t); e = 5 * c; z = 1 - .07 * c; }
+  else { const c = 1 + Math.cos(TAU * t); A = 60 * Math.sin(TAU * t); e = 24 * c - 6; z = 1.05 - .075 * c; }
+  if(envKind){ const az = 16 * Math.sin(TAU * t); return {spin: (az - A) * Math.PI / 180, az, e, z}; }  /* 3B odada kamera az sallanır, model dönerek açıyı tamamlar */
+  return {spin: 0, az: A, e, z};
+}
+function frame(t){
+  if(t === null) t = phase; const mo = camMotion(t);
+  pivot.rotation.y = offset + mo.spin; zoomMul = mo.z; camAz = mo.az;
+  placeCamera(mo.e + (($('bob').checked || forceBob) ? 10 * Math.sin(2 * Math.PI * t) : 0)); if(matU.uGradOn.value > .5) updGradY();
+}
 
 /* ---------- kamera ve görünüm ---------- */
-let zoomMul = 1;
-function camDist(){ const fv = THREE.MathUtils.degToRad(cam.fov), fh = 2 * Math.atan(Math.tan(fv / 2) * cam.aspect); return 1.25 / Math.sin(Math.min(fv, fh) / 2) * num('zm') * zoomMul; }
-function placeCamera(extra = 0){ const d = camDist(), e = THREE.MathUtils.degToRad(num('el') + extra); cam.up.set(0, 1, 0); cam.position.set(0, Math.sin(e) * d, Math.cos(e) * d); cam.lookAt(0, 0, 0); }
-function frame(t){ if(t === null) t = phase; const mo = motionAt(t); pivot.rotation.y = offset + mo.a * num('dir'); zoomMul = mo.z; placeCamera(mo.e + (($('bob').checked || forceBob) ? 10 * Math.sin(2 * Math.PI * t) : 0)); if(matU.uGradOn.value > .5) updGradY(); }
 const n0 = id => parseFloat(val(id)) || 0;
 const floorOn = () => $('sh').checked && !envKind;
 function fitFloor(){
@@ -877,7 +975,7 @@ function applyTransform(){
   upG.rotation.x = z ? -Math.PI / 2 : 0;
   user.rotation.set(n0('rx') * d, n0('ry') * d, n0('rz') * d, 'XYZ'); user.scale.setScalar(num('sc'));
   root.position.set(n0('px') * k, (z ? n0('pz') : n0('py')) * k, (z ? -n0('py') : n0('pz')) * k);
-  $('vSc').textContent = num('sc').toFixed(2); fitFloor(); updDims();
+  $('vSc').textContent = num('sc').toFixed(2); fitFloor(); refreshMet(); updDims();
 }
 const orient = applyTransform;
 function applyLight(){
@@ -891,7 +989,7 @@ function setWire(on){ if(!mesh || !wireMesh) return; if(on && val('wstyle') !== 
 function restoreWire(){ if(wireMesh) wireMesh.visible = false; mat.wireframe = $('wf').checked; }
 function clearResults(){ lastFiles = []; lastImages = []; $('gal').innerHTML = ''; $('gal').style.display = 'none'; $('resBox').style.display = 'none'; $('vid').removeAttribute('src'); $('redl').disabled = true; idbS('r', 'clear').catch(() => {}); }
 function useFileColors(){ const vc = !!(curM && curM.col && $('fc').checked); if(mat.vertexColors !== vc){ mat.vertexColors = vc; mat.needsUpdate = true; } mat.color.copy(vc ? new THREE.Color(1, 1, 1) : lin(val('cm'))); }
-function applyLook(){ const m = MO ? [MO.r, MO.m] : MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = MO && MO.ei != null ? MO.ei : (m[1] ? 1.6 : .9); useFileColors(); applyMatExtras(); rim.intensity = .6 * num('ri'); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked && (!COARSE || busy); $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
+function applyLook(){ const m = MO ? [MO.r, MO.m] : MATS[val('mat')]; mat.roughness = m[0]; mat.metalness = m[1]; mat.envMapIntensity = MO && MO.ei != null ? MO.ei : (m[1] ? 1.6 : .9); useFileColors(); applyMatExtras(); rim.intensity = .6 * num('ri'); mat.wireframe = $('wf').checked; applyLight(); applyView(); drawBG(); key.castShadow = $('sh').checked; $('cols').style.display = ['solid', 'grad', 'studio', 'transparent'].includes(val('bg')) ? 'grid' : 'none'; labels(); }
 
 /*PARSE_START*/
 function parseSTL(buf){
@@ -1126,7 +1224,7 @@ document.querySelector('aside').addEventListener('input', saveSet);
 function loop(now){
   if(COARSE && lastT && now - lastT < 40){ requestAnimationFrame(loop); return; }
   const dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now;
-  if(!busy){ if(!paused && !drag) phase = (phase + dt / num('dur')) % 1; if(mesh) frame(phase); renderFrame(cam); }
+  if(!busy){ if(!paused && !drag) phase = (phase + dt / dd()) % 1; if(mesh) frame(phase); renderFrame(cam); }
   requestAnimationFrame(loop);
 }
 
@@ -1156,13 +1254,18 @@ function videoPlan(w, h, fps, dur, brMbps, lim, boost, minBpp = .06){
 const VIEWS = [['on', 'Ön', [0, 0, 1], [0, 1, 0], 'v_front'], ['arka', 'Arka', [0, 0, -1], [0, 1, 0], 'v_back'], ['sag', 'Sağ', [1, 0, 0], [0, 1, 0], 'v_right'], ['sol', 'Sol', [-1, 0, 0], [0, 1, 0], 'v_left'], ['ust', 'Üst', [0, 1, 0], [0, 0, -1], 'v_top'], ['alt', 'Alt', [0, -1, 0], [0, 0, 1], 'v_bot']];
 const ISO = ['izo', 'Iso', [1, .8, 1], [0, 1, 0], 'v_iso'];
 const surfaceScene = () => $('sh').checked && (!!envKind || !!PRESETS[val('bg')] || val('bg') === 'photo');
-async function renderView(v, mime, fo, noBlob){ zoomMul = 1;
-  let c = cam; const d = camDist(), n = Math.hypot(...v[2]), dir = v[2].map(x => x / n);
+async function renderView(v, mime, fo, noBlob){ zoomMul = 1; camAz = 0;
+  let c = cam; const n = Math.hypot(...v[2]), dir = v[2].map(x => x / n);
   viewHide = v[0] === 'ust' || v[0] === 'alt'; envShow = v[0] !== 'alt'; envG.rotation.y = Math.hypot(dir[0], dir[2]) > .01 ? Math.atan2(dir[0], dir[2]) : 0;
-  if((fo || $('ortho').checked) && !(surfaceScene() && Math.abs(v[2][1]) < .01)){ const s = 1.25 * num('zm'), hh = s * Math.max(1, H / W); Object.assign(ocam, {left: -hh * W / H, right: hh * W / H, top: hh, bottom: -hh}); ocam.updateProjectionMatrix(); c = ocam; }
-  const lift = surfaceScene() && Math.abs(v[2][1]) < .01 ? 12 * Math.PI / 180 : 0, pv = lift ? [dir[0] * Math.cos(lift), Math.sin(lift), dir[2] * Math.cos(lift)] : dir;
-  c.up.set(...v[3]); c.position.set(...pv.map(x => x * (c === ocam ? 5 : d))); c.lookAt(0, 0, 0);
-  pivot.rotation.y = 0; applyView(); renderFrame(c); viewHide = false; envShow = true; envG.rotation.y = 0; cam.up.set(0, 1, 0);
+  const surf = surfaceScene() && Math.abs(v[2][1]) < .01, lift = surf ? 12 * Math.PI / 180 : 0, pv = lift ? [dir[0] * Math.cos(lift), Math.sin(lift), dir[2] * Math.cos(lift)] : dir;
+  pivot.rotation.y = 0;
+  if((fo || $('ortho').checked) && !surf){
+    c = ocam; c.up.set(...v[3]); c.position.set(...pv.map(x => x * 5)); c.lookAt(0, 0, 0); c.updateMatrixWorld(true); orthoFit(c, .82);
+    const vs = n0('vs') / 100; if(vs) c.setViewOffset(W, H, 0, -vs * H, W, H); else c.clearViewOffset();
+  } else {
+    const d = fitDir(pv, v[3], surf) * num('zm'); c.up.set(...v[3]); c.position.set(...pv.map(x => x * d)); c.lookAt(0, 0, 0); applyViewFor(c, surf);
+  }
+  renderFrame(c); viewHide = false; envShow = true; envG.rotation.y = 0; cam.up.set(0, 1, 0);
   return noBlob ? null : blobOf(mime);
 }
 async function encodeWebCodecs(fps, N, base, span, safe, f = 1, boost = 1){
@@ -1241,7 +1344,7 @@ async function run(doVideo, doImgs, dirH, autoSave, setMode){
   $('bar').style.display = 'block'; progress(0);
   const files = []; let ok = true; let nb = outName(); const base0 = nb; let nk = 1; while(lastFiles.some(f => f.name.startsWith(nb + '.') || f.name.startsWith(nb + '_1_') || f.name.startsWith(nb + '_sheet.'))) nb = base0 + '_' + (++nk);
   try{
-    const fmt = val('fmt'), fps = parseInt(val('fps')) || 30, dur = num('dur') || 6, lim = limitBytes(), nVid = setMode ? 2 : (doVideo ? 1 : 0), imgShare = doImgs ? (nVid ? .3 : 1) : 0, vspan = nVid ? (1 - imgShare) / nVid : 0;
+    const fmt = val('fmt'), fps = parseInt(val('fps')) || 30, dur = dd(), lim = limitBytes(), extraTour = doVideo && !setMode && $('tourvid').checked && !isCamMotion(val('motion')), nVid = setMode ? 2 : (doVideo ? (extraTour ? 2 : 1) : 0), imgShare = doImgs ? (nVid ? .3 : 1) : 0, vspan = nVid ? (1 - imgShare) / nVid : 0;
     sizeFromUI(true); videoNote = '';
     if(doImgs){
       drawBG(fmt === 'jpeg');
@@ -1269,12 +1372,13 @@ async function run(doVideo, doImgs, dirH, autoSave, setMode){
       drawBG(true); const wv = $('wf').checked; setWire(wv);
       const out = await makeVideo(fps, dur, imgShare, vspan, wv ? 1.4 : 1); restoreWire(); const nm = `${nb}.${out.ext}`; files.push({name: nm, blob: out.blob}); addVid(out.blob, nm, true);
       if($('gif').checked){ drawBG(true); let gb; for(const [g0, f0] of [[640, 15], [480, 12], [360, 10], [260, 8]]){ gb = await makeGif(dur, g0, f0); if(!lim || gb.size <= lim) break; } files.push({name: `${nb}.gif`, blob: gb}); }
+      if(extraTour){ forceTour = true; drawBG(true); setWire(wv); setMsg(T('m_tour')); const o2 = await makeVideo(fps, Math.min(30, Math.max(10, dur * 1.6)), imgShare + vspan, vspan, wv ? 1.4 : 1); forceTour = false; restoreWire(); const n2 = `${nb}_camera_tour.${o2.ext}`; files.push({name: n2, blob: o2.blob}); addVid(o2.blob, n2, true); }
     }
     lastFiles = lastFiles.concat(files); resSave(files); lastImages = lastFiles.filter(f => /\.(png|jpe?g|webp)$/i.test(f.name)); $('redl').disabled = false; $('gal').scrollIntoView({block: 'nearest'}); let where = ''; if(autoSave){ setMsg(T('m_save')); where = await saveAll(files, dirH); }
     if(doVideo || setMode){ $('vid').style.display = 'block'; $('dl').style.display = 'inline-flex'; $('resBox').style.display = 'flex'; $('vid').play().catch(() => {}); } $('gal').style.display = 'grid';
     showTab('res'); progress(1); setMsg((autoSave ? T('m_done', fileName, files.length, where) : T('m_gen', fileName, files.length)) + (videoNote ? ' ' + videoNote : ''));
   }catch(e){ ok = false; setMsg(e.message || String(e), true); console.error(e); }
-  forceBob = false; try{ restoreWire(); }catch(e){}
+  forceBob = false; forceTour = false; try{ restoreWire(); }catch(e){}
   busy = false; ['all', 'onlyV', 'onlyI'].forEach(i => $(i).disabled = false); $('batch').disabled = false;
   sizeFromUI(); applyLook(); setTimeout(() => $('bar').style.display = 'none', 800);
   return ok;
@@ -1323,11 +1427,9 @@ const refImg = new Image(); let refReady = false;
 refImg.onload = () => { refReady = true; if(envKind && envKind.startsWith('ref')){ envKind = null; bakeKey = ''; } if(PRESETS[val('bg')] || envKind === null) drawBG(); }; refImg.src = REF;
 function drawPreset(g, p){
   if(!refReady){ g.fillStyle = '#9aa0a5'; g.fillRect(0, 0, W, H); return; }
-  const iw = refImg.width, ih = refImg.height, ar = W / H, sa = iw / ih; let cw, ch;
-  if(ar > sa){ cw = iw; ch = iw / ar; } else { ch = ih; cw = ih * ar; } cw /= p.z; ch /= p.z;
-  const sx = Math.max(0, Math.min(iw - cw, p.cx * iw - cw / 2)), sy = Math.max(0, Math.min(ih - ch, p.cy * ih - ch / 2));
+  const q = presetGeom(p), k = refImg.width / 896 || 1;
   g.save(); g.imageSmoothingQuality = 'high'; if(p.f) g.filter = p.f; if(p.flip){ g.translate(W, 0); g.scale(-1, 1); }
-  g.drawImage(refImg, sx, sy, cw, ch, 0, 0, W, H); g.restore();
+  g.drawImage(refImg, q.sx * k, q.sy * k, q.cw * k, q.ch * k, 0, 0, W, H); g.restore();
 }
 function analyze(img){
   const c = document.createElement('canvas'); c.width = 24; c.height = 32; const g = c.getContext('2d'); g.drawImage(img, 0, 0, 24, 32);
@@ -1351,7 +1453,7 @@ function sceneDefaults(){
   else if(t === 'photo' && photos[selPhoto]) d = analyze(photos[selPhoto].img);
   else d = {la: 35, lw: 0, ls: 1, vs: 0, blur: num('blur')};
   $('la').value = d.la; $('lw').value = d.lw; $('ls').value = d.ls; $('vs').value = d.vs; $('blur').value = d.blur; $('ts').value = 0; $('sa').value = .28;
-  if(e) $('el').value = e.el;
+  if(e) $('el').value = e.el; if(p) $('el').value = p.el || 24;
   if(!colorTouched) $('cm').value = e ? e.col : '#d8d3c9';
   applyLook(); labels(); saveSet();
 }
@@ -1452,7 +1554,7 @@ function bake(c){
 function renderFrame(c){
   const under = !!mesh && c.position.y < floor.position.y + .02, sh = $('sh').checked && !viewHide && !under; fillB.intensity = under ? 1.2 * num('ls') : 0;
   if(envKind){
-    const show = envShow && !under, baked = show && num('blur') > 0 && (!COARSE || busy);
+    const show = envShow && !under, baked = show && num('blur') > 0 && (!COARSE || busy || !(isCamMotion(val('motion')) || ['spiral', 'dolly', 'cine'].includes(val('motion')) || $('bob').checked));
     if(baked) bake(c); else scene.background = envBg;
     envG.visible = show && !baked; floor.visible = sh && (baked || !show);
   } else floor.visible = sh;
@@ -1481,7 +1583,7 @@ async function snapshot(){
     lastFiles.push({name: nm, blob}); lastImages.push({name: nm, blob}); resSave([{name: nm, blob}]); addThumb(blob, nm, '📷 ' + snapN);
     $('gal').style.display = 'grid'; $('redl').disabled = false; showTab('res'); $('gal').scrollIntoView({block: 'nearest'});
   }catch(e){ setMsg(String(e.message || e), true); }
-  finally{ busy = false; key.castShadow = $('sh').checked && !COARSE; sizeFromUI(); }
+  finally{ busy = false; key.castShadow = $('sh').checked; sizeFromUI(); }
 }
 $('snap').onclick = snapshot;
 document.addEventListener('keydown', e => {
@@ -1747,7 +1849,7 @@ document.querySelectorAll('.tabbar button').forEach((b, i) => icon(b, {scene: 's
 $('pau').addEventListener('click', () => setTimeout(() => icon($('pau'), paused ? 'play' : 'pause'), 0));
 function restoreV8(){ if(val('mpid')) applyPresetById(val('mpid'), true); else applyMatExtras(); buildLooks(); rim.intensity = .6 * num('ri'); renderer.toneMappingExposure = .95 * num('exps'); updPA(); }
 
-loadSet(); if(!val('bg')) $('bg').value = 'ref'; applyLang(); sizeFromUI(); labels(); if(firstRun) sceneDefaults(); else applyLook(); requestAnimationFrame(loop);
+loadSet(); if(firstRun && COARSE && !$('opre').value) $('res').value = '1080x1350'; if(!val('bg')) $('bg').value = 'ref'; applyLang(); sizeFromUI(); labels(); if(firstRun) sceneDefaults(); else applyLook(); requestAnimationFrame(loop);
 restoreV8();
 
 </script>
@@ -1764,7 +1866,7 @@ restoreV8();
 <div class="box"><h3>Özellikler</h3><ul><li>Gerçekçi 3B sahneler, fotoğraf arka planları ve şeffaf PNG çıktısı</li><li>Sabit sırayla dokuz numaralı resim (tel kafes, gölgeli, ortografik, ön, sağ, sol, arka, alt, üst), isteğe bağlı GIF ve katalog sayfası</li><li>Birim seçimiyle hacim, yüzey alanı ve PLA ağırlık tahmini</li><li>Dört renk teması, yedi arayüz dili</li><li>İlk ziyaretten sonra çevrimdışı çalışan, kurulabilir uygulama</li><li>%100 tarayıcıda çalışır: modelin cihazından çıkmaz</li></ul></div></div>
 <div class="box"><h3>Etkileyici baskı önizlemeleri için ipuçları</h3><ul><li>Modelin en detaylı yüzünü kameraya çevir, temiz bir taban için "Düz yüzeye yatır"ı kullan.</li><li>Sade bir sahne ve yumuşak gölge seç; model öne çıksın.</li><li>Instagram için 1080×1080, Reels, TikTok ve Shorts için 1080×1920, pazar yerleri için 1920×1080 dışa aktar.</li><li>Alıcıya güven vermek için model adı ve boyutunu alt yazı olarak ekle.</li></ul></div>
 <div class="box"><h3>Sık sorulan sorular</h3><h4>3D dosyam bir sunucuya yükleniyor mu?</h4><p>Hayır. Dönüştürme tamamen tarayıcında WebGL ile yapılır; STL, 3MF ve OBJ dosyaların cihazından çıkmaz.</p><h4>Hangi dosya biçimleri destekleniyor?</h4><p>STL (ikili ve ASCII), 3MF, OBJ ve PLY; renkli modeller dahil. Birden fazla model yükleyip sırayla işleyebilirsin.</p><h4>Neler dışa aktarabilirim?</h4><p>MP4 döner video (cihazın izin verdiği yerde 4K&#x27;ya kadar), PNG, JPG veya WebP olarak dokuz numaralı resim (tel kafes, gölgeli, ortografik, ön, sağ, sol, arka, alt, üst), isteğe bağlı GIF ve katalog sayfası.</p><h4>Modelim neden çok küçük veya hacim 0 çıkıyor?</h4><p>STL dosyalarında birim yoktur. Model sekmesinden dosya birimini (mm, cm, m, inç) seç veya gerçek en uzun kenarı milimetre olarak yaz; hacim ve ağırlık tahmini güncellenir.</p><h4>Telefonuma uygulama olarak kurabilir miyim?</h4><p>Evet. Siteyi Android Chrome&#x27;da aç, &quot;Uygulamayı yükle&quot; düğmesine bas veya tarayıcı menüsünden &quot;Uygulamayı yükle&quot; seç. Sonra tam ekran açılır ve ilk ziyaretten sonra çevrimdışı çalışır.</p><h4>STLtoMP4 ücretsiz mi?</h4><p>Evet, kişisel ve ticari kullanım için ücretsizdir. Site reklamlarla desteklenir.</p></div></section>
-<section class="guides" lang="en"><div class="box"><h3>Guides for makers</h3><ul><li><a href="stl-vs-3mf-vs-obj-vs-ply.html">STL vs 3MF vs OBJ vs PLY: Which 3D File Format Should You Use?</a> – A practical comparison of STL, 3MF, OBJ and PLY: what each format stores, where it breaks, how large the files get and when to pick each one.</li><li><a href="how-to-make-a-3d-print-turntable-video.html">How to Make a Turntable Video of a 3D Model</a> – Step-by-step guide to a smooth, loopable turntable video of a 3D model: preparation, lighting, camera, duration, resolution, bitrate and file size.</li><li><a href="3d-print-preview-image-sizes-and-views.html">Best Image Sizes and Views for 3D Print Listings and Social Media</a> – Which views, aspect ratios, resolutions and file formats work best for 3D model listings, marketplaces, Instagram, Reels, TikTok and YouTube.</li><li><a href="fix-stl-scale-units-and-orientation.html">Why Your STL Looks Too Small, Too Big or Upside Down</a> – STL files carry no units and no up direction. Learn why models import at the wrong size or rotation, and how to correct scale, axis and base.</li><li><a href="estimate-3d-print-weight-and-filament-cost.html">How to Estimate 3D Print Weight and Filament Cost from an STL</a> – Estimate filament weight and cost from model volume, material density and infill, with worked examples and a table of common densities.</li><li><a href="how-to-write-a-3d-model-listing.html">How to Write a 3D Model Listing That Sells</a> – A practical structure for 3D model listings: titles, opening lines, technical details, images, licence terms and how to improve from buyer questions.</li><li><a href="check-stl-before-printing.html">How to Check an STL File Before You Print or Sell It</a> – A practical pre-print checklist: watertight meshes, flipped normals, wall thickness, overhangs, flat base, clearances and the tools that repair problems.</li><li><a href="reduce-stl-file-size.html">How to Reduce STL File Size Without Losing Visible Detail</a> – Why STL files get huge and how to shrink them: binary export, decimation, triangle budgets, removing hidden geometry, 3MF and zip compression.</li><li><a href="layer-height-infill-and-walls-explained.html">Layer Height, Infill and Walls: What Each Setting Really Does</a> – A plain explanation of the three print settings that matter most: layer height, infill and wall count, with ranges, trade-offs and starting points.</li><li><a href="lighting-and-materials-for-3d-renders.html">Lighting, Colour and Material Choices for 3D Model Renders</a> – How to light and colour 3D model previews so they look like the real print: key and fill light, shadows, matte vs glossy, backgrounds and honest colour.</li><li><a href="mp4-vs-gif-vs-webp-for-3d-previews.html">MP4 vs GIF vs WebP: Which Format for 3D Model Previews?</a> – Compare MP4, GIF and animated WebP for 3D previews: file size, quality, colours, transparency, looping and where each format is accepted.</li></ul><p><a href="guides.html">All guides / Tüm rehberler</a></p></div></section>
+<section class="guides" lang="en"><div class="box"><h3>Guides for makers</h3><ul><li><a href="stl-vs-3mf-vs-obj-vs-ply.html">STL vs 3MF vs OBJ vs PLY: Which 3D File Format Should You Use?</a> – A practical comparison of STL, 3MF, OBJ and PLY: what each format stores, where it breaks, how large the files get and when to pick each one.</li><li><a href="how-to-make-a-3d-print-turntable-video.html">How to Make a Turntable Video of a 3D Model</a> – Step-by-step guide to a smooth, loopable turntable video of a 3D model: preparation, lighting, camera, duration, resolution, bitrate and file size.</li><li><a href="3d-print-preview-image-sizes-and-views.html">Best Image Sizes and Views for 3D Print Listings and Social Media</a> – Which views, aspect ratios, resolutions and file formats work best for 3D model listings, marketplaces, Instagram, Reels, TikTok and YouTube.</li><li><a href="fix-stl-scale-units-and-orientation.html">Why Your STL Looks Too Small, Too Big or Upside Down</a> – STL files carry no units and no up direction. Learn why models import at the wrong size or rotation, and how to correct scale, axis and base.</li><li><a href="estimate-3d-print-weight-and-filament-cost.html">How to Estimate 3D Print Weight and Filament Cost from an STL</a> – Estimate filament weight and cost from model volume, material density and infill, with worked examples and a table of common densities.</li><li><a href="how-to-write-a-3d-model-listing.html">How to Write a 3D Model Listing That Sells</a> – A practical structure for 3D model listings: titles, opening lines, technical details, images, licence terms and how to improve from buyer questions.</li><li><a href="check-stl-before-printing.html">How to Check an STL File Before You Print or Sell It</a> – A practical pre-print checklist: watertight meshes, flipped normals, wall thickness, overhangs, flat base, clearances and the tools that repair problems.</li><li><a href="reduce-stl-file-size.html">How to Reduce STL File Size Without Losing Visible Detail</a> – Why STL files get huge and how to shrink them: binary export, decimation, triangle budgets, removing hidden geometry, 3MF and zip compression.</li><li><a href="layer-height-infill-and-walls-explained.html">Layer Height, Infill and Walls: What Each Setting Really Does</a> – A plain explanation of the three print settings that matter most: layer height, infill and wall count, with ranges, trade-offs and starting points.</li><li><a href="lighting-and-materials-for-3d-renders.html">Lighting, Colour and Material Choices for 3D Model Renders</a> – How to light and colour 3D model previews so they look like the real print: key and fill light, shadows, matte vs glossy, backgrounds and honest colour.</li><li><a href="mp4-vs-gif-vs-webp-for-3d-previews.html">MP4 vs GIF vs WebP: Which Format for 3D Model Previews?</a> – Compare MP4, GIF and animated WebP for 3D previews: file size, quality, colours, transparency, looping and where each format is accepted.</li><li><a href="camera-angles-for-3d-model-videos.html">Camera Angles for 3D Model Videos: Beyond the Turntable</a> – Eye level, three-quarter, high and low angles, orbit, sweep and fly-over, with a reusable shot list.</li><li><a href="choosing-a-scene-and-background-for-3d-previews.html">Choosing a Scene and Background for 3D Model Previews</a> – Plain, photo and 3D room backgrounds, grounding the object on its surface and sizing for phones.</li><li><a href="how-stltomp4-works.html">How STLtoMP4 Works</a> – Rendering and encoding inside your browser, privacy and limits.</li><li><a href="troubleshooting-stl-to-mp4.html">Troubleshooting STL to MP4</a> – Fixes for black frames, wrong framing, slow exports and files that will not play.</li><li><a href="3d-model-glossary.html">3D Model, Rendering and Video Glossary</a> – Short definitions of common terms.</li><li><a href="stl-dosyasi-nedir.html">STL Dosyası Nedir? (Türkçe)</a> – STL, OBJ ve 3MF farkları ve önizleme videosu rehberi.</li></ul><p><a href="guides.html">All guides / Tüm rehberler</a></p></div></section>
 <footer><nav aria-label="Site"><a href="guides.html">Guides / Rehberler</a> · <a href="about.html">About / Hakkında</a> · <a href="privacy.html">Privacy Policy / Gizlilik</a> · <a href="terms.html">Terms / Koşullar</a> · <a href="contact.html">Contact / İletişim</a></nav><p>&copy; 2026 STLtoMP4.com – Free browser-based 3D converter</p></footer>
 </article>
 </body>
